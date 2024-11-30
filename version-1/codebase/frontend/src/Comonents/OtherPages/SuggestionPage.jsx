@@ -1,0 +1,279 @@
+import React, { useState } from "react";
+import SuggestionHeader from "./SuggestionHeader";
+import Girl from "../../assets/headerIcon/girl.jpg";
+import Boy1 from "../../assets/headerIcon/boy1.png";
+import Boy2 from "../../assets/headerIcon/boy2.jpg";
+import communityafter from "../../assets/communityafter.png";
+import communitybefore from "../../assets/communitybefore.png";
+
+const SuggestionPage = () => {
+  const [joinCommunity, setJoinCommunity] = useState([
+    {
+      id: 1,
+      name: "Adventurer",
+      handle: "12K Travel Enthusiast",
+      image: Girl,
+    },
+    {
+      id: 2,
+      name: "Explorer",
+      handle: "12K Travel Enthusiast",
+      image: Boy1,
+    },
+    {
+      id: 3,
+      name: "Foodie",
+      handle: "12K Travel Enthusiast",
+      image: Boy2,
+    },
+    {
+      id: 4,
+      name: "Traveler",
+      handle: "12K Travel Enthusiast",
+      image: Boy1,
+    },
+    {
+      id: 5,
+      name: "Teerthstal",
+      handle: "12K Travel Enthusiast",
+      image: Girl,
+    },
+    {
+      id: 6,
+      name: "Traveler",
+      handle: "12K Travel Enthusiast",
+      image: Boy2,
+    },
+    {
+      id: 7,
+      name: "TravSo",
+      handle: "253K Travel Enthusiast",
+      image: Boy2,
+    },
+  ]);
+
+  const [imageStates, setImageStates] = useState({});
+  const [showFollow, setShowFollow] = useState(true);
+
+  const handleImageClick = (id) => {
+    setImageStates((prevStates) => {
+      const newState = { ...prevStates };
+      newState[id] =
+        newState[id] === communitybefore ? communityafter : communitybefore;
+      return newState;
+    });
+  };
+
+  const [cardsData, setCardsData] = useState([
+    {
+      id: 1,
+      name: "Pankaj Reet Tech",
+      title: "Solo Traveler",
+      description:
+        "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
+      image: Boy1,
+      follow: true
+    },
+    {
+      id: 2,
+      name: "Lakshit Bhayana",
+      title: "Solo Traveler",
+      description:
+        "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
+      image: Girl,
+      follow: true
+    },
+    {
+      id: 3,
+      name: "Pankaj Reet Tech",
+      title: "Solo Traveler",
+      description:
+        "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
+      image: Boy1,
+      follow: true
+    },
+    {
+      id: 4,
+      name: "John Doe",
+      title: "Solo Traveler",
+      description:
+        "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
+      image: Girl,
+      follow: true
+    },
+    {
+      id: 5,  
+      name: "Jane Smith",
+      title: "Solo Traveler",
+      description:
+        "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
+      image: Boy1,
+      follow: true
+    },
+    {
+      id: 6,
+      name: "Anna Brown",
+      title: "Solo Traveler",
+      description:
+        "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
+      image: Girl,
+      follow: true
+    },
+  ])
+
+   
+
+  const handleFollow = (userId) => {
+    setCardsData((prevData) =>
+      prevData.map((card) =>
+        card.id === userId ? { ...card, follow: !card.follow } : card
+      )
+    );
+  };
+
+  return (
+    <>
+      <SuggestionHeader />
+      <div className="bg-[#F0F7F7] p-6 flex justify-center items-center">
+        <div className="w-[1240px] container mx-auto flex flex-col gap-3">
+          <h2 className="font-poppins font-semibold text-[32px] text-[#212626] text-left mt-3">
+            Follow at least 3 community or people to get started
+          </h2>
+
+          <div className="flex items-center justify-between mt-3">
+            <h2 className="text-left font-poppins font-semibold text-[24px] text-[#212626]">
+              Community Suggestion For You
+            </h2>
+            <p className="font-inter font-medium text-[16px] text-[#667877]">
+              View More
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
+            {cardsData.map((card, index) => (
+              <div
+                key={index}
+                className="bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] transition-transform transform hover:scale-10 rounded-[10px]"
+              >
+                <img
+                  src={card.image}
+                  alt={card.name}
+                  className="w-full h-[240px] object-cover rounded-t-[8px]"
+                />
+                <div className="p-[16px]">
+                  <h3 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
+                    {card.name}
+                  </h3>
+                  <p className="text-left font-inter font-medium text-[14px] text-[#667877] mb-2">
+                    {card.title}
+                  </p>
+                  <p className="font-inter font-medium text-[14px] text-[#364045] text-left text-justify">
+                    {card.description}
+                  </p>
+                  <div className="flex items-center justify-between mt-4">
+                    <button className="bg-teal-500 w-[175px] h-[48px] text-white font-inter font-medium text-[16px] p-[12px] rounded-[8px] hover:bg-teal-600" onClick={() => handleFollow(card.id)}>
+                      {card.follow ? "Follow" : "Following"}
+                    </button>
+                    <button className="border-2 border-[#2DC6BE] w-[175px] h-[48px] text-[#2DC6BE] font-inter font-medium text-[16px] p-[12px] rounded-[8px]">
+                      Add as buddy
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between mt-5">
+            <h2 className="text-left font-poppins font-semibold text-[24px] text-[#212626]">
+            Influencer Suggestion  For You
+            </h2>
+            <p className="font-inter font-medium text-[16px] text-[#667877]">
+              View More
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
+            {cardsData.map((card, index) => (
+              <div
+                key={index}
+                className="bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] transition-transform transform hover:scale-10 rounded-[10px]"
+              >
+                <img
+                  src={card.image}
+                  alt={card.name}
+                  className="w-full h-[240px] object-cover rounded-t-[8px]"
+                />
+                <div className="p-[16px]">
+                  <h3 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
+                    {card.name}
+                  </h3>
+                  <p className="text-left font-inter font-medium text-[14px] text-[#667877] mb-2">
+                    {card.title}
+                  </p>
+                  <p className="font-inter font-medium text-[14px] text-[#364045] text-left text-justify">
+                    {card.description}
+                  </p>
+                  <div className="flex items-center justify-between mt-4">
+                    <button className="bg-teal-500 w-[175px] h-[48px] text-white font-inter font-medium text-[16px] p-[12px] rounded-[8px] hover:bg-teal-600">
+                      Follow
+                    </button>
+                    <button className="border-2 border-[#2DC6BE] w-[175px] h-[48px] text-[#2DC6BE] font-inter font-medium text-[16px] p-[12px] rounded-[8px]">
+                      Add as buddy
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+
+
+          <div className="flex items-center justify-between mt-5">
+            <h2 className="text-left font-poppins font-semibold text-[24px] text-[#212626]">
+            Travel buddy Suggestion  For You
+            </h2>
+            <p className="font-inter font-medium text-[16px] text-[#667877]">
+              View More
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
+            {cardsData.map((card, index) => (
+              <div
+                key={index}
+                className="bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] transition-transform transform hover:scale-10 rounded-[10px]"
+              >
+                <img
+                  src={card.image}
+                  alt={card.name}
+                  className="w-full h-[240px] object-cover rounded-t-[8px]"
+                />
+                <div className="p-[16px]">
+                  <h3 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
+                    {card.name}
+                  </h3>
+                  <p className="text-left font-inter font-medium text-[14px] text-[#667877] mb-2">
+                    {card.title}
+                  </p>
+                  <p className="font-inter font-medium text-[14px] text-[#364045] text-left text-justify">
+                    {card.description}
+                  </p>
+                  <div className="flex items-center justify-between mt-4">
+                    <button className="bg-teal-500 w-[175px] h-[48px] text-white font-inter font-medium text-[16px] p-[12px] rounded-[8px] hover:bg-teal-600">
+                      Follow
+                    </button>
+                    <button className="border-2 border-[#2DC6BE] w-[175px] h-[48px] text-[#2DC6BE] font-inter font-medium text-[16px] p-[12px] rounded-[8px]">
+                      Add as buddy
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default SuggestionPage;

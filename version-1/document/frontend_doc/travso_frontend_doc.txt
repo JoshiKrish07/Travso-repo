@@ -1,0 +1,160 @@
+
+Travso App Development Documentation
+LOGIN AND SIGNUP MODULE DOC
+
+Project Name :- Travso
+
+==========================================================================
+
+Process = SignUp
+Main Component = SignupPage.jsx
+Folder Destination :- src/Components/MainPages/SignupPage.jsx
+
+=> Created designs of all pages of signup. Sign up process consists of following Steps :-
+  Step-1 : Gather Basic information of user like:-
+	   i) Full Name
+    ii) Gender
+	 iii) State
+    iv) City
+     v) DOB
+	  vi) Email-id
+	 vii) Mobile Number
+
+  -> component used = SignupStep1.jsx
+
+  When user provides above details and clicks on next button, we ask for OTP verification on given 
+  mobile number. Once the user is verified we move to step-2.
+
+ Step-2 : On Step-2 we have two button asking for "Are you an influencer?". By default we it is "No".
+	  If user selects "Yes", Then we ask for any two social media links. User will have to provide
+	  atleast one social media link. In this we set the type of user(influencer or traveler(default))
+
+   -> component used = InfluencerPage.jsx
+   
+ Step-3 : This is the final Process of Signup. we ask for user details like:-
+	  i) username
+	  ii) Description
+	  iii) Create Passsword
+	  iv) Confirm Password
+
+	Once the user fills all entries, we will redirect to login page if api response is success.
+
+   -> component used = AlmostPage.jsx
+
+
+================================================================================================================
+
+Redux slice for calling Signup Process apis
+folder destination :- src/redux/authSlice
+=>  created thunk functions :-
+1)  registerUser function :- It is calling signup api from backend and storing data in user state.
+2)  generateOtp function :- It is calling otp api with generate action.
+3)  verifyOtp function :- It is calling otp api with verify action.
+4)  resendOTP function :- It is calling resend-otp api for a new OTP.
+ =>  Used on SignupStep1.jsx in handleNextStep1() function.
+
+5) finalSignup function :- It is calling final-signup for taking user name, description and password.
+ =>  Used on SignUp.jsx in handleSubmit() function.
+
+6) setInfluencerType :- It is calling followers-count api to verify a user can be set as influencer or not.
+ =>  Used on InfluencerPage.jsx in handleNextStep2() function.
+
+7) loginUser function :- It is calling login api.
+ =>  Used on LoginPage.jsx in handleSubmit() function.
+
+8) getEmailOTP function :- It is calling email-otp api to get email otp(forgot password section).
+ =>  Used on LoginPage.jsx in handleNext() function.
+
+9) getMobileOTPForgotPass function :- It is calling mobile-otp to get otp on mobile(forgot password section).
+ =>  Used on LoginPage.jsx in handleNext() function.
+
+10) verifyForgotPassOTP function :- It is calling fp-otp-verify api to verify otp sent on mobile number or email(forgot password section).
+=>  Used on LoginPage.jsx in handleVerify() function.
+
+11) updatePassword function :- It is calling update-password api to create new password(forgot password section).
+=>  Used on LoginPage.jsx in handleSubmitPassword() function.
+
+
+-> Redux for state and city api:-
+folder destination :- src/redux/StateCitySlice.js
+1) fetchStates function :- It is calling third-party api for states of India.
+2) fetchCities function :- It is calling third-part api for cities of particular state.
+
+ =>  fetchStates -> Used on SignupStep1.jsx in useEffect() function.
+=>  fetchCities -> Used on SignupPage.jsx in handleSelectChange() function.
+
+=========================================================================================================
+
+Process :- Login and forgot Password
+
+1) Taking user name and password for login and calling handleSubmit() function for login.
+   redux function used :- loginUser()
+
+2) forgot password section :-
+   i) Through mobile otp :- Taking user mobile number and username and calling handleNext() function.
+  ii) Through email otp :- Taking user email and username and calling handleNext() function.
+ iii) Verify OTP :- OTP fields to enter OTP and calling handleVerify() function which in return calls verifyForgotPassOTP() function from redux.
+  iv) Change Password :- Inputs for password and confirm password and calling handleSubmitPassword() function which calls updatePassword() from redux.
+
+For validation :-
+  i) Login :- validateInputs() function is used.
+ ii) Forgot Password :- validateFpInputs() is used.
+
+ =========================================================================================================
+
+Process :- User MODULE
+
+-> Redux functions used
+
+file:- postSlice.js
+1) getAllPosts function :- It is fetching all posts.
+2) commentOnPost function :- It is used to send the comment to backend which a user has made on any post.
+3) LikeUnlikePost function :- It is used to send data to backend for like and unlike on any post
+
+file:- authSlice.js
+1) getUserBuddies function :- It is used to fetch buddies data of a user.
+2) getUserFollowers function :- It is used to fetch the follower of a user.
+3) toWhomUserIsFollowing function :- It is used to fetch to whom user is following.
+4) getUserDetails function :- Fetching user details like full_name, user_name.
+5) getUserPosts function :- It is fetching user's post.
+6) removeProfileImage :- It is calling api which will delete user profile image from database.
+7) getAllUsers function :- It is calling api to fetch users, which we will use in search filter.
+8) removeCoverImage function :- It is calling api to remove cover image.
+9) uploadCoverImage function :- It is calling api to upload cover image.
+10) uploadProfileImage function :- It is calling api to update profile image of user.
+
+file destination :- src/Components/OtherPages/Sidebar.jsx
+
+We are using following redux functions on this page for showing information on POST section, Info, buddies, followers and following of a user
+1) getUserBuddies()
+2) getUserDetails()
+3) getUserPosts()
+4) getUserFollowers()
+5) toWhomUserIsFollowing()
+
+file destination :- src/Components/OtherPages/AllPopupComponent/CommentPopup.jsx
+=> CommentPopup Component :- Used on to show comment of particular post.
+                          -> Handled by setActivePostId state.(to show popup)
+                          -> We pass post id to this component and usimg this show the data of post on popup.
+
+
+file destination :- src/Components/OtherPages/EditProfile.jsx
+
+1) handleCoverUpload() function :- Using redux function uploadCoverImage() to upload a cover image.
+2) removeCoverPic() function :- Using redux function removeCoverImage(), removing cover photo on edit profile page.
+3) handleImageRemove() function :- Using redux function removeProfileImage(), removing profile image of user.
+4) Showing all the details of user using getUserDetails() function.
+5) Using redux function fetchCities(), giving dropdown to select city for edit.
+=============================================================================================================================================
+
+Module :- Search Bar
+1) Using getUserDetails function showing users according to search value.
+2) seacrhAccordingTo() function :- Given condition to show search according to:-
+    i) Place
+   ii) Buddies 
+  iii) Tags 
+   iv) Posts
+    v) Badges
+3) removeFromSeacrh() function :- Removes a option from search list.
+
+===========================================================================================================

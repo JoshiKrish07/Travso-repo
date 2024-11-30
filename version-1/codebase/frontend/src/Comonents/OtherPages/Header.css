@@ -1,0 +1,43 @@
+
+ 
+ .navitemData {
+    transition: transform 0.3s ease;
+  }
+
+  .navitemData:hover {
+    transform: scale(1); /* Scales up the item without changing layout */
+  }
+   
+   .navitemData .css-1umw9bq-MuiSvgIcon-root {
+    fill: rgb(176 187 193) !important;
+  }
+  
+  .navitemData:hover .css-1umw9bq-MuiSvgIcon-root {
+    fill: rgb(253, 254, 255) !important;
+    background-color: #1DB2AA;
+    padding: 4px;
+    border-radius: 20px;
+    height: 29px;
+    width: 30px;
+  }
+
+  .navitemDatas .css-1umw9bq-MuiSvgIcon-root {
+    fill: rgb(176 187 193) !important;
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .navitemDatas:hover .css-1umw9bq-MuiSvgIcon-root {
+    fill: rgb(253, 254, 255) !important;
+    background-color: #1DB2AA;
+    padding: 4px;
+    border-radius: 20px;
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+  
+  .navitemData:hover .labelData {
+    color: black;
+    font-weight: 600;
+  }
+  
