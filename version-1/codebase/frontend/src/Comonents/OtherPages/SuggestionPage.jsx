@@ -5,6 +5,9 @@ import Boy1 from "../../assets/headerIcon/boy1.png";
 import Boy2 from "../../assets/headerIcon/boy2.jpg";
 import communityafter from "../../assets/communityafter.png";
 import communitybefore from "../../assets/communitybefore.png";
+import DotThree from "../../assets/dotthree.png";
+import starBadges from "../../assets/starBadges.png";
+
 
 const SuggestionPage = () => {
   const [joinCommunity, setJoinCommunity] = useState([
@@ -53,7 +56,6 @@ const SuggestionPage = () => {
   ]);
 
   const [imageStates, setImageStates] = useState({});
-  const [showFollow, setShowFollow] = useState(true);
 
   const handleImageClick = (id) => {
     setImageStates((prevStates) => {
@@ -64,6 +66,8 @@ const SuggestionPage = () => {
     });
   };
 
+
+  
   const [cardsData, setCardsData] = useState([
     {
       id: 1,
@@ -161,6 +165,119 @@ const SuggestionPage = () => {
                   className="w-full h-[240px] object-cover rounded-t-[8px]"
                 />
                 <div className="p-[16px]">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
+                        {card.name}
+                      </h3>
+                    </div>
+                    <div>
+                      <img src={DotThree} alt={DotThree} className="h-4" />
+                    </div>
+                  </div>
+                  <p className="text-left font-inter font-medium text-[14px] text-[#667877] mb-2 -mt-1">
+                    {card.title}
+                  </p>
+                  <p className="font-inter font-medium text-[14px] text-[#364045] text-left text-justify">
+                    {card.description}
+                  </p>
+                  <div className="flex items-center justify-between mt-4">
+                    <button className="bg-teal-500 w-[175px] h-[48px] text-white font-inter font-medium text-[16px] p-[12px] rounded-[8px] hover:bg-teal-600" onClick={() => handleFollow(card.id)}>
+                    {card.follow ? "Follow" : "Following"}
+                    </button>
+                    <button className="border-2 border-[#2DC6BE] w-[175px] h-[48px] text-[#2DC6BE] font-inter font-medium text-[16px] p-[12px] rounded-[8px]">
+                      Add as buddy
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between mt-5">
+            <h2 className="text-left font-poppins font-semibold text-[24px] text-[#212626]">
+              Influencer Suggestion For You
+            </h2>
+            <p className="font-inter font-medium text-[16px] text-[#667877]">
+              View More
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
+            {cardsData.map((card, index) => (
+              <div
+                key={index}
+                className="bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] transition-transform transform hover:scale-10 rounded-[10px]"
+              >
+                <img
+                  src={card.image}
+                  alt={card.name}
+                  className="w-full h-[240px] object-cover rounded-t-[8px]"
+                />
+                <img
+                  src={starBadges}
+                  alt={starBadges}
+                  className="absolute left-0 top-0 rounded-t-[8px]"
+                />
+
+                <div className="p-[16px]">
+                  <h3 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
+                    {card.name}
+                  </h3>
+                  <p className="text-left font-inter font-medium text-[14px] text-[#667877] mb-2">
+                    {card.title}
+                  </p>
+                  <p className="font-inter font-medium text-[14px] text-[#364045] text-left text-justify">
+                    {card.description}
+                  </p>
+                  {/* <div className="flex items-center justify-between mt-4">
+                    <button className="bg-gradient-to-r from-[#1DB2AA] to-[#BAE53D] w-[175px] h-[48px] text-white font-inter font-medium text-[16px] p-[12px] rounded-[8px] hover:bg-gradient-to-r from-[#1DB2AA] to-[#BAE53D]">
+                      Follow
+                    </button>
+                    <button className="border-2 border-gradient-to-r from-[#1DB2AA] to-[#BAE53D] w-[175px] h-[48px] text-gradient-to-r from-[#1DB2AA] to-[#BAE53D] font-inter font-medium text-[16px] p-[12px] rounded-[8px]">
+                      Add as buddy
+                    </button>
+                  </div> */}
+                  <div className="flex items-center justify-between mt-4">
+                    {/* First Button */}
+                    <button className="bg-gradient-to-r from-[#1DB2AA] to-[#BAE53D] w-[175px] h-[48px] text-white font-inter font-medium text-[16px] p-[12px] rounded-[8px] hover:bg-gradient-to-r from-[#1DB2AA] to-[#BAE53D]" onClick={() => handleFollow(card.id)}>
+                    {card.follow ? "Follow" : "Following"}
+                    </button>
+
+                    {/* Second Button */}
+                    <div className="relative inline-block">
+                      <button className="w-[175px] h-[48px] bg-white text-transparent bg-clip-text bg-gradient-to-r from-[#1DB2AA] to-[#BAE53D] font-inter font-medium text-[16px] p-[12px] rounded-[8px]">
+                        Add as buddy
+                      </button>
+                      <div className="absolute inset-0 rounded-[8px] border-2 border-[#BAE53D] border-gradient-to-r from-[#1DB2AA] to-[#BAE53D] p-[2px] -z-10"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between mt-5">
+            <h2 className="text-left font-poppins font-semibold text-[24px] text-[#212626]">
+              Travel buddy Suggestion For You
+            </h2>
+            <p className="font-inter font-medium text-[16px] text-[#667877]">
+              View More
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
+            {cardsData.map((card, index) => (
+              <div
+                key={index}
+                className="bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] transition-transform transform hover:scale-10 rounded-[10px]"
+              >
+                <img
+                  src={card.image}
+                  alt={card.name}
+                  className="w-full h-[240px] object-cover rounded-t-[8px]"
+                />
+                <div className="p-[16px]">
                   <h3 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
                     {card.name}
                   </h3>
@@ -172,95 +289,7 @@ const SuggestionPage = () => {
                   </p>
                   <div className="flex items-center justify-between mt-4">
                     <button className="bg-teal-500 w-[175px] h-[48px] text-white font-inter font-medium text-[16px] p-[12px] rounded-[8px] hover:bg-teal-600" onClick={() => handleFollow(card.id)}>
-                      {card.follow ? "Follow" : "Following"}
-                    </button>
-                    <button className="border-2 border-[#2DC6BE] w-[175px] h-[48px] text-[#2DC6BE] font-inter font-medium text-[16px] p-[12px] rounded-[8px]">
-                      Add as buddy
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex items-center justify-between mt-5">
-            <h2 className="text-left font-poppins font-semibold text-[24px] text-[#212626]">
-            Influencer Suggestion  For You
-            </h2>
-            <p className="font-inter font-medium text-[16px] text-[#667877]">
-              View More
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
-            {cardsData.map((card, index) => (
-              <div
-                key={index}
-                className="bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] transition-transform transform hover:scale-10 rounded-[10px]"
-              >
-                <img
-                  src={card.image}
-                  alt={card.name}
-                  className="w-full h-[240px] object-cover rounded-t-[8px]"
-                />
-                <div className="p-[16px]">
-                  <h3 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
-                    {card.name}
-                  </h3>
-                  <p className="text-left font-inter font-medium text-[14px] text-[#667877] mb-2">
-                    {card.title}
-                  </p>
-                  <p className="font-inter font-medium text-[14px] text-[#364045] text-left text-justify">
-                    {card.description}
-                  </p>
-                  <div className="flex items-center justify-between mt-4">
-                    <button className="bg-teal-500 w-[175px] h-[48px] text-white font-inter font-medium text-[16px] p-[12px] rounded-[8px] hover:bg-teal-600">
-                      Follow
-                    </button>
-                    <button className="border-2 border-[#2DC6BE] w-[175px] h-[48px] text-[#2DC6BE] font-inter font-medium text-[16px] p-[12px] rounded-[8px]">
-                      Add as buddy
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-
-
-          <div className="flex items-center justify-between mt-5">
-            <h2 className="text-left font-poppins font-semibold text-[24px] text-[#212626]">
-            Travel buddy Suggestion  For You
-            </h2>
-            <p className="font-inter font-medium text-[16px] text-[#667877]">
-              View More
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
-            {cardsData.map((card, index) => (
-              <div
-                key={index}
-                className="bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] transition-transform transform hover:scale-10 rounded-[10px]"
-              >
-                <img
-                  src={card.image}
-                  alt={card.name}
-                  className="w-full h-[240px] object-cover rounded-t-[8px]"
-                />
-                <div className="p-[16px]">
-                  <h3 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
-                    {card.name}
-                  </h3>
-                  <p className="text-left font-inter font-medium text-[14px] text-[#667877] mb-2">
-                    {card.title}
-                  </p>
-                  <p className="font-inter font-medium text-[14px] text-[#364045] text-left text-justify">
-                    {card.description}
-                  </p>
-                  <div className="flex items-center justify-between mt-4">
-                    <button className="bg-teal-500 w-[175px] h-[48px] text-white font-inter font-medium text-[16px] p-[12px] rounded-[8px] hover:bg-teal-600">
-                      Follow
+                    {card.follow ? "Follow" : "Following"}
                     </button>
                     <button className="border-2 border-[#2DC6BE] w-[175px] h-[48px] text-[#2DC6BE] font-inter font-medium text-[16px] p-[12px] rounded-[8px]">
                       Add as buddy
