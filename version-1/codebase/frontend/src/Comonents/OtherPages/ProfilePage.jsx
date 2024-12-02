@@ -48,7 +48,7 @@ const ProfilePage = () => {
   // upload cover image
   const handleCoverUpload = async (e) => {
     const file = e.target.files[0];
-    console.log("===file====>", file);
+    // console.log("===file====>", file);
     if (file) {
       const reader = new FileReader();
       reader.readAsDataURL(file);

@@ -10,6 +10,7 @@ import ProfilePage from './Comonents/OtherPages/ProfilePage';
 import EditProfile from './Comonents/OtherPages/EditProfile';
 import ProtectedRoute from './Comonents/OtherPages/ProtectedRoute';
 import SuggestionPage from './Comonents/OtherPages/SuggestionPage';
+import CommunityPage from './Comonents/OtherPages/CommunityPage';
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         </Route>
         <Route path="/editprofile" element={<EditProfile />} />
         <Route path="/suggestion" element={<SuggestionPage />} />
+        <Route path="/community" element={<CommunityPage />} />
       </Routes>
     </Router>
   );

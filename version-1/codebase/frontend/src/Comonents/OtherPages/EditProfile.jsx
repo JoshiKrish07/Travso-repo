@@ -353,8 +353,6 @@ const handleCoverUpload = async (e) => {
     setProfilePhoto(null); // Remove the profile photo
   };
 
-  console.log("===userDetails===", userDetails)
-
   return (
     <>
       {/* Header Section */}
@@ -415,7 +413,7 @@ const handleCoverUpload = async (e) => {
                 <div className="flex flex-col items-center" >
                   <img src={Icon} alt="Placeholder" className="w-8 h-8 mb-2" />
                   <span className="font-inter font-medium text-[16px] text-[#869E9D]">
-                    <label htmlFor="cover-upload" onClick={() =>
+                    <label htmlFor="cover-upload" className="cursor-pointer" onClick={() =>
                   document.getElementById("cover-upload-2").click()
                 }>Upload Cover Photo (optional)</label>
                   </span>
@@ -476,7 +474,7 @@ const handleCoverUpload = async (e) => {
                       alt="Placeholder"
                       className="w-8 h-8 mb-2"
                     />
-                    <button type="button" className="font-inter font-medium text-[16px] text-[#869E9D]" onClick={() =>
+                    <button type="button" className="font-inter font-medium text-[16px] text-[#869E9D] cursor-pointer" onClick={() =>
                             document.getElementById("profile-upload-1").click()
                           }>
                       Upload Profile Photo

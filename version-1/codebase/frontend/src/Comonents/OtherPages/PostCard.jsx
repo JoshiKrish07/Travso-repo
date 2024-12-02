@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable no-useless-escape */
+import React, { useEffect, useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faImage,
@@ -60,9 +61,12 @@ const PostCard = () => {
   const [flashMsgType, setFlashMsgType] = useState("");
   const [isCommentPopup, setIsCommentPopup] = useState(false);
   const [activePostId, setActivePostId] = useState(null);
+  const triggerRef = useRef(null);
 
   // const { allPosts } = useSelector((state) => state.postSlice);
-  const { user: userDetails, userPosts: allPosts } = useSelector((state) => state.auth);
+  const { user: userDetails, userPosts: allPosts } = useSelector(
+    (state) => state.auth
+  );
   // console.log("=====userPosts====>", allPosts);
   useEffect(() => {
     if (!allPosts) {
@@ -164,7 +168,6 @@ const PostCard = () => {
   // };
 
   const handleLikeUnlike = async (postId) => {
-    console.log("===postId====>", postId);
     try {
       const likeUnlikeResult = await dispatch(
         LikeUnlikePost({ post_id: postId })
@@ -184,21 +187,23 @@ const PostCard = () => {
   // show post date and time
   function formatISODate(isoDate) {
     const date = new Date(isoDate);
-  
+
     // Format options
     const options = {
-      day: 'numeric',
-      month: 'long',
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true
+      day: "numeric",
+      month: "long",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
     };
-  
+
     // Format the date and adjust the output
-    const formattedDate = date.toLocaleString('en-GB', options);
-    return formattedDate.replace(',', ' at').replace(/\s([AP]M)$/, '$1'); // Remove space before AM/PM
+    const formattedDate = date.toLocaleString("en-GB", options);
+    return formattedDate.replace(",", " at").replace(/\s([AP]M)$/, "$1"); // Remove space before AM/PM
   }
 
+
+  // for comment time difference
   function getHoursFromNow(timestamp) {
     const givenDate = new Date(timestamp);
     const currentDate = new Date();
@@ -206,12 +211,23 @@ const PostCard = () => {
     // Calculate the absolute difference in milliseconds
     const timeDifference = Math.abs(givenDate - currentDate);
   
-    // Convert the difference to hours (1 hour = 3600000 milliseconds)
+    // Convert the difference to hours
     const hoursDifference = Math.floor(timeDifference / (1000 * 60 * 60));
+  
+    if (hoursDifference >= 24) {
+      const days = Math.floor(hoursDifference / 24);
+      return `${days}d`;
+    }
   
     return `${hoursDifference}h`;
   }
-  
+
+  // to extract the media URLs for a specific post
+  const getFirstImage = (mediaUrl) => {
+    // Clean the string and split it into an array
+    const mediaArray = mediaUrl.replace(/^\[\"|\"?\]$/g, '').split('","');
+    return mediaArray[0]; // Return the first image URL
+  };
 
   // console.log("===allposts====>", allPosts);
 
@@ -312,7 +328,7 @@ const PostCard = () => {
             </p>
             {/* {post.image && ( */}
             <img
-              src={allPosts[index].media_url}
+              src={getFirstImage(allPosts[index].media_url)}
               alt="Post"
               className="w-full h-[548px] rounded-lg object-cover"
             />
@@ -388,7 +404,14 @@ const PostCard = () => {
               </div>
               <div className="flex items-start space-x-3 rounded-md">
                 {/* Profile Image */}
-                <img src={allPosts[index].last_comment_user_profile_image || dummyUserImage} alt="User" className="w-8 h-8 rounded-full" />
+                <img
+                  src={
+                    allPosts[index].last_comment_user_profile_image ||
+                    dummyUserImage
+                  }
+                  alt="User"
+                  className="w-8 h-8 rounded-full"
+                />
 
                 {/* Content Section */}
                 <div className="flex flex-col space-y-2">
@@ -409,11 +432,16 @@ const PostCard = () => {
                         <img src={ok} alt="Green Icon" className="w-4 h-4" />
                       </div>
                       <div className="">
-                        62 <sup>Comments</sup>
+                        {allPosts[index]?.last_comment_likes_count} <sup>Comments</sup>
                       </div>
                     </div>
                     <div className="">
-                      62 <sup>{getHoursFromNow(allPosts[index]?.last_comment_created_at)}</sup>
+                      62{" "}
+                      <sup>
+                        {getHoursFromNow(
+                          allPosts[index]?.last_comment_created_at
+                        )}
+                      </sup>
                     </div>
                   </div>
                 </div>
@@ -441,40 +469,63 @@ const PostCard = () => {
                     onChange={(e) => setCommentInputVal(e.target.value)}
                   />
 
-                  
-
                   {/* Icons */}
                   <div className="flex items-center space-x-3 text-gray-400">
                     <button className="hover:text-gray-600">
                       <FontAwesomeIcon icon={faImage} className="w-5 h-5" />
                     </button>
-
-                    {showEmojiPicker && (
-                    <div className="absolute top-12 left-0 bg-white border rounded-lg shadow-lg p-3 grid grid-cols-8 gap-2 z-50 max-h-48 overflow-y-auto">
-                      {emojis.map((emoji, index) => (
-                        <button
-                          key={index}
-                          className="text-2xl hover:bg-gray-200 p-2 rounded"
-                          onClick={() => handleEmojiClick(emoji)}
-                        >
-                          {emoji}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                    <button className="hover:text-gray-600">
-                      <FontAwesomeIcon
-                        icon={faSmile}
-                        className="w-5 h-5"
+                    <div className="relative">
+                      <button
+                        className="hover:text-gray-600"
+                        ref={triggerRef}
                         onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                      />
-                    </button>
+                      >
+                        <FontAwesomeIcon icon={faSmile} className="w-5 h-5" />
+                      </button>
+                      {showEmojiPicker && (
+                        <div
+                          className="absolute bg-white border rounded-lg shadow-lg p-3 grid grid-cols-8 gap-2 z-50 max-h-48 overflow-y-auto"
+                          style={{
+                            right: 2, 
+                            top: "-210px",
+                            width: "23rem",
+                          }}
+                        >
+                          {emojis.map((emoji, index) => (
+                            <button
+                              key={index}
+                              className="text-2xl hover:bg-gray-200 p-2 rounded"
+                              onClick={() => handleEmojiClick(emoji)}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
                     <button className="hover:text-gray-600">
                       <FontAwesomeIcon icon={faUser} className="w-5 h-5" />
                     </button>
                     <button className="hover:text-gray-600">
                       <FontAwesomeIcon icon={faPaperclip} className="w-5 h-5" />
                     </button>
+
+                    {/* {showEmojiPicker && (
+                      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                        <div className="bg-white border rounded-lg shadow-lg p-5 grid grid-cols-8 gap-2 max-h-48 overflow-y-auto">
+                          {emojis.map((emoji, index) => (
+                            <button
+                              key={index}
+                              className="text-2xl hover:bg-gray-200 p-2 rounded"
+                              onClick={() => handleEmojiClick(emoji)}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )} */}
                   </div>
                 </div>
               </div>
