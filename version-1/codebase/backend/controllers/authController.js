@@ -516,7 +516,7 @@ async function loginUser(req, res) {
     // Generate JWT
     const token = await jwt.sign({ userId: user[0].id, email: user[0].email, userName: user[0].user_name }, process.env.JWT_SECRET_KEY, { expiresIn: "1d" });
 
-    return res.status(200).json({ message: "Login successful", token });
+    return res.status(200).json({ message: "Login successful", token, is_follow_selected: user[0].is_follow_selected });
 
   } catch (err) {
     console.log("Error in catch part login api", err);
@@ -1158,6 +1158,39 @@ async function addSearch(req, res) {
   }
 }
 
+async function updateFollowSelect(req, res) {
+  try {
+    const userId = req.user.userId; // Extract user ID from token
+
+    if(!userId) {
+      return res.status(404).json({ message: 'Misssing User Id' });
+    }
+
+    // Update user in the database using user id
+    const [updateResult] = await pool.execute(
+      `UPDATE users 
+             SET is_follow_selected = ?
+             WHERE id = ?`,
+      [
+        true,
+        userId,
+      ]
+    );
+
+    console.log("=======in updateCommunitySelect====>", updateResult.affectedRows);
+    // Check if any rows were updated
+    if (updateResult.affectedRows === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.status(200).json({ message: "follow selected updated successfully" });
+    
+  } catch (error) {
+    console.log("Error in updateCommunitySelect function:", error);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+}
+
 module.exports = {
   registerUser,
   sendOTP,
@@ -1181,5 +1214,6 @@ module.exports = {
   removeCoverImage,
   uploadCoverImage,
   logOut,
-  addSearch
+  addSearch,
+  updateFollowSelect
 };

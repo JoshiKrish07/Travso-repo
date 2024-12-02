@@ -148,8 +148,9 @@ async function getUserPosts(req , res){
           p.media_url,
           p.status,
           p.block_post,
-          u.full_name AS post_user_full_name,
-          u.user_name AS post_user_name,
+          u.full_name,
+          u.user_name,
+          u.profile_image,
           p.created_at AS post_created_at,
           p.updated_at AS post_updated_at,
           (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.id) AS total_likes,
@@ -206,7 +207,13 @@ async function getUserPosts(req , res){
                c.post_id = p.id 
            ORDER BY 
                c.created_at DESC 
-           LIMIT 1) AS last_comment_created_at
+           LIMIT 1) AS last_comment_created_at,
+          (SELECT COUNT(*) 
+           FROM comments_like cl 
+           JOIN comments c ON cl.comment_id = c.id 
+           WHERE c.post_id = p.id 
+           ORDER BY c.created_at DESC 
+           LIMIT 1) AS last_comment_likes_count
       FROM 
           posts p
       JOIN 
@@ -287,6 +294,7 @@ async function addBucketList( req , res){
     }
     }
     
+    // function to share post
     async function sharedPost(req , res){
         try {
             const { post_id, user_id} = req.body;
@@ -317,7 +325,8 @@ async function addBucketList( req , res){
             });
         }
     }
-    
+  
+    // function to comment on post
 async function postComment(req , res){
 try {
     const userId = req.user.userId; // extract user id from token 
@@ -411,6 +420,7 @@ try {
         `SELECT 
               c.user_id,
               c.post_id,
+              c.id,
               c.content,
               u.full_name,
               u.profile_image,
@@ -435,10 +445,74 @@ try {
 
     } catch (error) {
         
-        console.log(" Error to get data",error).json({
+        console.log(" Error to get data getPostComments function",error)
+        return res.status(500).json({
             error: "Internal Server Error"
         });
 
+    }
+}
+
+// function to like a comment
+async function likeAnyComment(req , res){
+
+    try {
+            // const {comment_id, user_id} = req.body;
+        const { comment_id } = req.params;
+        const user_id = req.user.userId; // extrcting from token
+
+
+        if(!comment_id || !user_id){
+        return res.status(400).json({
+            error:"All fields are required"
+        });
+        
+        }
+
+         // Check if the like already exists
+      const [existingLike] = await pool.execute(
+        `SELECT * FROM comments_like WHERE comment_id = ? AND user_id = ?`,
+        [comment_id, user_id]
+      );
+  
+      if (existingLike.length > 0) {
+        // Like exists, so remove it
+        await pool.execute(
+          `DELETE FROM comments_like WHERE comment_id = ? AND user_id = ?`,
+          [comment_id, user_id]
+        );
+  
+        return res.status(200).json({
+          message: "Like removed successfully.",
+        });
+      } else {
+        // Like doesn't exist, so add it
+        await pool.execute(
+          `INSERT INTO comments_like (comment_id, user_id) VALUES (?, ?)`,
+          [comment_id, user_id]
+        );
+  
+        return res.status(200).json({
+          message: "Like added successfully."
+        });
+      }
+    } catch (error) {
+        console.log(" Error likeAnyComment function",error)
+        return res.status(500).json({
+            error: "Internal Server Error"
+        });
+    }
+
+  }
+
+async function getSinglePostDetails(req, res) {
+    try {
+        
+    } catch (error) {
+        console.log(" Error getSinglePostDetails function",error)
+        return res.status(500).json({
+            error: "Internal Server Error"
+        });
     }
 }
 
@@ -451,5 +525,6 @@ module.exports = {
     sharedPost,
     addBucketList,
     postComment,
-    postLike
+    postLike,
+    likeAnyComment
 }
