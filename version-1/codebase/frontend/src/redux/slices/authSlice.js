@@ -218,7 +218,7 @@ export const loginUser = createAsyncThunk(
       }
 
       const data = await response.json();
-      // console.log("===data==in login user ===>", data);
+      console.log("===data==in login user ===>", data);
       return data;
     } catch (error) {
       console.log("error in login user call thunk", error.message)
@@ -715,6 +715,35 @@ export const getOnlineFriends = createAsyncThunk(
   }
 );
 
+// Thunk for updateSelectFollow details
+export const updateSelectFollow =  createAsyncThunk(
+  'auth/updateSelectFollow',
+  async (_,{ rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/auth/update-follow-select`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in updateSelectFollow=>", data);
+      return data;
+    } catch (error) {
+      console.log("error in updateSelectFollow call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 
 const authSlice = createSlice({
   name: 'auth',
@@ -1020,13 +1049,26 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      // handle logout user
       .addCase(logoutUser.fulfilled, (state) => {
         state.isAuthenticated = false;
         state.user = null;
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.error = action.payload;
-      });
+      })
+      // handle updateSelectFollow
+      .addCase(updateSelectFollow.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateSelectFollow.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(updateSelectFollow.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
   },
 });
 

@@ -4,7 +4,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 // Thunk for getAllPosts details
 export const getAllPosts = createAsyncThunk(
-  'auth/getAllPosts',
+  'post/getAllPosts',
   async (_,{ rejectWithValue }) => {
     try {
     //   const token = localStorage.getItem('token');
@@ -32,7 +32,7 @@ export const getAllPosts = createAsyncThunk(
 
 // Thunk for commentOnPost details
 export const commentOnPost = createAsyncThunk(
-  'auth/commentOnPost',
+  'post/commentOnPost',
   async ({post_id,content},{ rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
@@ -62,7 +62,7 @@ export const commentOnPost = createAsyncThunk(
 
 // Thunk for commentOnPost details
 export const LikeUnlikePost = createAsyncThunk(
-  'auth/LikeUnlikePost',
+  'post/LikeUnlikePost',
   async ({post_id},{ rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
@@ -92,7 +92,7 @@ export const LikeUnlikePost = createAsyncThunk(
 
 // Thunk for getAllPosts details
 export const getCommentOnPost = createAsyncThunk(
-  'auth/getCommentOnPost',
+  'post/getCommentOnPost',
   async (postId,{ rejectWithValue }) => {
     try {
       console.log("====postId===")
@@ -114,6 +114,36 @@ export const getCommentOnPost = createAsyncThunk(
       return data;
     } catch (error) {
       console.log("error in getCommentOnPost call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Thunk for likeAnyComment details
+export const likeAnyComment = createAsyncThunk(
+  'auth/likeAnyComment',
+  async (commentId,{ rejectWithValue }) => {
+    try {
+      console.log("======commentId======",commentId);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/like-a-comment/${commentId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      console.log("=====data===in likeAnyComment===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in likeAnyComment call thunk", error.message)
       return rejectWithValue(error.message);
     }
   }
@@ -183,6 +213,18 @@ const postSlice = createSlice({
         state.postComment = action.payload.data;
       })
       .addCase(getCommentOnPost.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle likeAnyComment
+      .addCase(likeAnyComment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(likeAnyComment.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(likeAnyComment.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

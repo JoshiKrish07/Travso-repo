@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Objects from "../../assets/Objects.png";
@@ -296,6 +297,13 @@ const Sidebar = () => {
     }
   }
 
+  // to extract the media URLs for a specific post
+  const getFirstImage = (mediaUrl) => {
+    // Clean the string and split it into an array
+    const mediaArray = mediaUrl.replace(/^\[\"|\"?\]$/g, '').split('","');
+    return mediaArray[0]; // Return the first image URL
+  };
+
   return (
     <div className="flex flex-col">
       <div className="w-[405px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.25)] p-4 px-6 mb-4">
@@ -367,7 +375,7 @@ const Sidebar = () => {
           {visiblePosts.map((post) => (
             <div key={post.id}>
               <img
-                src={post.media_url}
+                src={getFirstImage(post.media_url)}
                 alt={post.description}
                 className="w-full h-[130px] rounded-sm object-cover"
               />

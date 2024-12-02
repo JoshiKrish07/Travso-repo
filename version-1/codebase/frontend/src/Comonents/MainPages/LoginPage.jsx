@@ -311,7 +311,11 @@ const handleSubmit = async(e) => {
       } else {
         localStorage.setItem("token", response.token);
         handleFlashMessage(response.message, 'success');
-        navigate("/profile");
+        if(response.is_follow_selected) {
+          navigate("/profile");
+        } else {
+          navigate("/editprofile");
+        }
       }
     } catch (error) {
       console.log("error at login page catch block", error);
