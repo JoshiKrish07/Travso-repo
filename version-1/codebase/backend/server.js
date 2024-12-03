@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 8000;
 const fileUpload = require('express-fileupload');
 const path = require('path');
 const fs = require("fs");
+const db = require("./utils/db");
 
 // Increase body parser size limits
 app.use(express.json({ limit: "10mb" })); // Allow large payloads
@@ -51,6 +52,14 @@ app.listen(PORT,(err) => {
     if(err) throw err;
     else {
        console.log( `server started at port ${PORT}`);
+       // Now check the database connection in the background
+      db.getConnection()
+      .then(() => {
+        console.log('Successfully connected to the database');
+      })
+      .catch((err) => {
+        console.error('Failed to connect to the database:', err);
+      });
     }
 })
 

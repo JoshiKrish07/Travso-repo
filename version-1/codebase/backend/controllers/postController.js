@@ -414,6 +414,7 @@ try {
   async function getPostComments(req , res){
     try {
         const { postId } = req.params;
+        console.log("=====postId==getPostComments==>", postId)
         const [getComments] = await pool.execute(
         //   SELECT    FROM comments where post_id = ?,[postId]
 
@@ -491,7 +492,7 @@ try {
             replies: groupedReplies[comment.comment_id] || [],
         }));
 
-       console.log("==data Fetched==>",getComments)
+       console.log("==data Fetched==>",finalComments)
        return res.status(200).json({
         message: "All comments of post",
         data: finalComments
