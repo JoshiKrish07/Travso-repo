@@ -223,7 +223,9 @@ async function getUserPosts(req , res){
           AND p.user_id = ?
       GROUP BY 
           p.id, p.user_id, p.is_public, p.description, p.buddies_id, p.tag_id, 
-          p.location_id, p.media_url, p.status, p.block_post, p.created_at, p.updated_at;
+          p.location_id, p.media_url, p.status, p.block_post, p.created_at, p.updated_at
+          ORDER BY 
+          p.created_at DESC;
       
       `,
         [UserId]
@@ -591,6 +593,69 @@ async function replyOnComment(req , res){
     }
     }
 
+    async function storePost(req, res) {
+        try {
+      const user_id = req.user.userId; // extrcting from token
+
+          const {
+            is_public,
+            description,
+            buddies_id,
+            tag_id,
+            location_id,
+            media_url,
+            status,
+            block_post,
+          } = req.body;
+      
+          // Validate required fields
+          if (!user_id || !description) {
+            return res.status(400).json({
+              message: "Missing required fields (user_id, description).",
+            });
+          }
+      
+          // Insert the post into the database
+          const [result] = await pool.execute(
+            `INSERT INTO posts (
+              user_id,
+              is_public,
+              description,
+              buddies_id,
+              tag_id,
+              location_id,
+              media_url,
+              status,
+              block_post,
+              created_at,
+              updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+            [
+              user_id,
+              is_public !== undefined ? is_public : 1, // Default to 1 (true) if not provided
+              description || null, // Allow null for optional fields
+              buddies_id || null,
+              tag_id || null,
+              location_id || null,
+              media_url || "[]", // Default to empty JSON array
+              status || "active", // Default to 'active'
+              block_post !== undefined ? block_post : 0, // Default to 0 (false)
+            ]
+          );
+      
+          // Respond with success message
+          return res.status(200).json({
+            message: "Post created successfully.",
+            post_id: result.insertId, // Return the ID of the newly created post
+          });
+        } catch (error) {
+          console.error("Error in storing post:", error);
+          return res.status(500).json({
+            error: "Internal Server Error",
+          });
+        }
+      }
+
 module.exports = {
     allPosts,
     postWithlikes,
@@ -602,5 +667,6 @@ module.exports = {
     postComment,
     postLike,
     likeAnyComment,
-    replyOnComment
+    replyOnComment,
+    storePost
 }

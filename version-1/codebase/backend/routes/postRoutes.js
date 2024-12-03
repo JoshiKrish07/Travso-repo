@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {  allPosts, postWithlikes , getActiveStories , getPostComments ,getUserPosts, postComment, postLike, likeAnyComment, replyOnComment} = require('../controllers/postController');
+const {  allPosts, postWithlikes , getActiveStories , getPostComments ,getUserPosts, postComment, postLike, likeAnyComment, replyOnComment, storePost} = require('../controllers/postController');
 const verifyToken = require("../utils/verifyToken");
 
 
@@ -22,6 +22,7 @@ router.post("/comment-on-post", verifyToken, postComment);
 router.post("/like-unlike-post", verifyToken, postLike);
 router.post("/like-a-comment/:comment_id",verifyToken, likeAnyComment);
 router.post("/reply-on-comment",verifyToken, replyOnComment);
+router.post("/commit-post",verifyToken, storePost);
 
 
 

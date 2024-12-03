@@ -298,10 +298,21 @@ const Sidebar = () => {
   }
 
   // to extract the media URLs for a specific post
+  // const getFirstImage = (mediaUrl) => {
+  //   // Clean the string and split it into an array
+  //   const mediaArray = mediaUrl.replace(/^\[\"|\"?\]$/g, '').split('","');
+  //   return mediaArray[0]; // Return the first image URL
+  // };
+
   const getFirstImage = (mediaUrl) => {
+    // If mediaUrl is an empty array string, return null
+    if (mediaUrl === "[]") return null;
+  
     // Clean the string and split it into an array
     const mediaArray = mediaUrl.replace(/^\[\"|\"?\]$/g, '').split('","');
-    return mediaArray[0]; // Return the first image URL
+  
+    // Return the first image URL or null if the array is empty
+    return mediaArray.length > 0 ? mediaArray[0] : null;
   };
 
   return (
@@ -374,11 +385,20 @@ const Sidebar = () => {
           {/* Dynamically render images and titles */}
           {visiblePosts.map((post) => (
             <div key={post.id}>
-              <img
+              {
+                  getFirstImage(post.media_url) && (
+                    <img
+                      src={getFirstImage(post.media_url)}
+                      alt={post.description}
+                      className="w-full h-[130px] rounded-sm object-cover"
+                    />
+                  )
+                }
+              {/* <img
                 src={getFirstImage(post.media_url)}
                 alt={post.description}
                 className="w-full h-[130px] rounded-sm object-cover"
-              />
+              /> */}
             </div>
           ))}
         </div>
