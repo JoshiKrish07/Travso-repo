@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { updateSelectFollow } from "../../redux/slices/authSlice";
 
-
 const SuggestionPage = () => {
   const dispatch = useDispatch();
   const [joinCommunity, setJoinCommunity] = useState([
@@ -61,8 +60,8 @@ const SuggestionPage = () => {
   ]);
 
   const [imageStates, setImageStates] = useState({});
-  const [flashMessage, setFlashMessage] = useState('');
-  const [flashMsgType, setFlashMsgType] = useState('');
+  const [flashMessage, setFlashMessage] = useState("");
+  const [flashMsgType, setFlashMsgType] = useState("");
   const [threeSelected, setThreeSelected] = useState(false);
   const navigate = useNavigate();
 
@@ -83,7 +82,7 @@ const SuggestionPage = () => {
       setFlashMessage("");
       setFlashMsgType("");
     }, 3000); // Hide the message after 3 seconds
-  }
+  };
 
   const [cardsData, setCardsData] = useState([
     {
@@ -93,7 +92,7 @@ const SuggestionPage = () => {
       description:
         "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
       image: Boy1,
-      follow: false
+      follow: false,
     },
     {
       id: 2,
@@ -102,7 +101,7 @@ const SuggestionPage = () => {
       description:
         "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
       image: Girl,
-      follow: false
+      follow: false,
     },
     {
       id: 3,
@@ -111,10 +110,9 @@ const SuggestionPage = () => {
       description:
         "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
       image: Boy1,
-      follow: false
+      follow: false,
     },
-    
-  ])
+  ]);
 
   const [influencerData, setInfluencerData] = useState([
     {
@@ -124,7 +122,7 @@ const SuggestionPage = () => {
       description:
         "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
       image: Boy1,
-      follow: false
+      follow: false,
     },
     {
       id: 2,
@@ -133,7 +131,7 @@ const SuggestionPage = () => {
       description:
         "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
       image: Girl,
-      follow: false
+      follow: false,
     },
     {
       id: 3,
@@ -142,10 +140,9 @@ const SuggestionPage = () => {
       description:
         "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
       image: Boy1,
-      follow: false
+      follow: false,
     },
-  ])
-
+  ]);
 
   const [travelBuddyData, setTravelBuddyData] = useState([
     {
@@ -155,7 +152,7 @@ const SuggestionPage = () => {
       description:
         "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
       image: Boy1,
-      follow: false
+      follow: false,
     },
     {
       id: 2,
@@ -164,7 +161,7 @@ const SuggestionPage = () => {
       description:
         "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
       image: Girl,
-      follow: false
+      follow: false,
     },
     {
       id: 3,
@@ -173,82 +170,86 @@ const SuggestionPage = () => {
       description:
         "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
       image: Boy1,
-      follow: false
+      follow: false,
     },
-    
-  ])
+  ]);
 
   useEffect(() => {
     checkFollowedCount();
   }, [cardsData, influencerData, travelBuddyData]);
 
-
   const handleFollow = (userId, type) => {
-
-    if(type === 'community') {
+    if (type === "community") {
       setCardsData((prevData) =>
         prevData.map((card) =>
           card.id === userId ? { ...card, follow: !card.follow } : card
         )
       );
-    } 
-    else if(type === 'influencer') {
+    } else if (type === "influencer") {
       setInfluencerData((prevData) =>
         prevData.map((card) =>
           card.id === userId ? { ...card, follow: !card.follow } : card
         )
       );
-    }
-    else if(type === 'travelBuddy') {
+    } else if (type === "travelBuddy") {
       setTravelBuddyData((prevData) =>
         prevData.map((card) =>
           card.id === userId ? { ...card, follow: !card.follow } : card
         )
       );
     }
-
   };
-
 
   /* Check for follow count */
   const checkFollowedCount = () => {
-
     const totalFollowed =
       cardsData.filter((card) => card.follow).length +
       influencerData.filter((card) => card.follow).length +
       travelBuddyData.filter((card) => card.follow).length;
-  
+
     if (totalFollowed >= 3) {
       setThreeSelected(true);
-      handleFlashMessage("Yes you can Tap Next Button", "success");
+      handleFlashMessage("Now you can Tap Next Button", "success");
     } else {
       setThreeSelected(false);
     }
   };
 
-  const handleNext = async() => {
+  const handleNext = async () => {
     try {
-      const updateSelectFollowResult = await dispatch(updateSelectFollow()).unwrap();
+      const updateSelectFollowResult = await dispatch(
+        updateSelectFollow()
+      ).unwrap();
       // console.log("======updateSelectFollowResult====>", updateSelectFollowResult);
-      if(updateSelectFollowResult) {
-        navigate('/community');
+      if (updateSelectFollowResult) {
+        navigate("/community");
       }
     } catch (error) {
       console.log("====error in selectpage handlenext", error);
     }
-  }
+  };
 
   return (
     <>
       <SuggestionHeader />
-      {flashMessage && <SuccessError message={flashMessage} messageType={flashMsgType}/>}
+      {flashMessage && (
+        <SuccessError message={flashMessage} messageType={flashMsgType} />
+      )}
       <div className="bg-[#F0F7F7] p-6 flex justify-center items-center">
-
         <div className="w-[1240px] container mx-auto flex flex-col gap-3">
-          <h2 className="font-poppins font-semibold text-[32px] text-[#212626] text-left mt-3">
-            Follow at least 3 community or people to get started
-          </h2>
-          <button type="button" disabled={!threeSelected} onClick={handleNext}>Next</button>
+          <div className="flex items-center justify-between">
+            <h2 className="font-poppins font-semibold text-[32px] text-[#212626] text-left mt-3">
+              Follow at least 3 community or people to get started
+            </h2>
+            <button
+              type="button"
+              disabled={!threeSelected}
+              onClick={handleNext}
+              className={`${!threeSelected ? "border border-[#2DC6BE] bg-[#F0F7F7] text-[#2DC6BE]" : "bg-teal-500 text-white hover:bg-teal-600"} rounded-[8px] py-2 px-10 font-inter font-medium text-[16px]`}
+            >
+              Next
+            </button>
+          </div>
 
           <div className="flex items-center justify-between mt-3">
             <h2 className="text-left font-poppins font-semibold text-[24px] text-[#212626]">
@@ -288,8 +289,15 @@ const SuggestionPage = () => {
                     {card.description}
                   </p>
                   <div className="flex items-center justify-between mt-4">
-                    <button className="bg-teal-500 w-[175px] h-[48px] text-white font-inter font-medium text-[16px] p-[12px] rounded-[8px] hover:bg-teal-600" onClick={() => handleFollow(card.id, "community")}>
-                    {!card.follow ? "Follow" : "Following"}
+                    <button
+                     className={`w-[175px] h-[48px] font-inter font-medium text-[16px] p-[12px] rounded-[8px] ${
+                      card.follow
+                        ? "border-2 border-[#2DC6BE] text-[#2DC6BE]" // Second button's class
+                        : "bg-teal-500 text-white hover:bg-teal-600" // First button's default class
+                    }`}
+                      onClick={() => handleFollow(card.id, "community")}
+                    >
+                      {!card.follow ? "Follow" : "Following"}
                     </button>
                     <button className="border-2 border-[#2DC6BE] w-[175px] h-[48px] text-[#2DC6BE] font-inter font-medium text-[16px] p-[12px] rounded-[8px]">
                       Add as buddy
@@ -346,8 +354,15 @@ const SuggestionPage = () => {
                   </div> */}
                   <div className="flex items-center justify-between mt-4">
                     {/* First Button */}
-                    <button className="bg-gradient-to-r from-[#1DB2AA] to-[#BAE53D] w-[175px] h-[48px] text-white font-inter font-medium text-[16px] p-[12px] rounded-[8px] hover:bg-gradient-to-r from-[#1DB2AA] to-[#BAE53D]" onClick={() => handleFollow(card.id, "influencer")}>
-                    {!card.follow ? "Follow" : "Following"}
+                    <button
+                      className={`${
+                        card.follow
+                          ? "w-[175px] h-[48px] bg-white text-transparent bg-clip-text bg-gradient-to-r from-[#1DB2AA] to-[#BAE53D] border-2 border-[#BAE53D] rounded-[8px] font-inter font-medium text-[16px] p-[12px]"
+                          : "bg-gradient-to-r from-[#1DB2AA] to-[#BAE53D] w-[175px] h-[48px] text-white font-inter font-medium text-[16px] p-[12px] rounded-[8px]"
+                      }`}
+                      onClick={() => handleFollow(card.id, "influencer")}
+                    >
+                      {card.follow ? "Following" : "Follow"}
                     </button>
 
                     {/* Second Button */}
@@ -394,9 +409,17 @@ const SuggestionPage = () => {
                     {card.description}
                   </p>
                   <div className="flex items-center justify-between mt-4">
-                    <button className="bg-teal-500 w-[175px] h-[48px] text-white font-inter font-medium text-[16px] p-[12px] rounded-[8px] hover:bg-teal-600" onClick={() => handleFollow(card.id, "travelBuddy")}>
-                    {!card.follow ? "Follow" : "Following"}
+                    <button
+                      className={`w-[175px] h-[48px] font-inter font-medium text-[16px] p-[12px] rounded-[8px] ${
+                        card.follow
+                          ? "border-2 border-[#2DC6BE] text-[#2DC6BE]" // Second button's class
+                          : "bg-teal-500 text-white hover:bg-teal-600" // First button's default class
+                      }`}
+                      onClick={() => handleFollow(card.id, "travelBuddy")}
+                    >
+                      {!card.follow ? "Follow" : "Following"}
                     </button>
+
                     <button className="border-2 border-[#2DC6BE] w-[175px] h-[48px] text-[#2DC6BE] font-inter font-medium text-[16px] p-[12px] rounded-[8px]">
                       Add as buddy
                     </button>

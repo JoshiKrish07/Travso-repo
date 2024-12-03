@@ -168,10 +168,10 @@ async function sendOTP(req, res) {
     //     return res.status(404).json({ error: "Something went wrong while generating OTP" });
     //   }
 
-    const result = await sendMobileOTP(user[0].otp, mobileNumber);
+    // const result = await sendMobileOTP(user[0].otp, mobileNumber);
 
-    // const otpResult = await fetch(`http://cloud.smsindiahub.in/vendorsms/pushsms.aspx?APIKey=lUvHtyPCL0mIz0T3Y5hTBg&msisdn=${mobileNumber}&sid=AREPLY
-    //   &msg=Your One Time Password is ${user[0].otp}. Thanks SMSINDIAHUB&fl=0&gwid=2`)
+    const otpResult = await fetch(`http://cloud.smsindiahub.in/vendorsms/pushsms.aspx?APIKey=lUvHtyPCL0mIz0T3Y5hTBg&msisdn=${mobileNumber}&sid=AREPLY
+      &msg=Your One Time Password is ${user[0].otp}. Thanks SMSINDIAHUB&fl=0&gwid=2`)
       
     //       console.log("===otpResult====>", otpResult);
 

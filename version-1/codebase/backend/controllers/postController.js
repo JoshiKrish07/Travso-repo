@@ -417,29 +417,84 @@ try {
         const [getComments] = await pool.execute(
         //   SELECT    FROM comments where post_id = ?,[postId]
 
-        `SELECT 
-              c.user_id,
-              c.post_id,
-              c.id,
-              c.content,
-              u.full_name,
-              u.profile_image,
-              u.user_name,
-              c.created_at
-          FROM 
-               comments c
-         JOIN
-               users u
-         ON 
-              c.user_id = u.id
-          WHERE
-                post_id = ?`,[postId]
+       `SELECT 
+                c.user_id,
+                c.post_id,
+                c.id,
+                c.content,
+                u.full_name,
+                u.profile_image,
+                c.created_at,
+                -- Count total likes for each comment
+                (SELECT COUNT(*) FROM comments_like cl WHERE cl.comment_id = c.id) AS total_likes_on_comment,
+                -- Count total replies for each comment
+                (SELECT COUNT(*) FROM comment_reply cr WHERE cr.comment_id = c.id) AS total_reply_on_comment
+             
+            FROM 
+                comments c
+            JOIN
+                users u
+            ON 
+                c.user_id = u.id
+            WHERE
+                c.post_id = ?
+            ORDER BY 
+                c.created_at ASC
+                `,[postId]
         );
+
+          // Fetch all replies
+          const [replies] = await pool.execute(
+            `
+            SELECT 
+                cr.id AS reply_id,
+                cr.comment_id,
+                cr.user_id,
+                cr.content AS reply_content,
+                u.full_name AS reply_user_full_name,
+                u.user_name AS reply_user_user_name,
+                u.profile_image AS reply_user_profile_image,
+                cr.created_at AS reply_created_at
+            FROM 
+                comment_reply cr
+                JOIN
+                users u
+            ON 
+                cr.user_id = u.id
+            WHERE 
+                cr.comment_id IN (
+                    SELECT id FROM comments WHERE post_id = ?
+                )
+            `,
+            [postId]
+        );
+
+        // Group replies by comment ID
+        const groupedReplies = replies.reduce((acc, reply) => {
+            if (!acc[reply.comment_id]) {
+                acc[reply.comment_id] = [];
+            }
+            acc[reply.comment_id].push({
+                reply_id: reply.reply_id,
+                reply_content: reply.reply_content,
+                reply_user_full_name: reply.reply_user_full_name,
+                reply_user_user_name: reply.reply_user_user_name,
+                reply_user_profile_image: reply.reply_user_profile_image,
+                reply_created_at: reply.reply_created_at,
+            });
+            return acc;
+        }, {});
+
+        // Attach replies to their respective comments
+        const finalComments = getComments.map((comment) => ({
+            ...comment,
+            replies: groupedReplies[comment.comment_id] || [],
+        }));
 
        console.log("==data Fetched==>",getComments)
        return res.status(200).json({
         message: "All comments of post",
-        data: getComments
+        data: finalComments
        });
         
 
@@ -505,16 +560,35 @@ async function likeAnyComment(req , res){
 
   }
 
-async function getSinglePostDetails(req, res) {
+async function replyOnComment(req , res){
     try {
-        
-    } catch (error) {
-        console.log(" Error getSinglePostDetails function",error)
-        return res.status(500).json({
-            error: "Internal Server Error"
+    
+      const { comment_id, content } = req.body;
+      const user_id = req.user.userId; // extrcting from token
+
+    
+      if( !comment_id || !user_id || !content){
+        return res.status(400).json({
+          error:"All fields are required"
         });
+      }
+    
+      const [data] = await pool.execute(
+        `INSERT INTO comment_reply (comment_id , user_id, content) VALUE (? ,? ,?)`,
+        [comment_id, user_id, content]
+      );
+       
+      return res.status(200).json({
+        message:" Comment added successfully",
+      });
+      
+    } catch (error) {
+      
+      return res.status(500).json({
+        error:"Internal server Error"
+      });
     }
-}
+    }
 
 module.exports = {
     allPosts,
@@ -526,5 +600,6 @@ module.exports = {
     addBucketList,
     postComment,
     postLike,
-    likeAnyComment
+    likeAnyComment,
+    replyOnComment
 }

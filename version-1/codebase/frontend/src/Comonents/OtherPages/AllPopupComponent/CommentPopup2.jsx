@@ -34,7 +34,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserDetails, getUserPosts } from "../../../redux/slices/authSlice";
 import {
   commentOnPost,
-  commentOnReply,
   getCommentOnPost,
   likeAnyComment,
   LikeUnlikePost,
@@ -91,15 +90,8 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
   const [isFullTextVisible, setIsFullTextVisible] = useState(false);
   const [dropdownOpenSetting, setDropdownOpenSetting] = useState(false);
   const [commentInputVal, setCommentInputVal] = useState("");
-  const [commentReplyInputVal, setCommentReplyInputVal] = useState("");
   const [allPosts, setAllPosts] = useState(null);
   const [showReplyField, setShowReplyField] = useState(false);
-  const [replyToCommentId, setReplyToCommentId] = useState(null);
-
-  const handleReplyClick = (commentId) => {
-    console.log("====replyToCommentId===>", replyToCommentId)
-    setReplyToCommentId(replyToCommentId === commentId ? null : commentId);
-  };
 
   const toggleSetting = () => {
     setDropdownOpenSetting(!dropdownOpenSetting);
@@ -270,12 +262,9 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
     setCurrentIndex(index);
   };
 
-  const handleCommentLikeUnlike = async (commentId, postId) => {
+  const handleCommentLikeUnlike = async (commentId) => {
     try {
       const response = await dispatch(likeAnyComment(commentId)).unwrap();
-      if(response) {
-        await dispatch(getCommentOnPost(postId));
-      }
       console.log("=====response=====>", response);
     } catch (error) {
       console.log("error in handleCommentLikeUnlike", error);
@@ -286,53 +275,23 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
   const mediaArray =
     allPosts && allPosts[0].media_url.replace(/^\[\"|\"?\]$/g, "").split('","'); // Split the string into individual URLs
 
-  // handle when user replies on any comment and hits enter
-  const handleReplyInputEnter = async (e, commentId) => {
-    // console.log("====commentId===>", commentId);
-    try {
-      if (e.key === "Enter" && !e.shiftKey) {
-        try {
-          const replyResponse = await dispatch(commentOnReply({ 'comment_id': commentId, 'content': commentReplyInputVal })).unwrap();
-          if(replyResponse) {
-            setCommentReplyInputVal("");
-            await dispatch(getCommentOnPost(postId));
-            await dispatch(getUserPosts());
-          }
-        } catch (error) {
-          console.log("error in comment api", error);
-          const errorMessage = error.error || "Unexpected Error Occured";
-          // handleFlashMessage(errorMessage, 'error')
-        }
-      }
-    } catch (error) {
-      console.log("error in handleReplyInputEnter commentpopup page", error);
-    }
-  };
 
-  const sendReplyComment = async(commentId, postId) => {
-    console.log("===postId==>", postId)
-    try {
-      const replyResponse = await dispatch(commentOnReply({ 'comment_id': commentId, 'content': commentReplyInputVal })).unwrap();
-      console.log("====replyResponse===>", replyResponse);
-      if(replyResponse) {
-        await dispatch(getCommentOnPost(postId));
-        await dispatch(getUserPosts());
-        setCommentReplyInputVal("");
+
+  // handle 
+  const handleReplyInputEnter = async() => {
+      try {
+        console.log("hello")
+      } catch (error) {
+        console.log("error in handleReplyInputEnter commentpopup page", error);
       }
-    } catch (error) {
-      console.log("error in sendReplyComment commentpopup page", error);
-    }
   }
 
-  const handleCommentImageUpload = async(e) => {
-    console.log("file handleCommentImageUpload===>", e.target.files[0]);
-  }
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-lg w-[1100px] md:w-[1100px] h-[640px] flex flex-col overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-lg w-[1040px] md:w-[1040px] h-[640px] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex justify-between items-center px-6 pt-4 sticky top-0 bg-white z-10">
           <h2 className="font-poppins font-semibold text-[#212626] text-[24px]">
@@ -450,21 +409,21 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
             <div className="flex items-center justify-between">
               <ul className="flex gap-2">
                 <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
-                  {allPosts && allPosts[0]?.total_likes || ""} Love &nbsp; &nbsp;{" "}
+                  {allPosts && allPosts[0]?.total_likes} Love &nbsp; &nbsp;{" "}
                   <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>
                 </li>
                 <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
-                  {allPosts && allPosts[0]?.total_comments || ""} comments &nbsp;
+                  {allPosts && allPosts[0]?.total_comments} comments &nbsp;
                   &nbsp;{" "}
                   <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>
                 </li>
                 <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
-                  {allPosts && allPosts[0]?.total_buckets || ""} Bucket listed &nbsp;
+                  {allPosts && allPosts[0]?.total_buckets} Bucket listed &nbsp;
                   &nbsp;{" "}
                   <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>
                 </li>
                 <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
-                  {allPosts && allPosts[0]?.total_shared || ""} Shared &nbsp; &nbsp;
+                  {allPosts && allPosts[0]?.total_shared} Shared &nbsp; &nbsp;
                 </li>
               </ul>
               <p className="font-inter font-medium text-[12px] text-[#667877] ">
@@ -527,7 +486,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
           </div>
 
           {/* Right Section - Post Activity */}
-          <div className="w-2/4 px-6 py-4 h-full border-l border-gray-100 flex flex-col justify-between">
+          <div className="w-2/5 px-6 py-4 h-full border-l border-gray-100 flex flex-col justify-between">
             {/* Top Fixed Section */}
             <div className="flex items-center justify-between sticky top-0 bg-white z-10 cursor-pointer">
               <h3 className="font-poppins font-semibold text-[20px] text-[#212626]">
@@ -622,11 +581,13 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                           </div>
 
                           {/* Interaction Section */}
-                          <div className="flex flex-col">
-                            <div className="-mt-1 flex items-center gap-4">
-                            <div className="flex items-center cursor-pointer" onClick={() => handleCommentLikeUnlike(userPosts.id, allPosts[0]?.id)}>
+                          <div className="-mt-5 flex items-center gap-2">
+                            <div className="flex items-center">
                               <div
-                                className="flex items-center"
+                                className="flex items-center cursor-pointer"
+                                onClick={() =>
+                                  handleCommentLikeUnlike(userPosts.id)
+                                }
                               >
                                 <img
                                   src={noto_fire}
@@ -636,16 +597,12 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                               </div>
                               <div className="flex items-center">
                                 <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
-                                  {userPosts?.total_likes_on_comment || ""}{" "}
-                                  {userPosts?.total_likes_on_comment > 1 ? "likes" : "like"}{" "}
-                                  
+                                  {userPosts?.total_likes_on_comment || "0"}{" "}
+                                  likes
                                 </p>
                               </div>
                             </div>
-                            <div
-                              className="flex items-center"
-                              onClick={() => handleReplyClick(userPosts?.id)}
-                            >
+                            <div className="flex items-center" onClick={() => setShowReplyField(!showReplyField)}>
                               <div className="flex items-center">
                                 <img
                                   src={Dialog}
@@ -655,142 +612,16 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                               </div>
                               <div className="flex items-center cursor-pointer">
                                 <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
-                                  {userPosts?.total_reply_on_comment || ""}{" "}
-                                  {userPosts?.total_reply_on_comment > 1 ? "replies" : "reply"}{" "}
-                                  
+                                  {userPosts?.total_reply_on_comment || "0"}{" "}
+                                  replies
                                 </p>
                               </div>
-                              {/* Conditional rendering of the reply input field */}
-                              {/* {replyToCommentId === userPosts?.id && (
-                                <div className="reply-field">
-                                  <img
-                                    src={face_smile}
-                                    alt="smile"
-                                    className="cursor-pointer"
-                                    onClick={(e) => {
-                                      e.stopPropagation(); // Prevent closing the input
-                                      setShowEmojiPicker(!showEmojiPicker);
-                                    }}
-                                  />
-                                  <input
-                                    type="text"
-                                    placeholder="Add a comment"
-                                    onKeyDown={(e) =>
-                                      handleReplyInputEnter(e, userPosts?.id)
-                                    }
-                                    value={commentReplyInputVal}
-                                    onChange={(e) =>
-                                      setCommentReplyInputVal(e.target.value)
-                                    }
-                                    onFocus={(e) => e.stopPropagation()} // Prevent losing focus
-                                    className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-500 ml-2 text-sm"
-                                  />
-                                  <div className="flex items-center justify-center space-x-3 text-gray-400 mr-8">
-                                    <button
-                                      className="hover:text-gray-600"
-                                      onClick={(e) => e.stopPropagation()} // Prevent closing input
-                                    >
-                                      <FontAwesomeIcon
-                                        icon={faPaperclip}
-                                        className="w-5 h-5"
-                                      />
-                                    </button>
-                                    <button
-                                      className="relative"
-                                      onClick={(e) => {
-                                        e.stopPropagation(); // Prevent closing input
-                                        sendComment(userPosts?.id);
-                                      }}
-                                    >
-                                      <img
-                                        src={Send}
-                                        className="fixed bottom-[44px] w-[44px] h-[44px]"
-                                      />
-                                    </button>
-                                  </div>
-                                </div>
-                              )} */}
                             </div>
-                            </div>
-                            {/* Input Section New */}
-                            {replyToCommentId === userPosts?.id && (
-                            <div className="mt-3">
-                              <div className="flex items-center gap-2">
-                                {/* Profile Image */}
-                                <img
-                                  src={
-                                    (userDetails &&
-                                      userDetails.profile_image) ||
-                                    dummyUserImage
-                                  }
-                                  alt="Profile"
-                                  className="w-10 h-10 rounded-full"
-                                />
-
-                                <div className="flex items-center bg-gray-200 py-2 pl-2 rounded-full w-[100%]">
-                                  {showEmojiPicker && (
-                                    <div className="absolute top-12 left-0 bg-white border rounded-lg shadow-lg p-3 grid grid-cols-8 gap-2 z-50 max-h-48 overflow-y-auto">
-                                      {emojis.map((emoji, index) => (
-                                        <button
-                                          key={index}
-                                          className="text-2xl hover:bg-gray-200 p-2 rounded"
-                                          onClick={() =>
-                                            handleEmojiClick(emoji)
-                                          }
-                                        >
-                                          {emoji}
-                                        </button>
-                                      ))}
-                                    </div>
-                                  )}
-                                  <img
-                                    src={face_smile}
-                                    alt="smile"
-                                    className="cursor-pointer"
-                                    onClick={() =>
-                                      setShowEmojiPicker(!showEmojiPicker)
-                                    }
-                                  />
-                                  {/* Input Field */}
-                                  <input
-                                    type="text"
-                                    placeholder="Add a comment"
-                                    onKeyDown={(e) =>
-                                      handleReplyInputEnter(e, userPosts?.id, allPosts[0]?.id)
-                                    }
-                                    value={commentReplyInputVal}
-                                    onChange={(e) =>
-                                      setCommentReplyInputVal(e.target.value)
-                                    }
-                                    className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-500 ml-2 text-sm"
-                                  />
-
-                                  {/* Icons */}
-                                  <div className="flex items-center justify-center space-x-3 text-gray-400">
-                                    <button className="hover:text-gray-600">
-                                      <FontAwesomeIcon
-                                        icon={faPaperclip}
-                                        className="w-5 h-5"
-                                      />
-                                    </button>
-                                    <button className="">
-                                      <img
-                                        src={Send}
-                                        onClick={() =>
-                                          sendReplyComment(userPosts?.id, allPosts[0]?.id)
-                                        }
-                                        className="w-[44px] h-[44px] -my-5"
-                                      />
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            )}
+                            
                           </div>
                         </div>
-                        {userPosts?.replies?.length > 0 &&
-                          userPosts?.replies?.map(
+                        {userPosts.comment_reply &&
+                          userPosts.comment_reply.map(
                             (userReply, replyIndex) => {
                               return (
                                 <div key={replyIndex}>
@@ -884,7 +715,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                   className="w-10 h-10 rounded-full"
                 />
 
-                <div className="flex items-center bg-gray-200 py-2 pl-2 rounded-full w-[100%]">
+                <div className="flex items-center bg-gray-200 p-2 rounded-full w-[100%]">
                   {showEmojiPicker && (
                     <div className="absolute top-12 left-0 bg-white border rounded-lg shadow-lg p-3 grid grid-cols-8 gap-2 z-50 max-h-48 overflow-y-auto">
                       {emojis.map((emoji, index) => (
@@ -915,16 +746,15 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                   />
 
                   {/* Icons */}
-                  <div className="flex items-center justify-center space-x-3 text-gray-400" >
-                    <button className="hover:text-gray-600" onClick={() => document.getElementById("uploadCommentImage").click()}>
-                    <input type="file" id="uploadCommentImage" hidden onChange={(e) => handleCommentImageUpload(e)} />
+                  <div className="flex items-center justify-center space-x-3 text-gray-400 mr-8">
+                    <button className="hover:text-gray-600">
                       <FontAwesomeIcon icon={faPaperclip} className="w-5 h-5" />
                     </button>
-                    <button className="">
+                    <button className="relative">
                       <img
                         src={Send}
                         onClick={() => sendComment(allPosts[0]?.id)}
-                        className="w-[44px] h-[44px] -my-5"
+                        className="fixed bottom-[44px] w-[44px] h-[44px]"
                       />
                     </button>
                   </div>

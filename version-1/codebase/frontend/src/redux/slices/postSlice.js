@@ -149,6 +149,41 @@ export const likeAnyComment = createAsyncThunk(
   }
 );
 
+
+// Thunk for commentOnReply details
+export const commentOnReply = createAsyncThunk(
+  'post/commentOnReply',
+  async ({comment_id, content},{ rejectWithValue }) => {
+    try {
+      console.log("======commentId======",comment_id);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/reply-on-comment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          comment_id,
+          content
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      console.log("=====data===in commentOnReply===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in commentOnReply call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const postSlice = createSlice({
   name: 'postSlice',
   initialState: {
@@ -225,6 +260,18 @@ const postSlice = createSlice({
         state.loading = false;
       })
       .addCase(likeAnyComment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle commentOnReply
+      .addCase(commentOnReply.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(commentOnReply.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(commentOnReply.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
