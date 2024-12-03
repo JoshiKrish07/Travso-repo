@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 30, 2024 at 02:01 PM
+-- Generation Time: Dec 03, 2024 at 12:10 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -125,7 +125,68 @@ INSERT INTO `comments` (`id`, `post_id`, `user_id`, `content`, `created_at`) VAL
 (27, 4, 27, 'hello', '2024-11-29 06:18:27'),
 (28, 1, 27, 'new comment', '2024-11-29 09:52:31'),
 (29, 1, 27, 'test again', '2024-11-29 09:55:33'),
-(30, 1, 27, 'nikhil testing', '2024-11-29 09:57:04');
+(30, 1, 27, 'nikhil testing', '2024-11-29 09:57:04'),
+(31, 1, 27, 'hello', '2024-12-02 14:09:14'),
+(32, 1, 27, '🙃', '2024-12-02 14:15:36'),
+(33, 5, 27, 'hello', '2024-12-02 17:26:02'),
+(34, 1, 27, 'hello', '2024-12-02 17:54:57'),
+(35, 1, 27, 'final comment on button click', '2024-12-02 17:59:35'),
+(36, 1, 27, 'without button', '2024-12-02 17:59:43'),
+(37, 1, 27, '😀', '2024-12-02 18:55:48'),
+(38, 1, 27, 'k22', '2024-12-03 08:35:54'),
+(39, 1, 27, 'test comment 3', '2024-12-03 10:34:27');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `comments_like`
+--
+
+CREATE TABLE `comments_like` (
+  `id` int(11) NOT NULL,
+  `comment_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `comments_like`
+--
+
+INSERT INTO `comments_like` (`id`, `comment_id`, `user_id`, `created_at`) VALUES
+(5, 1, 44, '2024-12-02 12:28:06'),
+(8, 1, 27, '2024-12-02 17:41:24'),
+(13, 2, 27, '2024-12-03 10:26:48'),
+(18, 5, 27, '2024-12-03 10:33:13');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `comment_reply`
+--
+
+CREATE TABLE `comment_reply` (
+  `id` int(11) NOT NULL,
+  `comment_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `content` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `comment_reply`
+--
+
+INSERT INTO `comment_reply` (`id`, `comment_id`, `user_id`, `content`, `created_at`) VALUES
+(1, 1, 43, 'Accha batau teko nice.', '2024-12-02 11:44:15'),
+(2, 1, 44, 'Ha Bhai.', '2024-12-02 12:34:04'),
+(4, 2, 27, 'nikhil ko reply', '2024-12-03 08:17:44'),
+(5, 2, 27, 'nikhil ko reply second time', '2024-12-03 08:21:09'),
+(6, 1, 27, '1st time reply', '2024-12-03 08:22:01'),
+(7, 1, 27, 'second comment', '2024-12-03 08:23:18'),
+(8, 1, 27, 'third reply', '2024-12-03 08:27:37'),
+(9, 1, 27, 'test', '2024-12-03 08:27:59'),
+(10, 5, 27, 'test comment', '2024-12-03 10:34:12');
 
 -- --------------------------------------------------------
 
@@ -172,8 +233,9 @@ INSERT INTO `likes` (`id`, `post_id`, `user_id`, `created_at`) VALUES
 (2, 1, 13, '2024-11-25 07:13:42'),
 (3, 1, 19, '2024-11-25 07:14:05'),
 (5, 4, 28, '2024-11-26 05:15:51'),
-(25, 5, 27, '2024-11-28 12:38:43'),
-(37, 4, 27, '2024-11-29 06:35:01');
+(43, 4, 27, '2024-12-02 13:52:51'),
+(44, 5, 27, '2024-12-02 17:26:13'),
+(54, 1, 27, '2024-12-03 07:13:04');
 
 -- --------------------------------------------------------
 
@@ -202,7 +264,7 @@ CREATE TABLE `posts` (
   `buddies_id` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`buddies_id`)),
   `tag_id` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`tag_id`)),
   `location_id` int(11) DEFAULT NULL,
-  `media_url` varchar(255) NOT NULL,
+  `media_url` longtext NOT NULL DEFAULT '[]',
   `status` enum('active','inactive','deleted') DEFAULT 'active',
   `block_post` tinyint(1) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -214,11 +276,11 @@ CREATE TABLE `posts` (
 --
 
 INSERT INTO `posts` (`id`, `user_id`, `is_public`, `description`, `buddies_id`, `tag_id`, `location_id`, `media_url`, `status`, `block_post`, `created_at`, `updated_at`) VALUES
-(1, 27, 1, 'Post description 1', '2', '2', 1, 'https://images.unsplash.com/photo-1521575107034-e0fa0b594529?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fHBvc3R8ZW58MHx8MHx8fDA%3D', 'active', 0, '2024-11-25 06:29:48', '2024-11-26 12:29:46'),
-(2, 27, 0, 'Post description 2', '1', '3', 2, 'https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 'inactive', 0, '2024-11-25 06:29:48', '2024-11-26 12:31:25'),
-(3, 27, 1, 'Post description 3', '1', '1', 3, 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg', 'deleted', 1, '2024-11-25 06:29:48', '2024-11-26 12:32:45'),
-(4, 27, 1, 'Post description 4', '3', '2', 1, 'https://image-processor-storage.s3.us-west-2.amazonaws.com/images/866759932dc5358cee86f6552d1250f2/inside-bubble-spheres.jpg', 'active', 1, '2024-11-25 06:29:48', '2024-11-26 12:36:04'),
-(5, 27, 0, 'Post description 5', '1', '4', 2, 'https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg', 'active', 0, '2024-11-25 06:29:48', '2024-11-26 12:32:51');
+(1, 27, 1, 'Post description 1', '2', '2', 1, '[\"https://images.unsplash.com/photo-1521575107034-e0fa0b594529?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fHBvc3R8ZW58MHx8MHx8fDA%3D\",\"https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"]', 'active', 0, '2024-11-25 06:29:48', '2024-12-02 11:41:10'),
+(2, 27, 0, 'Post description 2', '1', '3', 2, '[\"https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"]', 'inactive', 0, '2024-11-25 06:29:48', '2024-12-02 11:14:02'),
+(3, 27, 1, 'Post description 3', '1', '1', 3, '[\"https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg\"]', 'deleted', 1, '2024-11-25 06:29:48', '2024-12-02 11:14:31'),
+(4, 27, 1, 'Post description 4', '3', '2', 1, '[\"https://image-processor-storage.s3.us-west-2.amazonaws.com/images/866759932dc5358cee86f6552d1250f2/inside-bubble-spheres.jpg\"]', 'active', 1, '2024-11-25 06:29:48', '2024-12-02 17:23:57'),
+(5, 27, 0, 'Post description 5', '1', '4', 2, '[\"https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg\"]', 'active', 0, '2024-11-25 06:29:48', '2024-12-02 17:24:06');
 
 -- --------------------------------------------------------
 
@@ -313,31 +375,34 @@ CREATE TABLE `users` (
   `profile_image` varchar(255) DEFAULT NULL,
   `cover_image` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `is_logged_in` tinyint(1) NOT NULL DEFAULT 0
+  `is_logged_in` tinyint(1) NOT NULL DEFAULT 0,
+  `is_follow_selected` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `full_name`, `first_name`, `last_name`, `gender`, `dob`, `state`, `city`, `email`, `mobile_number`, `otp`, `isOtpVerified`, `is_influencer`, `user_name`, `description`, `password`, `is_active`, `user_type`, `smlink1`, `profile_image`, `cover_image`, `created_at`, `is_logged_in`) VALUES
-(9, 'krishna', NULL, NULL, 'male', '1990-11-15', 'Madhya Pradesh', 'Indore', 'kk14@kk.com', '1234567892', '7619', 1, 0, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, '2024-11-26 11:37:50', 0),
-(11, 'Krishna', NULL, NULL, 'male', '2024-11-01', 'Madhya Pradesh', 'Indore', 'krishnakant0795@gmail.com', '9977195275', '8884', 0, 0, 'Krishna002', 'Test Account Description', '$2b$10$OW4ZCAzq3XiY2n/Yb1TSBu1zY1EOyO.yiUIHkMzpu.xC3b0LLhqiC', 1, 'traveler', 'https://www.instagram.com/krishnakant7947/profilecard/?igsh=MXhieDRyZjhmdHhpZQ==', NULL, NULL, '2024-11-26 11:37:50', 0),
-(13, 'Rishabh', NULL, NULL, 'male', '2024-11-01', 'Madhya Pradesh', 'Indore', 'rishabh@rishabh.com', '8720096457', '3198', 0, 0, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, '2024-11-26 11:37:50', 0),
-(19, 'krishna', NULL, NULL, 'male', '1995-03-07', 'Madhya Pradesh', 'Indore', 'kk19@kk.com', '9977194285', '1466', 0, 0, 'Krish003', NULL, NULL, 1, 'traveler', NULL, NULL, NULL, '2024-11-26 11:37:50', 0),
-(23, 'Krishna005', NULL, NULL, 'male', '2007-02-25', 'Madhya Pradesh', 'Indore', 'kktest@kk.com', '1212121212', '3725', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, '2024-11-26 11:37:50', 0),
-(26, 'Nikhil Sir', NULL, NULL, 'male', '2006-02-26', 'Madhya Pradesh', 'Indore', 'nikhil02.1998@gmail.com', '7415872603', '0640', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, '2024-11-26 11:37:50', 0),
-(27, 'Krishna Kant Malviy', 'Krishna Kant', 'Malviy', 'male', '2006-02-08', 'Madhya Pradesh', 'Indore', 'learncoding299@gmail.com', '9755895314', '0325', 0, 0, 'Krishna005', 'Test Description', '$2b$10$OW4ZCAzq3XiY2n/Yb1TSBu1zY1EOyO.yiUIHkMzpu.xC3b0LLhqiC', 1, 'traveler', NULL, 'http://localhost:3000/uploads/profile_img/profile_1732942866301.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1732942875410.jpeg', '2024-11-26 11:37:50', 0),
-(28, 'Pankaj', NULL, NULL, 'male', '2007-02-26', 'Madhya Pradesh', 'Indore', 'sales@reettechit.com', '9022993526', '4331', 0, 0, 'Pankaj Sir', 'Test Description', '$2b$10$wqVUTH6NMAKjQgvXCe6Lmu332quK9pPiiHPtz4K8ZLa6tcXpdKpD2', 1, 'traveler', NULL, NULL, NULL, '2024-11-26 11:37:50', 0),
-(30, 'Test', NULL, NULL, 'male', '2007-02-27', 'Madhya Pradesh', 'Indore', 'test@test.com', '1212121211', '5133', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, '2024-11-27 01:54:23', 0),
-(31, 'bdh', NULL, NULL, 'female', '2004-02-28', 'Andhra Pradesh', 'Ādoni', 'emai@email.com', '9340169945', '1929', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, '2024-11-27 12:19:35', 0),
-(32, 'Prashant', NULL, NULL, 'male', '2003-01-28', 'Madhya Pradesh', 'Indore', 'prashant@prashant.com', '9340169981', '7723', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, '2024-11-28 13:52:29', 0),
-(33, 'hhh', NULL, NULL, 'male', '2005-01-29', 'Madhya Pradesh', 'Indore', 'ss@ss.com', '1212121213', '9578', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, '2024-11-29 10:23:17', 0),
-(34, 'sd', NULL, NULL, 'male', '1998-02-28', 'Andhra Pradesh', 'Ādoni', 'dsd@sd.com', '1234567890', '7315', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, '2024-11-29 12:22:56', 0),
-(35, 'sd', NULL, NULL, 'male', '2008-01-29', 'Andhra Pradesh', 'Ādoni', 'kk@ll.com', '1234567898', '7639', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, '2024-11-29 13:05:44', 0),
-(36, 'sd', NULL, NULL, 'male', '2007-03-29', 'Andhra Pradesh', 'Addanki', 'kk@kk.com', '1212454572', '4903', 0, 0, 'test001', 'Test description', '$2b$10$RO2fWhAGEnZX49Cq6pR1.uJjrLsZm.wYD0Ftvfe/RfYPgeTt8BHGe', NULL, 'traveler', NULL, NULL, NULL, '2024-11-29 13:09:12', 0),
-(41, 'Test Account1', 'Test', 'Account1', 'male', '2008-02-29', 'Madhya Pradesh', 'Harda', 'test1@test.com', '1233211231', '4918', 0, 0, 'test1', 'Test Description  Test 1', '$2b$10$3G1LH/D8IwgmJKsI4SWWWuFaksMjm3Bpl4ZMVY7LkgPXwkz2vA5KK', NULL, 'traveler', NULL, 'http://localhost:3000/uploads/profile_img/profile_1732948983049.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1732951028576.jpeg', '2024-11-30 06:28:10', 0),
-(42, 'Test Account2', 'Test', 'Account2', 'male', '2008-02-29', 'Madhya Pradesh', 'Indore', 'test2@test.com', '1234563215', '6859', 0, 0, 'test2', 'Test Description new', '$2b$10$CJXPEs91RUyfX9f3D5LCk.idHaJM1tVKw8OEf4vqXEemxSkz.5GQe', NULL, 'traveler', NULL, 'http://localhost:3000/uploads/profile_img/profile_1732969808487.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1732969898721.webp', '2024-11-30 09:29:51', 0);
+INSERT INTO `users` (`id`, `full_name`, `first_name`, `last_name`, `gender`, `dob`, `state`, `city`, `email`, `mobile_number`, `otp`, `isOtpVerified`, `is_influencer`, `user_name`, `description`, `password`, `is_active`, `user_type`, `smlink1`, `profile_image`, `cover_image`, `created_at`, `is_logged_in`, `is_follow_selected`) VALUES
+(9, 'krishna', NULL, NULL, 'male', '1990-11-15', 'Madhya Pradesh', 'Indore', 'kk14@kk.com', '1234567892', '7619', 1, 0, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0),
+(11, 'Krishna', NULL, NULL, 'male', '2024-11-01', 'Madhya Pradesh', 'Indore', 'krishnakant0795@gmail.com', '9977195275', '8884', 0, 0, 'Krishna002', 'Test Account Description', '$2b$10$OW4ZCAzq3XiY2n/Yb1TSBu1zY1EOyO.yiUIHkMzpu.xC3b0LLhqiC', 1, 'traveler', 'https://www.instagram.com/krishnakant7947/profilecard/?igsh=MXhieDRyZjhmdHhpZQ==', NULL, NULL, '2024-11-26 11:37:50', 0, 0),
+(13, 'Rishabh', NULL, NULL, 'male', '2024-11-01', 'Madhya Pradesh', 'Indore', 'rishabh@rishabh.com', '8720096457', '3198', 0, 0, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0),
+(19, 'krishna', NULL, NULL, 'male', '1995-03-07', 'Madhya Pradesh', 'Indore', 'kk19@kk.com', '9977194285', '1466', 0, 0, 'Krish003', NULL, NULL, 1, 'traveler', NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0),
+(23, 'Krishna005', NULL, NULL, 'male', '2007-02-25', 'Madhya Pradesh', 'Indore', 'kktest@kk.com', '1212121212', '3725', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0),
+(26, 'Nikhil Sir', NULL, NULL, 'male', '2006-02-26', 'Madhya Pradesh', 'Indore', 'nikhil02.1998@gmail.com', '7415872603', '0640', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0),
+(27, 'Krishna Kant Malviya', 'Krishna Kant', 'Malviya', 'male', '2006-02-08', 'Madhya Pradesh', 'Indore', 'learncoding299@gmail.com', '9755895314', '0325', 0, 0, 'Krishna005', 'Test Description 004', '$2b$10$OW4ZCAzq3XiY2n/Yb1TSBu1zY1EOyO.yiUIHkMzpu.xC3b0LLhqiC', 1, 'traveler', NULL, 'http://localhost:3000/uploads/profile_img/profile_1733134156676.webp', 'http://localhost:3000/uploads/cover_img/profile_1733136257342.webp', '2024-11-26 11:37:50', 0, 1),
+(30, 'Test', NULL, NULL, 'male', '2007-02-27', 'Madhya Pradesh', 'Indore', 'test@test.com', '1212121211', '5133', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, '2024-11-27 01:54:23', 0, 0),
+(31, 'bdh', NULL, NULL, 'female', '2004-02-28', 'Andhra Pradesh', 'Ādoni', 'emai@email.com', '9340169945', '1929', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, '2024-11-27 12:19:35', 0, 0),
+(32, 'Prashant', NULL, NULL, 'male', '2003-01-28', 'Madhya Pradesh', 'Indore', 'prashant@prashant.com', '9340169981', '7723', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, '2024-11-28 13:52:29', 0, 0),
+(33, 'hhh', NULL, NULL, 'male', '2005-01-29', 'Madhya Pradesh', 'Indore', 'ss@ss.com', '1212121213', '9578', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, '2024-11-29 10:23:17', 0, 0),
+(34, 'sd', NULL, NULL, 'male', '1998-02-28', 'Andhra Pradesh', 'Ādoni', 'dsd@sd.com', '1234567890', '7315', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, '2024-11-29 12:22:56', 0, 0),
+(35, 'sd', NULL, NULL, 'male', '2008-01-29', 'Andhra Pradesh', 'Ādoni', 'kk@ll.com', '1234567898', '7639', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, '2024-11-29 13:05:44', 0, 0),
+(36, 'sd', NULL, NULL, 'male', '2007-03-29', 'Andhra Pradesh', 'Addanki', 'kk@kk.com', '1212454572', '4903', 0, 0, 'test001', 'Test description', '$2b$10$RO2fWhAGEnZX49Cq6pR1.uJjrLsZm.wYD0Ftvfe/RfYPgeTt8BHGe', NULL, 'traveler', NULL, NULL, NULL, '2024-11-29 13:09:12', 0, 0),
+(41, 'Test Account1', 'Test', 'Account1', 'male', '2008-02-29', 'Madhya Pradesh', 'Harda', 'test1@test.com', '1233211231', '4918', 0, 0, 'test1', 'Test Description  Test 1', '$2b$10$3G1LH/D8IwgmJKsI4SWWWuFaksMjm3Bpl4ZMVY7LkgPXwkz2vA5KK', NULL, 'traveler', NULL, 'http://localhost:3000/uploads/profile_img/profile_1732948983049.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1732951028576.jpeg', '2024-11-30 06:28:10', 0, 0),
+(42, 'Test Account2', 'Test', 'Account2', 'male', '2008-02-29', 'Madhya Pradesh', 'Indore', 'test2@test.com', '1234563215', '6859', 0, 0, 'test2', 'Test Description new', '$2b$10$CJXPEs91RUyfX9f3D5LCk.idHaJM1tVKw8OEf4vqXEemxSkz.5GQe', NULL, 'traveler', NULL, 'http://localhost:3000/uploads/profile_img/profile_1732969808487.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1732969898721.webp', '2024-11-30 09:29:51', 0, 0),
+(43, 'test003 ', 'test003', '', 'male', '2006-02-01', 'Madhya Pradesh', 'Indore', 'test3@test.com', '1254125412', '8966', 0, 0, 'test003', 'test description 003', '$2b$10$noJ70se3/3w2yGB1MzItMeCF3O6G2PVi9wMt.2I2tPPHxpIyE4mHe', NULL, 'traveler', NULL, 'http://localhost:3000/uploads/profile_img/profile_1733057594306.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733057585165.webp', '2024-12-01 12:52:02', 0, 0),
+(44, 'test4 ', 'test4', '', 'male', '2008-02-02', 'Madhya Pradesh', 'Indore', 'test4@test.com', '1237894561', '1720', 0, 0, 'test004', 'Test Description 004', '$2b$10$RHUAXhLqKFfFvIXMz7CC8.sVPWcUwAd0GdJcwTFWQYsR7VKyWl2wm', NULL, 'traveler', NULL, 'http://localhost:3000/uploads/profile_img/profile_1733116560982.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733116543861.webp', '2024-12-02 05:13:56', 0, 1),
+(45, 'Arti Kushwaha', 'Arti', 'Kushwaha', 'female', '1998-11-03', 'Madhya Pradesh', 'Bhopal', 'aktest@gmail.com', '7000085170', '4926', 0, 0, 'arti07', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.', '$2b$10$GqrpGoigu6uRrbYMLe1aRupkFR4Y1LGxRoQowBFj200g7b6BylN.a', NULL, 'traveler', NULL, 'http://localhost:3000/uploads/profile_img/profile_1733222590612.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733222582167.jpeg', '2024-12-03 10:41:50', 0, 1);
 
 --
 -- Indexes for dumped tables
@@ -372,6 +437,20 @@ ALTER TABLE `comments`
   ADD PRIMARY KEY (`id`),
   ADD KEY `post_id` (`post_id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `comments_like`
+--
+ALTER TABLE `comments_like`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `comment_id` (`comment_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `comment_reply`
+--
+ALTER TABLE `comment_reply`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `followers`
@@ -458,7 +537,19 @@ ALTER TABLE `buddies`
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+
+--
+-- AUTO_INCREMENT for table `comments_like`
+--
+ALTER TABLE `comments_like`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
+-- AUTO_INCREMENT for table `comment_reply`
+--
+ALTER TABLE `comment_reply`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `followers`
@@ -470,7 +561,7 @@ ALTER TABLE `followers`
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT for table `list_posts`
@@ -506,7 +597,7 @@ ALTER TABLE `tags`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- Constraints for dumped tables

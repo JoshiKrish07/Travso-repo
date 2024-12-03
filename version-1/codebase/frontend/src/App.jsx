@@ -11,6 +11,7 @@ import EditProfile from './Comonents/OtherPages/EditProfile';
 import ProtectedRoute from './Comonents/OtherPages/ProtectedRoute';
 import SuggestionPage from './Comonents/OtherPages/SuggestionPage';
 import CommunityPage from './Comonents/OtherPages/CommunityPage';
+import ChatPage from './Comonents/OtherPages/ChatModule/ChatPage';
 
 
 function App() {
@@ -28,6 +29,8 @@ function App() {
         <Route path="/editprofile" element={<EditProfile />} />
         <Route path="/suggestion" element={<SuggestionPage />} />
         <Route path="/community" element={<CommunityPage />} />
+        <Route path="/chat" element={<ChatPage />} />
+
       </Routes>
     </Router>
   );

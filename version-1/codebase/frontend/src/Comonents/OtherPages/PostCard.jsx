@@ -29,7 +29,7 @@ import {
 import SuccessError from "./SuccessError";
 import CommentPopup from "./AllPopupComponent/CommentPopup";
 import dummyUserImage from "../../assets/user_image-removebg-preview.png";
-
+import SharePopup from "./AllPopupComponent/SharePopup";
 import Saved from "../../assets/headerIcon/archive-minus.png";
 import { getUserPosts } from "../../redux/slices/authSlice";
 
@@ -56,6 +56,7 @@ const posts = [
 
 const PostCard = () => {
   const dispatch = useDispatch();
+  const [isSharePopup, setIsSharePopup] = useState(false);
   const [commentInputVal, setCommentInputVal] = useState("");
   const [flashMessage, setFlashMessage] = useState("");
   const [flashMsgType, setFlashMsgType] = useState("");
@@ -231,6 +232,17 @@ const PostCard = () => {
 
   // console.log("===allposts====>", allPosts);
 
+  // handle onchange of image upload on post section
+  const handlePostImageUpload = (e) => {
+    console.log("=====handlePostImageUpload=====>", e.target.files[0]);
+  }
+
+
+  // handle onchange of image upload on comment section
+  const handleCommentImage = (e) => {
+    console.log("====handleCommentImage===>", e.target.files[0]);
+  }
+
   return (
     <>
       {flashMessage && (
@@ -249,14 +261,15 @@ const PostCard = () => {
           {/* Input Field */}
           <input
             type="text"
-            placeholder={`Write your story today ${userDetails?.user_name}...`}
+            placeholder={`Write your story today ...`}
             className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-500 ml-3 text-sm"
           />
 
           {/* Icons */}
           <div className="flex items-center space-x-3 text-gray-400">
-            <button className="hover:text-gray-600">
+            <button className="hover:text-gray-600" onClick={() => document.getElementById("postGallery").click()}>
               <FontAwesomeIcon icon={faImage} className="w-5 h-5" />
+              <input type="file" id="postGallery" onChange={(e) => handlePostImageUpload(e)} hidden/>
             </button>
 
             <button className="hover:text-gray-600">
@@ -265,7 +278,7 @@ const PostCard = () => {
             <button className="hover:text-gray-600">
               <FontAwesomeIcon icon={faUser} className="w-5 h-5" />
             </button>
-            <button className="hover:text-gray-600">
+            <button className="hover:text-gray-600" onClick={() => document.getElementById("postGallery").click()}>
               <FontAwesomeIcon icon={faPaperclip} className="w-5 h-5" />
             </button>
           </div>
@@ -373,6 +386,7 @@ const PostCard = () => {
               <button
                 aria-label="Edit Info"
                 className="flex items-center justify-center w-[197px] h-[40px] bg-[#cdd0d499] text-[#434C50] hover:text-gray-800 py-1 px-3 rounded-full "
+                onClick={() => setIsSharePopup(true)}
               >
                 <img src={send} alt="Edit Icon" className="mr-2 w-6 h-6" />
                 {/* <span className="text-md font-normal">1K Share</span> */}
@@ -395,6 +409,12 @@ const PostCard = () => {
                   postId={allPosts[index].id}
                 />
               )}
+
+<SharePopup
+              isOpen={isSharePopup}
+              onClose={() => setIsSharePopup(false)}
+            />
+
             </div>
 
             {/* Comment Section */}
@@ -471,8 +491,9 @@ const PostCard = () => {
 
                   {/* Icons */}
                   <div className="flex items-center space-x-3 text-gray-400">
-                    <button className="hover:text-gray-600">
+                    <button className="hover:text-gray-600" onClick={() => document.getElementById("commentImageUpload").click()}>
                       <FontAwesomeIcon icon={faImage} className="w-5 h-5" />
+                      <input type="file" id="commentImageUpload" hidden onChange={(e) => handleCommentImage(e)} />
                     </button>
                     <div className="relative">
                       <button

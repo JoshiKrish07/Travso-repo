@@ -595,22 +595,24 @@ const Header = () => {
 
             {/* Navigation Links */}
             <nav className="flex items-center justify-between ml-5 mr-5 text-gray-500 gap-6 md:w-[400px]">
-              {/* <Link to='/'><NavItem icon={HomeIcon} label="Home" /></Link> */}
-              <NavItem icon={HomeIcon} label="Home" />
+              <Link to='/community'><NavItem icon={HomeIcon} label="Home" /></Link>
+              {/* <NavItem icon={HomeIcon} label="Home" /> */}
               <NavItem icon={ExploreIcon} label="Explore" />
               <NavItem icon={PersonIcon} label="Buddies Request" />
             </nav>
 
             {/* Icons and Profile Section */}
             <div className="flex items-center">
-              <IconButton
-                icon={
-                  <FontAwesomeIcon
-                    icon={faCommentDots}
-                    className="w-4 h-4 hover:w-5 hover:h-5"
-                  />
-                }
-              />
+              <Link to='/chat'>
+                <IconButton
+                  icon={
+                    <FontAwesomeIcon
+                      icon={faCommentDots}
+                      className="w-4 h-4 hover:w-5 hover:h-5"
+                    />
+                  }
+                />
+              </Link>
               <div
                 className="relative"
                 onMouseEnter={() => setIsNotificationsOpen(true)}
