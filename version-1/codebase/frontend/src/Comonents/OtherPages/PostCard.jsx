@@ -23,6 +23,7 @@ import p3 from "../../assets/headerIcon/p3.png";
 import { useDispatch, useSelector } from "react-redux";
 import {
   commentOnPost,
+  commitPost,
   getAllPosts,
   LikeUnlikePost,
 } from "../../redux/slices/postSlice";
@@ -58,6 +59,7 @@ const PostCard = () => {
   const dispatch = useDispatch();
   const [isSharePopup, setIsSharePopup] = useState(false);
   const [commentInputVal, setCommentInputVal] = useState("");
+  const [commentInputValForPost, setCommentInputValForPost] = useState("");
   const [flashMessage, setFlashMessage] = useState("");
   const [flashMsgType, setFlashMsgType] = useState("");
   const [isCommentPopup, setIsCommentPopup] = useState(false);
@@ -120,11 +122,40 @@ const PostCard = () => {
     "🐱",
   ];
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showEmojiPickerForPost, setShowEmojiPickerForPost] = useState(false);
 
   const handleEmojiClick = (emoji) => {
     setCommentInputVal((prevComment) => prevComment + emoji);
     setShowEmojiPicker(false); // Close the emoji picker after selection
   };
+
+  const handleEmojiClickForPost = (emoji) => {
+    console.log("==handleEmojiClickForPost===>")
+    setCommentInputValForPost((prevComment) => prevComment + emoji);
+    setShowEmojiPickerForPost(false); // Close the emoji picker after selection
+  };
+
+  const handleInputEnterForPost = async(e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      try {
+        const commentResult = await dispatch(
+          commitPost({description: commentInputValForPost})
+        ).unwrap();
+        if (commentResult) {
+          console.log("=====commentResult===>", commentResult.message);
+          // await dispatch(getAllPosts());
+          await dispatch(getUserPosts());
+          setCommentInputValForPost("");
+          // handleFlashMessage(commentResult.message, 'success');
+        }
+      } catch (error) {
+        console.log("error in comment api", error);
+        const errorMessage = error.error || "Unexpected Error Occured";
+        handleFlashMessage(errorMessage, "error");
+      }
+      
+    }
+  }
 
   /* emoji functionality starts */
 
@@ -224,10 +255,21 @@ const PostCard = () => {
   }
 
   // to extract the media URLs for a specific post
+  // const getFirstImage = (mediaUrl) => {
+  //   // Clean the string and split it into an array
+  //   const mediaArray = mediaUrl.replace(/^\[\"|\"?\]$/g, '').split('","');
+  //   return mediaArray[0]; // Return the first image URL
+  // };
+
   const getFirstImage = (mediaUrl) => {
+    // If mediaUrl is an empty array string, return null
+    if (mediaUrl === "[]") return null;
+  
     // Clean the string and split it into an array
     const mediaArray = mediaUrl.replace(/^\[\"|\"?\]$/g, '').split('","');
-    return mediaArray[0]; // Return the first image URL
+  
+    // Return the first image URL or null if the array is empty
+    return mediaArray.length > 0 ? mediaArray[0] : null;
   };
 
   // console.log("===allposts====>", allPosts);
@@ -261,6 +303,9 @@ const PostCard = () => {
           {/* Input Field */}
           <input
             type="text"
+            value={commentInputValForPost}
+            onChange={(e) => setCommentInputValForPost(e.target.value)}
+            onKeyDown={(e) => handleInputEnterForPost(e)}
             placeholder={`Write your story today ...`}
             className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-500 ml-3 text-sm"
           />
@@ -273,7 +318,36 @@ const PostCard = () => {
             </button>
 
             <button className="hover:text-gray-600">
-              <FontAwesomeIcon icon={faSmile} className="w-5 h-5" />
+            <div className="relative">
+                      <button
+                        className="hover:text-gray-600"
+                        ref={triggerRef}
+                        onClick={() => setShowEmojiPickerForPost(!showEmojiPickerForPost)}
+                      >
+                        <FontAwesomeIcon icon={faSmile} className="w-5 h-5" />
+                      </button>
+                      {showEmojiPickerForPost && (
+                        <div
+                          className="absolute bg-white border rounded-lg shadow-lg p-3 grid grid-cols-8 gap-2 z-50 max-h-48 overflow-y-auto"
+                          style={{
+                            right: 2, 
+                            top: "-210px",
+                            width: "23rem",
+                          }}
+                        >
+                          {emojis.map((emoji, index) => (
+                            <button
+                              key={index}
+                              className="text-2xl hover:bg-gray-200 p-2 rounded"
+                              onClick={() => handleEmojiClickForPost(emoji)}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+              {/* <FontAwesomeIcon icon={faSmile} className="w-5 h-5" /> */}
             </button>
             <button className="hover:text-gray-600">
               <FontAwesomeIcon icon={faUser} className="w-5 h-5" />
@@ -340,11 +414,16 @@ const PostCard = () => {
               #arsitek #art #creative
             </p>
             {/* {post.image && ( */}
-            <img
-              src={getFirstImage(allPosts[index].media_url)}
-              alt="Post"
-              className="w-full h-[548px] rounded-lg object-cover"
-            />
+            {
+              getFirstImage(allPosts[index].media_url) && (
+                <img
+                  src={getFirstImage(allPosts[index].media_url)}
+                  alt="Post"
+                  className="w-full h-[548px] rounded-lg object-cover"
+                />
+              )
+            }
+            
             {/* )} */}
             <div className="flex items-center justify-between mt-4">
               <button
@@ -355,7 +434,7 @@ const PostCard = () => {
                 <img src={fire} alt="Edit Icon" className="mr-2 w-6 h-6" />
                 {/* <span className="text-md font-normal">72K Liked</span> */}
                 <span className="text-md font-normal">
-                  {allPosts[index].total_likes} Liked
+                  {allPosts[index].total_likes > 0 ? allPosts[index].total_likes : ""} Liked
                 </span>
               </button>
 
@@ -368,7 +447,7 @@ const PostCard = () => {
                 <img src={Dialog} alt="Edit Icon" className="mr-2 w-6 h-6" />
                 {/* <span className="text-md font-normal">50K Comments</span> */}
                 <span className="text-md font-normal">
-                  {allPosts[index].total_comments} Comments
+                  {allPosts[index].total_comments > 0 ? allPosts[index].total_comments : ""} Comments
                 </span>
               </button>
 
@@ -379,7 +458,7 @@ const PostCard = () => {
                 <img src={bucket} alt="Edit Icon" className="mr-2 w-6 h-6" />
                 {/* <span className="text-md font-normal">2.3K Saved</span> */}
                 <span className="text-md font-normal">
-                  {allPosts[index].total_buckets} Saved
+                  {allPosts[index].total_buckets > 0 ? allPosts[index].total_buckets : ""} Saved
                 </span>
               </button>
 
@@ -391,7 +470,7 @@ const PostCard = () => {
                 <img src={send} alt="Edit Icon" className="mr-2 w-6 h-6" />
                 {/* <span className="text-md font-normal">1K Share</span> */}
                 <span className="text-md font-normal">
-                  {allPosts[index].total_shared} Share
+                  {allPosts[index].total_shared > 0 ? allPosts[index].total_shared : ""} Share
                 </span>
               </button>
               {/*--------------- Comment Popup ----------------*/}

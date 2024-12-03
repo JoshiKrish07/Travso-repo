@@ -184,6 +184,39 @@ export const commentOnReply = createAsyncThunk(
   }
 );
 
+
+// Thunk for commentOnReply details
+export const commitPost = createAsyncThunk(
+  'post/commitPost',
+  async (formData,{ rejectWithValue }) => {
+    try {
+  
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/commit-post`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      console.log("=====data===in commentOnReply===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in commentOnReply call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
 const postSlice = createSlice({
   name: 'postSlice',
   initialState: {
@@ -272,6 +305,18 @@ const postSlice = createSlice({
         state.loading = false;
       })
       .addCase(commentOnReply.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle commitPost
+      .addCase(commitPost.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(commitPost.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(commitPost.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
