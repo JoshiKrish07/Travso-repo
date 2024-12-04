@@ -115,7 +115,7 @@ const InfluencerPage = ({
                 type="text"
                 name="smlink1"
                 value={formData?.smlink1 || ""}
-                placeholder="Socail Media Link 1"
+                placeholder="Social Media Link 1"
                 onChange={handleInputChange}
                 className="w-full p-2 border border-[#2DC6BE] rounded-[12px] focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder:font-poppins placeholder:text-customBlack mt-3"
               />
@@ -123,7 +123,7 @@ const InfluencerPage = ({
                 type="text"
                 name="smlink2"
                 value={formData?.smlink2 || ""}
-                placeholder="Socail Media Link 2"
+                placeholder="Social Media Link 2"
                 onChange={handleInputChange}
                 className="w-full p-2 border border-[#2DC6BE] rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder:font-poppins placeholder:text-customBlack mt-3"
               /> */}

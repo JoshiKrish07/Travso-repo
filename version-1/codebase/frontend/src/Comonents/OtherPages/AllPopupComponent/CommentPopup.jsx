@@ -9,6 +9,7 @@ import {
   faSmile,
   faUser,
   faPaperclip,
+  faFilm,
 } from "@fortawesome/free-solid-svg-icons";
 import Travel from "../../../assets/travel.png";
 import First from "../../../assets/1.png";
@@ -40,6 +41,8 @@ import {
   LikeUnlikePost,
 } from "../../../redux/slices/postSlice";
 import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
+import EmojiPicker from "emoji-picker-react";
+import "./AllPopupPage.css";
 
 const emojis = [
   "😀",
@@ -91,13 +94,16 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
   const [isFullTextVisible, setIsFullTextVisible] = useState(false);
   const [dropdownOpenSetting, setDropdownOpenSetting] = useState(false);
   const [commentInputVal, setCommentInputVal] = useState("");
+  const [imagePreview, setImagePreview] = useState(null); // For displaying image
   const [commentReplyInputVal, setCommentReplyInputVal] = useState("");
   const [allPosts, setAllPosts] = useState(null);
   const [showReplyField, setShowReplyField] = useState(false);
   const [replyToCommentId, setReplyToCommentId] = useState(null);
 
+  const [showShareFilePopup, setShowShareFilePopup] = useState(false);
+
   const handleReplyClick = (commentId) => {
-    console.log("====replyToCommentId===>", replyToCommentId)
+    // console.log("====replyToCommentId===>", replyToCommentId)
     setReplyToCommentId(replyToCommentId === commentId ? null : commentId);
   };
 
@@ -114,11 +120,27 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
   const { userPosts, user: userDetails } = useSelector((state) => state.auth);
 
   /* emoji functionality starts */
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false); // working on reply on comment
+  const [showEmojiPicker1, setShowEmojiPicker1] = useState(false); // wprking on normal comment
 
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  // const handleEmojiClick = (emoji) => {
+  //   console.log("first")
+  //   setCommentInputVal((prevComment) => prevComment + emoji);
+  //   setShowEmojiPicker1(false); // Close the emoji picker after selection
+  // };
 
-  const handleEmojiClick = (emoji) => {
-    setCommentInputVal((prevComment) => prevComment + emoji);
+  const handleEmojiClick = (emojiObject) => {
+    setCommentInputVal((prevComment) => prevComment + emojiObject.emoji);
+    setShowEmojiPicker1(false);
+  };
+
+  const handleEmojiClickComment = (emojiObject, commentId) => {
+    // setCommentReplyInputVal((prevComment) => prevComment + emojiObject.emoji);
+
+    setCommentReplyInputVal((prevReplies) => ({
+      ...prevReplies,
+      [commentId]: (prevReplies[commentId] || "") + emojiObject.emoji,
+    }));
     setShowEmojiPicker(false); // Close the emoji picker after selection
   };
   //  console.log("===showEmojiPicker==>", showEmojiPicker);
@@ -130,9 +152,9 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
       dispatch(getUserPosts());
     }
 
-    if (!postComment) {
+    // if (!postComment) {
       dispatch(getCommentOnPost(postId));
-    }
+    // }
 
     if (!userDetails) {
       dispatch(getUserDetails());
@@ -143,7 +165,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
     if (foundPost) {
       setAllPosts([foundPost]); // Place the found post at the 0 index
     }
-  }, [dispatch, userPosts]);
+  }, [dispatch, userPosts, postId]);
 
   // to handle like and unlike
   const handleLikeUnlike = async (postId) => {
@@ -229,13 +251,18 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
 
     // Convert the difference to hours
     const hoursDifference = Math.floor(timeDifference / (1000 * 60 * 60));
+    const minutesDifference = Math.floor(timeDifference / (1000 * 60)) % 60;
 
     if (hoursDifference >= 24) {
       const days = Math.floor(hoursDifference / 24);
       return `${days}d`;
     }
 
-    return `${hoursDifference}h`;
+    if (hoursDifference >= 1) {
+      return `${hoursDifference}h`;
+    }
+  
+    return `${minutesDifference}m`;
   }
 
   // Sample data for the popup
@@ -273,7 +300,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
   const handleCommentLikeUnlike = async (commentId, postId) => {
     try {
       const response = await dispatch(likeAnyComment(commentId)).unwrap();
-      if(response) {
+      if (response) {
         await dispatch(getCommentOnPost(postId));
       }
       console.log("=====response=====>", response);
@@ -283,8 +310,15 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
   };
 
   // to show post images
-  const mediaArray =
-    allPosts && allPosts[0].media_url.replace(/^\[\"|\"?\]$/g, "").split('","'); // Split the string into individual URLs
+  // const mediaArray =
+  //   allPosts && allPosts[0].media_url.replace(/^\[\"|\"?\]$/g, "").split('","'); // Split the string into individual URLs
+
+   // to show post images
+   const mediaArray =
+   allPosts && allPosts[0].media_url;
+
+
+   console.log("=======mediaArray=====>", mediaArray);
 
   // handle when user replies on any comment and hits enter
   const handleReplyInputEnter = async (e, commentId) => {
@@ -292,9 +326,14 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
     try {
       if (e.key === "Enter" && !e.shiftKey) {
         try {
-          const replyResponse = await dispatch(commentOnReply({ 'comment_id': commentId, 'content': commentReplyInputVal })).unwrap();
-          if(replyResponse) {
-            setCommentReplyInputVal("");
+          const replyResponse = await dispatch(
+            commentOnReply({
+              comment_id: commentId,
+              content: commentReplyInputVal[commentId],
+            })
+          ).unwrap();
+          if (replyResponse) {
+            setCommentReplyInputVal({});
             await dispatch(getCommentOnPost(postId));
             await dispatch(getUserPosts());
           }
@@ -309,29 +348,58 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
     }
   };
 
-  const sendReplyComment = async(commentId, postId) => {
-    console.log("===postId==>", postId)
+  const sendReplyComment = async (commentId, postId) => {
     try {
-      const replyResponse = await dispatch(commentOnReply({ 'comment_id': commentId, 'content': commentReplyInputVal })).unwrap();
+      const replyResponse = await dispatch(
+        commentOnReply({
+          comment_id: commentId,
+          content: commentReplyInputVal[commentId],
+        })
+      ).unwrap();
       console.log("====replyResponse===>", replyResponse);
-      if(replyResponse) {
+      if (replyResponse) {
         await dispatch(getCommentOnPost(postId));
         await dispatch(getUserPosts());
-        setCommentReplyInputVal("");
+        setCommentReplyInputVal({});
       }
     } catch (error) {
       console.log("error in sendReplyComment commentpopup page", error);
     }
-  }
+  };
 
-  const handleCommentImageUpload = async(e) => {
-    console.log("file handleCommentImageUpload===>", e.target.files[0]);
-  }
+  const handleCommentImageUpload = async (e) => {
+    console.log("file handleCommentImageUpload===>");
+    const file = e.target.files[0];
+    console.log("===file===>", file);
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = async () => {
+        try {
+          setImagePreview(reader.result);
+          setImagePreview(reader.result); // Set the image preview
+
+          // Append the image preview as part of the comment (you can also append it to a markdown or HTML format)
+          setCommentInputVal(
+            (prevComment) =>
+              prevComment + `<img src="${reader.result}" alt="comment-image" />`
+          );
+          console.log("Image uploaded successfully");
+        } catch (error) {
+          console.error("Image upload failed handleCommentImageUpload:", error);
+        } finally {
+          e.target.value = null;
+        }
+      };
+    }
+  };
+
+  // console.log("======showShareFilePopup====>", showShareFilePopup);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.15)] flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl shadow-lg w-[1100px] md:w-[1100px] h-[640px] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex justify-between items-center px-6 pt-4 sticky top-0 bg-white z-10">
@@ -381,18 +449,22 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
 
             {/*---------- Scrollable Part ---------*/}
             <div className="flex-1 overflow-y-auto scrollbar-hidden">
-              <div className="relative w-full max-w-4xl mx-auto">
                 {/* Slider */}
-                <div className="overflow-hidden relative">
-                  <div>
-                    <img
-                      // src={images[currentIndex]}
-                      src={mediaArray && mediaArray[currentIndex]}
-                      alt={`Slide ${currentIndex}`}
-                      className="rounded-lg w-full h-[344px] object-cover transition duration-500"
-                    />
-                  </div>
-                </div>
+                { mediaArray && mediaArray.length > 0 && (
+                  <div className="relative w-full max-w-4xl mx-auto">
+                
+                    <div className="overflow-hidden relative">
+                      <div>
+                        <img
+                          // src={images[currentIndex]}
+                          src={mediaArray && mediaArray.length > 0 && mediaArray[currentIndex]}
+                          alt={`Slide ${currentIndex}`}
+                          className="rounded-lg w-full h-[344px] object-cover transition duration-500"
+                        />
+                      </div>
+                    </div>
+                 
+                
 
                 {/* Left Button */}
                 <button
@@ -412,7 +484,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
 
                 {/* Dots */}
                 <div className="flex justify-center mt-1">
-                  {mediaArray &&
+                  {mediaArray && mediaArray.length > 0 &&
                     mediaArray?.map((_, index) => (
                       <div
                         key={index}
@@ -426,6 +498,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                     ))}
                 </div>
               </div>
+              )}
               {/* Post Description */}
               <p className="font-inter font-medium text-[14px] text-[#212626] text-left text-justify mb-1">
                 {isFullTextVisible
@@ -450,21 +523,23 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
             <div className="flex items-center justify-between">
               <ul className="flex gap-2">
                 <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
-                  {allPosts && allPosts[0]?.total_likes || ""} Love &nbsp; &nbsp;{" "}
-                  <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>
-                </li>
-                <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
-                  {allPosts && allPosts[0]?.total_comments || ""} comments &nbsp;
+                  {(allPosts && allPosts[0]?.total_likes) || ""} Love &nbsp;
                   &nbsp;{" "}
                   <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>
                 </li>
                 <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
-                  {allPosts && allPosts[0]?.total_buckets || ""} Bucket listed &nbsp;
-                  &nbsp;{" "}
+                  {(allPosts && allPosts[0]?.total_comments) || ""} comments
+                  &nbsp; &nbsp;{" "}
                   <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>
                 </li>
                 <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
-                  {allPosts && allPosts[0]?.total_shared || ""} Shared &nbsp; &nbsp;
+                  {(allPosts && allPosts[0]?.total_buckets) || ""} Bucket listed
+                  &nbsp; &nbsp;{" "}
+                  <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>
+                </li>
+                <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
+                  {(allPosts && allPosts[0]?.total_shared) || ""} Shared &nbsp;
+                  &nbsp;
                 </li>
               </ul>
               <p className="font-inter font-medium text-[12px] text-[#667877] ">
@@ -624,44 +699,52 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                           {/* Interaction Section */}
                           <div className="flex flex-col">
                             <div className="-mt-1 flex items-center gap-4">
-                            <div className="flex items-center cursor-pointer" onClick={() => handleCommentLikeUnlike(userPosts.id, allPosts[0]?.id)}>
+                              <div
+                                className="flex items-center cursor-pointer"
+                                onClick={() =>
+                                  handleCommentLikeUnlike(
+                                    userPosts.id,
+                                    allPosts[0]?.id
+                                  )
+                                }
+                              >
+                                <div className="flex items-center">
+                                  <img
+                                    src={noto_fire}
+                                    alt="noto_fire"
+                                    className="w-4 h-4"
+                                  />
+                                </div>
+                                <div className="flex items-center">
+                                  <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
+                                    {userPosts?.total_likes_on_comment || ""}{" "}
+                                    {userPosts?.total_likes_on_comment > 1
+                                      ? "likes"
+                                      : "like"}{" "}
+                                  </p>
+                                </div>
+                              </div>
                               <div
                                 className="flex items-center"
+                                onClick={() => handleReplyClick(userPosts?.id)}
                               >
-                                <img
-                                  src={noto_fire}
-                                  alt="noto_fire"
-                                  className="w-4 h-4"
-                                />
-                              </div>
-                              <div className="flex items-center">
-                                <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
-                                  {userPosts?.total_likes_on_comment || ""}{" "}
-                                  {userPosts?.total_likes_on_comment > 1 ? "likes" : "like"}{" "}
-                                  
-                                </p>
-                              </div>
-                            </div>
-                            <div
-                              className="flex items-center"
-                              onClick={() => handleReplyClick(userPosts?.id)}
-                            >
-                              <div className="flex items-center">
-                                <img
-                                  src={Dialog}
-                                  alt="Dialog"
-                                  className="w-4 h-4"
-                                />
-                              </div>
-                              <div className="flex items-center cursor-pointer">
-                                <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
-                                  {userPosts?.total_reply_on_comment || ""}{" "}
-                                  {userPosts?.total_reply_on_comment > 1 ? "replies" : "reply"}{" "}
-                                  
-                                </p>
-                              </div>
-                              {/* Conditional rendering of the reply input field */}
-                              {/* {replyToCommentId === userPosts?.id && (
+                                <div className="flex items-center">
+                                  <img
+                                    src={Dialog}
+                                    alt="Dialog"
+                                    className="w-4 h-4"
+                                  />
+                                </div>
+                                <div className="flex items-center cursor-pointer">
+                                  <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
+                                    {userPosts?.total_reply_on_comment || ""}{" "}
+                                    {userPosts?.total_reply_on_comment > 1
+                                      ? "replies"
+                                      : "reply"}{" "}
+                                  </p>
+                                </div>
+                                {/* Conditional rendering of the reply input field */}
+                                {/* {replyToCommentId === userPosts?.id && (
                                 <div className="reply-field">
                                   <img
                                     src={face_smile}
@@ -710,159 +793,187 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                                   </div>
                                 </div>
                               )} */}
-                            </div>
+                              </div>
                             </div>
                             {/* Input Section New */}
                             {replyToCommentId === userPosts?.id && (
-                            <div className="mt-3">
-                              <div className="flex items-center gap-2">
-                                {/* Profile Image */}
-                                <img
-                                  src={
-                                    (userDetails &&
-                                      userDetails.profile_image) ||
-                                    dummyUserImage
-                                  }
-                                  alt="Profile"
-                                  className="w-10 h-10 rounded-full"
-                                />
+                              <div className="mt-3">
+                                <div className="flex items-center gap-2">
+                                  {/* Profile Image */}
+                                  <img
+                                    src={
+                                      (userDetails &&
+                                        userDetails?.profile_image) ||
+                                      dummyUserImage
+                                    }
+                                    alt="Profile"
+                                    className="w-10 h-10 rounded-full"
+                                  />
 
-                                <div className="flex items-center bg-gray-200 py-2 pl-2 rounded-full w-[100%]">
-                                  {showEmojiPicker && (
-                                    <div className="absolute top-12 left-0 bg-white border rounded-lg shadow-lg p-3 grid grid-cols-8 gap-2 z-50 max-h-48 overflow-y-auto">
+                                  <div className="relative">
+                                    {showEmojiPicker && (
+                                      <div className="absolute top-10 left-0 z-50">
+                                        <EmojiPicker
+                                          onEmojiClick={(emojiObject) =>
+                                            handleEmojiClickComment(
+                                              emojiObject,
+                                              userPosts?.id
+                                            )
+                                          }
+                                          className="w-[250px] h-[300px] shadow-lg rounded-lg"
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <div className="flex items-center bg-gray-200 py-2 pl-2 rounded-full w-[100%]">
+                                    {/* {showEmojiPicker && (
+                                    <div className="absolute top-10 right-72 bg-white border rounded-lg shadow-lg p-3 grid grid-cols-8 gap-2 z-50 max-h-48 overflow-y-auto">
                                       {emojis.map((emoji, index) => (
                                         <button
                                           key={index}
                                           className="text-2xl hover:bg-gray-200 p-2 rounded"
                                           onClick={() =>
-                                            handleEmojiClick(emoji)
+                                            handleEmojiClickComment(emoji)
                                           }
                                         >
                                           {emoji}
                                         </button>
                                       ))}
                                     </div>
-                                  )}
-                                  <img
-                                    src={face_smile}
-                                    alt="smile"
-                                    className="cursor-pointer"
-                                    onClick={() =>
-                                      setShowEmojiPicker(!showEmojiPicker)
-                                    }
-                                  />
-                                  {/* Input Field */}
-                                  <input
-                                    type="text"
-                                    placeholder="Add a comment"
-                                    onKeyDown={(e) =>
-                                      handleReplyInputEnter(e, userPosts?.id, allPosts[0]?.id)
-                                    }
-                                    value={commentReplyInputVal}
-                                    onChange={(e) =>
-                                      setCommentReplyInputVal(e.target.value)
-                                    }
-                                    className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-500 ml-2 text-sm"
-                                  />
+                                  )} */}
 
-                                  {/* Icons */}
-                                  <div className="flex items-center justify-center space-x-3 text-gray-400">
-                                    <button className="hover:text-gray-600">
-                                      <FontAwesomeIcon
-                                        icon={faPaperclip}
-                                        className="w-5 h-5"
-                                      />
-                                    </button>
-                                    <button className="">
-                                      <img
-                                        src={Send}
-                                        onClick={() =>
-                                          sendReplyComment(userPosts?.id, allPosts[0]?.id)
-                                        }
-                                        className="w-[44px] h-[44px] -my-5"
-                                      />
-                                    </button>
+                                    <img
+                                      src={face_smile}
+                                      alt="smile"
+                                      className="cursor-pointer"
+                                      onClick={() =>
+                                        setShowEmojiPicker(!showEmojiPicker)
+                                      }
+                                    />
+                                    {/* Input Field */}
+                                    <input
+                                      type="text"
+                                      placeholder="Add a comment"
+                                      onKeyDown={(e) =>
+                                        handleReplyInputEnter(
+                                          e,
+                                          userPosts?.id,
+                                          allPosts[0]?.id
+                                        )
+                                      }
+                                      value={
+                                        commentReplyInputVal[userPosts?.id] ||
+                                        ""
+                                      }
+                                      onChange={(e) =>
+                                        setCommentReplyInputVal((prev) => ({
+                                          ...prev,
+                                          [userPosts?.id]: e.target.value,
+                                        }))
+                                      }
+                                      className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-500 ml-2 text-sm"
+                                    />
+
+                                    {/* Icons */}
+                                    <div className="flex items-center justify-center space-x-3 text-gray-400">
+                                      <button className="hover:text-gray-600">
+                                        <FontAwesomeIcon
+                                          icon={faPaperclip}
+                                          className="w-5 h-5"
+                                        />
+                                      </button>
+                                      <button className="">
+                                        <img
+                                          src={Send}
+                                          onClick={() =>
+                                            sendReplyComment(
+                                              userPosts?.id,
+                                              allPosts[0]?.id
+                                            )
+                                          }
+                                          className="w-[44px] h-[44px] -my-5"
+                                        />
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
                             )}
                           </div>
                         </div>
                         {userPosts?.replies?.length > 0 &&
-                          userPosts?.replies?.map(
-                            (userReply, replyIndex) => {
-                              return (
-                                <div key={replyIndex}>
-                                  <div className="mt-4 ml-8">
-                                    {/* Child Comment Reaction */}
-                                    <div className="flex items-start rounded-md">
-                                      {/* Profile Image */}
-                                      <img
-                                        src={Girl}
-                                        alt="User"
-                                        className="w-8 h-8 rounded-full"
-                                      />
+                          userPosts?.replies?.map((userReply, replyIndex) => {
+                            return (
+                              <div key={userReply?.reply_id}>
+                                <div className="mt-4 ml-8">
+                                  {/* Child Comment Reaction */}
+                                  <div className="flex items-start rounded-md">
+                                    {/* Profile Image */}
+                                    <img
+                                      src={userReply?.reply_user_profile_image || dummyUserImage}
+                                      alt="User"
+                                      className="w-8 h-8 rounded-full"
+                                    />
 
-                                      {/* Content Section */}
-                                      <div className="w-full flex flex-col space-y-2">
-                                        {/* Comment Content */}
-                                        <div className="flex flex-col bg-[#EEF0F29C] p-2 rounded-[12px] w-full">
-                                          <div className="flex items-center justify-between">
-                                            <p className="flex items-center font-inter font-medium text-[#212626] text-[16px] text-left">
-                                              Joana Almeida &nbsp;{" "}
-                                              <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>{" "}
-                                              &nbsp;{" "}
-                                              <span className="font-inter font-medium text-[16px] text-[#667877]">
-                                                4 hrs ago
-                                              </span>
-                                            </p>
-                                            <img
-                                              src={dots_vertical}
-                                              alt="dots_vertical"
-                                              className="w-[24px] h-[24px]"
-                                            />
-                                          </div>
-
-                                          <p className="font-inter font-medium text-[14px] text-[#212626] text-left">
-                                            Nice View 🎉
+                                    {/* Content Section */}
+                                    <div className="w-full flex flex-col space-y-2">
+                                      {/* Comment Content */}
+                                      <div className="flex flex-col bg-[#EEF0F29C] p-2 rounded-[12px] w-full">
+                                        <div className="flex items-center justify-between">
+                                          <p className="flex items-center font-inter font-medium text-[#212626] text-[16px] text-left">
+                                            {userReply?.reply_user_full_name} &nbsp;{" "}
+                                            <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>{" "}
+                                            &nbsp;{" "}
+                                            <span className="font-inter font-medium text-[16px] text-[#667877]">
+                                              {getTimeDifferenceFromNow(userReply?.reply_created_at)} ago
+                                            </span>
                                           </p>
+                                          <img
+                                            src={dots_vertical}
+                                            alt="dots_vertical"
+                                            className="w-[24px] h-[24px]"
+                                          />
                                         </div>
 
-                                        {/* Interaction Section */}
-                                        <div className="flex items-center gap-2">
+                                        <p className="font-inter font-medium text-[14px] text-[#212626] text-left">
+                                          {userReply?.reply_content}
+                                        </p>
+                                      </div>
+
+                                      {/* Interaction Section */}
+                                      <div className="flex items-center gap-2">
+                                        <div className="flex items-center">
                                           <div className="flex items-center">
-                                            <div className="flex items-center">
-                                              <img
-                                                src={noto_fire}
-                                                alt="noto_fire"
-                                                className="w-4 h-4"
-                                              />
-                                            </div>
-                                            <div className="flex items-center">
-                                              <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
-                                                62 likes
-                                              </p>
-                                            </div>
+                                            <img
+                                              src={noto_fire}
+                                              alt="noto_fire"
+                                              className="w-4 h-4"
+                                            />
                                           </div>
                                           <div className="flex items-center">
-                                            <div className="flex items-center">
-                                              <img
-                                                src={Dialog}
-                                                alt="Dialog"
-                                                className="w-4 h-4"
-                                              />
-                                            </div>
+                                            <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
+                                              62 likes
+                                            </p>
+                                          </div>
+                                        </div>
+                                        <div className="flex items-center">
+                                          <div className="flex items-center">
+                                            <img
+                                              src={Dialog}
+                                              alt="Dialog"
+                                              className="w-4 h-4"
+                                            />
                                           </div>
                                         </div>
                                       </div>
                                     </div>
-                                    {/* Child Comment Reaction */}
                                   </div>
+                                  {/* Child Comment Reaction */}
                                 </div>
-                              );
-                            }
-                          )}
+                              </div>
+                            );
+                          })}
                       </div>
                       {/* Parent Comment Reaction */}
                     </div>
@@ -884,9 +995,26 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                   className="w-10 h-10 rounded-full"
                 />
 
+                {/* <div>
+                  {showEmojiPicker1 && (
+                    <EmojiPicker onEmojiClick={handleEmojiClick} />
+                  )}
+                </div> */}
+
+                <div className="relative">
+                  {showEmojiPicker1 && (
+                    <div className="absolute -top-[380px] left-0 z-50">
+                      <EmojiPicker
+                        onEmojiClick={handleEmojiClick}
+                        className="w-[250px] h-[300px] shadow-lg rounded-lg"
+                      />
+                    </div>
+                  )}
+                </div>
+
                 <div className="flex items-center bg-gray-200 py-2 pl-2 rounded-full w-[100%]">
-                  {showEmojiPicker && (
-                    <div className="absolute top-12 left-0 bg-white border rounded-lg shadow-lg p-3 grid grid-cols-8 gap-2 z-50 max-h-48 overflow-y-auto">
+                  {/* {showEmojiPicker1 && (
+                    <div className="absolute top-96 right-52 bg-white border rounded-lg shadow-lg p-3 grid grid-cols-8 gap-2 z-50 max-h-48 overflow-y-auto">
                       {emojis.map((emoji, index) => (
                         <button
                           key={index}
@@ -897,13 +1025,15 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                         </button>
                       ))}
                     </div>
-                  )}
+                  )} */}
+
                   <img
                     src={face_smile}
                     alt="smile"
                     className="cursor-pointer"
-                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    onClick={() => setShowEmojiPicker1(!showEmojiPicker1)}
                   />
+
                   {/* Input Field */}
                   <input
                     type="text"
@@ -915,11 +1045,55 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                   />
 
                   {/* Icons */}
-                  <div className="flex items-center justify-center space-x-3 text-gray-400" >
-                    <button className="hover:text-gray-600" onClick={() => document.getElementById("uploadCommentImage").click()}>
+                  <div className="flex items-center justify-center space-x-3 text-gray-400">
+                    {/* <button className="hover:text-gray-600" onClick={() => document.getElementById("uploadCommentImage").click()}>
                     <input type="file" id="uploadCommentImage" hidden onChange={(e) => handleCommentImageUpload(e)} />
                       <FontAwesomeIcon icon={faPaperclip} className="w-5 h-5" />
+                    </button> */}
+                    <button
+                      className="hover:text-gray-600"
+                      onClick={() => setShowShareFilePopup(!showShareFilePopup)}
+                    >
+                      <FontAwesomeIcon icon={faPaperclip} className="w-5 h-5" />
                     </button>
+
+                    {/* Popup Menu */}
+                    {showShareFilePopup && (
+                      <div className="absolute top-[520px] right-72 bg-white shadow-lg rounded-md p-2 w-20 z-50 flex flex-col space-y-3">
+                        {/* Image Icon */}
+                        <button
+                          className="flex items-center justify-center hover:text-blue-500"
+                          onClick={() => {
+                            document
+                              .getElementById("uploadCommentImage")
+                              .click();
+                            setShowShareFilePopup(false);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faImage} className="w-6 h-6" />
+                        </button>
+
+                        {/* GIF Icon */}
+                        <button
+                          className="flex items-center justify-center hover:text-green-500"
+                          onClick={() => {
+                            // Handle GIF upload logic or open GIF picker
+                            setShowShareFilePopup(false);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faFilm} className="w-6 h-6" />
+                        </button>
+                      </div>
+                    )}
+
+                    <input
+                      type="file"
+                      id="uploadCommentImage"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={(e) => handleCommentImageUpload(e)}
+                    />
+
                     <button className="">
                       <img
                         src={Send}

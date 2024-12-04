@@ -372,7 +372,7 @@ const SignupStep1 = ({
 
       {/* Right Section */}
       <div className="flex-[1] flex justify-center items-center min-h-[50vh] md:min-h-screen">
-        <div className="rounded-lg w-11/12 md:w-3/4 lg:w-3/5 md:mb-10 mt-10">
+        <div className="rounded-lg w-11/12 md:w-3/4 lg:w-3/5 mb-10 mt-10 md:mt-0 md:mb-0">
           <div>
             {/* show flash message */}
            

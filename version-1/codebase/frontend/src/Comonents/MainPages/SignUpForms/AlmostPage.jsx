@@ -70,7 +70,7 @@ const AlmostPage = ({ formData, formDataError, handleInputChange, handleSubmit, 
               <input
                 type="text"
                 name="userName"
-                placeholder="User Name"
+                placeholder="Unique ID"
                 value={formData?.userName || ""}
                 onChange={handleInputChange}
                 className="w-full p-2 border border-[#2DC6BE] rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder:font-poppins placeholder:text-customBlack"

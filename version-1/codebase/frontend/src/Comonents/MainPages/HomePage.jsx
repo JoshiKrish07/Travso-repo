@@ -36,6 +36,7 @@ const HomePage = () => {
       {/* Right Section */}
       <div className="flex-[1] flex justify-center items-center min-h-[50vh] md:min-h-full">
         <div className="rounded-lg w-11/12 md:w-3/4 lg:w-3/5 flex flex-col gap-28">
+          <h1>Dummy Page</h1>
           <h2 className="text-[25px] font-semibold text-center">
             <button className="bg-teal-400 text-white font-semibold rounded-md hover:bg-teal-500 transition p-2 w-32" onClick={handleLogin}>Login</button>
           </h2>

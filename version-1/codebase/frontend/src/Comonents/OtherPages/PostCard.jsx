@@ -33,6 +33,7 @@ import dummyUserImage from "../../assets/user_image-removebg-preview.png";
 import SharePopup from "./AllPopupComponent/SharePopup";
 import Saved from "../../assets/headerIcon/archive-minus.png";
 import { getUserPosts } from "../../redux/slices/authSlice";
+import SavedPopup from "./AllPopupComponent/SavedPopup";
 
 const posts = [
   {
@@ -65,6 +66,7 @@ const PostCard = () => {
   const [isCommentPopup, setIsCommentPopup] = useState(false);
   const [activePostId, setActivePostId] = useState(null);
   const triggerRef = useRef(null);
+  const [isCommentWithSavedPopup, setIsCommentWithSavedPopup] = useState(false);
 
   // const { allPosts } = useSelector((state) => state.postSlice);
   const { user: userDetails, userPosts: allPosts } = useSelector(
@@ -130,16 +132,16 @@ const PostCard = () => {
   };
 
   const handleEmojiClickForPost = (emoji) => {
-    console.log("==handleEmojiClickForPost===>")
+    console.log("==handleEmojiClickForPost===>");
     setCommentInputValForPost((prevComment) => prevComment + emoji);
     setShowEmojiPickerForPost(false); // Close the emoji picker after selection
   };
 
-  const handleInputEnterForPost = async(e) => {
+  const handleInputEnterForPost = async (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       try {
         const commentResult = await dispatch(
-          commitPost({description: commentInputValForPost})
+          commitPost({ description: commentInputValForPost })
         ).unwrap();
         if (commentResult) {
           console.log("=====commentResult===>", commentResult.message);
@@ -153,9 +155,8 @@ const PostCard = () => {
         const errorMessage = error.error || "Unexpected Error Occured";
         handleFlashMessage(errorMessage, "error");
       }
-      
     }
-  }
+  };
 
   /* emoji functionality starts */
 
@@ -234,24 +235,29 @@ const PostCard = () => {
     return formattedDate.replace(",", " at").replace(/\s([AP]M)$/, "$1"); // Remove space before AM/PM
   }
 
-
   // for comment time difference
   function getHoursFromNow(timestamp) {
     const givenDate = new Date(timestamp);
     const currentDate = new Date();
-  
+
     // Calculate the absolute difference in milliseconds
     const timeDifference = Math.abs(givenDate - currentDate);
-  
+
     // Convert the difference to hours
     const hoursDifference = Math.floor(timeDifference / (1000 * 60 * 60));
-  
+    const minutesDifference = Math.floor(timeDifference / (1000 * 60)) % 60;
+
+
     if (hoursDifference >= 24) {
       const days = Math.floor(hoursDifference / 24);
       return `${days}d`;
     }
+
+    if (hoursDifference >= 1) {
+      return `${hoursDifference}h`;
+    }
   
-    return `${hoursDifference}h`;
+    return `${minutesDifference}m`;
   }
 
   // to extract the media URLs for a specific post
@@ -264,10 +270,10 @@ const PostCard = () => {
   const getFirstImage = (mediaUrl) => {
     // If mediaUrl is an empty array string, return null
     if (mediaUrl === "[]") return null;
-  
+
     // Clean the string and split it into an array
-    const mediaArray = mediaUrl.replace(/^\[\"|\"?\]$/g, '').split('","');
-  
+    const mediaArray = mediaUrl.replace(/^\[\"|\"?\]$/g, "").split('","');
+
     // Return the first image URL or null if the array is empty
     return mediaArray.length > 0 ? mediaArray[0] : null;
   };
@@ -277,13 +283,12 @@ const PostCard = () => {
   // handle onchange of image upload on post section
   const handlePostImageUpload = (e) => {
     console.log("=====handlePostImageUpload=====>", e.target.files[0]);
-  }
-
+  };
 
   // handle onchange of image upload on comment section
   const handleCommentImage = (e) => {
     console.log("====handleCommentImage===>", e.target.files[0]);
-  }
+  };
 
   return (
     <>
@@ -312,47 +317,60 @@ const PostCard = () => {
 
           {/* Icons */}
           <div className="flex items-center space-x-3 text-gray-400">
-            <button className="hover:text-gray-600" onClick={() => document.getElementById("postGallery").click()}>
+            <button
+              className="hover:text-gray-600"
+              onClick={() => document.getElementById("postGallery").click()}
+            >
               <FontAwesomeIcon icon={faImage} className="w-5 h-5" />
-              <input type="file" id="postGallery" onChange={(e) => handlePostImageUpload(e)} hidden/>
+              <input
+                type="file"
+                id="postGallery"
+                onChange={(e) => handlePostImageUpload(e)}
+                hidden
+              />
             </button>
 
             <button className="hover:text-gray-600">
-            <div className="relative">
+              <div className="relative">
+                <button
+                  className="hover:text-gray-600"
+                  ref={triggerRef}
+                  onClick={() =>
+                    setShowEmojiPickerForPost(!showEmojiPickerForPost)
+                  }
+                >
+                  <FontAwesomeIcon icon={faSmile} className="w-5 h-5" />
+                </button>
+                {showEmojiPickerForPost && (
+                  <div
+                    className="absolute bg-white border rounded-lg shadow-lg p-3 grid grid-cols-8 gap-2 z-50 max-h-48 overflow-y-auto"
+                    style={{
+                      right: 2,
+                      top: "-210px",
+                      width: "23rem",
+                    }}
+                  >
+                    {emojis.map((emoji, index) => (
                       <button
-                        className="hover:text-gray-600"
-                        ref={triggerRef}
-                        onClick={() => setShowEmojiPickerForPost(!showEmojiPickerForPost)}
+                        key={index}
+                        className="text-2xl hover:bg-gray-200 p-2 rounded"
+                        onClick={() => handleEmojiClickForPost(emoji)}
                       >
-                        <FontAwesomeIcon icon={faSmile} className="w-5 h-5" />
+                        {emoji}
                       </button>
-                      {showEmojiPickerForPost && (
-                        <div
-                          className="absolute bg-white border rounded-lg shadow-lg p-3 grid grid-cols-8 gap-2 z-50 max-h-48 overflow-y-auto"
-                          style={{
-                            right: 2, 
-                            top: "-210px",
-                            width: "23rem",
-                          }}
-                        >
-                          {emojis.map((emoji, index) => (
-                            <button
-                              key={index}
-                              className="text-2xl hover:bg-gray-200 p-2 rounded"
-                              onClick={() => handleEmojiClickForPost(emoji)}
-                            >
-                              {emoji}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                    ))}
+                  </div>
+                )}
+              </div>
               {/* <FontAwesomeIcon icon={faSmile} className="w-5 h-5" /> */}
             </button>
             <button className="hover:text-gray-600">
               <FontAwesomeIcon icon={faUser} className="w-5 h-5" />
             </button>
-            <button className="hover:text-gray-600" onClick={() => document.getElementById("postGallery").click()}>
+            <button
+              className="hover:text-gray-600"
+              onClick={() => document.getElementById("postGallery").click()}
+            >
               <FontAwesomeIcon icon={faPaperclip} className="w-5 h-5" />
             </button>
           </div>
@@ -413,17 +431,23 @@ const PostCard = () => {
             <p className="mb-3 text-left text-[#1DB2AA]">
               #arsitek #art #creative
             </p>
-            {/* {post.image && ( */}
-            {
-              getFirstImage(allPosts[index].media_url) && (
+            
+            {/* {getFirstImage(allPosts[index].media_url) && (
+              <img
+                src={getFirstImage(allPosts[index].media_url)}
+                alt="Post"
+                className="w-full h-[548px] rounded-lg object-cover"
+              />
+            )} */}
+
+              {(allPosts[index].media_url).length > 0 && (
                 <img
-                  src={getFirstImage(allPosts[index].media_url)}
+                  src={allPosts[index].media_url[0]}
                   alt="Post"
                   className="w-full h-[548px] rounded-lg object-cover"
                 />
-              )
-            }
-            
+              )}
+
             {/* )} */}
             <div className="flex items-center justify-between mt-4">
               <button
@@ -434,7 +458,10 @@ const PostCard = () => {
                 <img src={fire} alt="Edit Icon" className="mr-2 w-6 h-6" />
                 {/* <span className="text-md font-normal">72K Liked</span> */}
                 <span className="text-md font-normal">
-                  {allPosts[index].total_likes > 0 ? allPosts[index].total_likes : ""} Liked
+                  {allPosts[index].total_likes > 0
+                    ? allPosts[index].total_likes
+                    : ""}{" "}
+                  Liked
                 </span>
               </button>
 
@@ -447,18 +474,25 @@ const PostCard = () => {
                 <img src={Dialog} alt="Edit Icon" className="mr-2 w-6 h-6" />
                 {/* <span className="text-md font-normal">50K Comments</span> */}
                 <span className="text-md font-normal">
-                  {allPosts[index].total_comments > 0 ? allPosts[index].total_comments : ""} Comments
+                  {allPosts[index].total_comments > 0
+                    ? allPosts[index].total_comments
+                    : ""}{" "}
+                  Comments
                 </span>
               </button>
 
               <button
                 aria-label="Edit Info"
                 className="flex items-center justify-center w-[197px] h-[40px] bg-[#cdd0d499] text-[#434C50] hover:text-gray-800 py-1 px-3 rounded-full "
+                onClick={() => setIsCommentWithSavedPopup(true)}
               >
                 <img src={bucket} alt="Edit Icon" className="mr-2 w-6 h-6" />
                 {/* <span className="text-md font-normal">2.3K Saved</span> */}
                 <span className="text-md font-normal">
-                  {allPosts[index].total_buckets > 0 ? allPosts[index].total_buckets : ""} Saved
+                  {allPosts[index].total_buckets > 0
+                    ? allPosts[index].total_buckets
+                    : ""}{" "}
+                  Saved
                 </span>
               </button>
 
@@ -470,7 +504,10 @@ const PostCard = () => {
                 <img src={send} alt="Edit Icon" className="mr-2 w-6 h-6" />
                 {/* <span className="text-md font-normal">1K Share</span> */}
                 <span className="text-md font-normal">
-                  {allPosts[index].total_shared > 0 ? allPosts[index].total_shared : ""} Share
+                  {allPosts[index].total_shared > 0
+                    ? allPosts[index].total_shared
+                    : ""}{" "}
+                  Share
                 </span>
               </button>
               {/*--------------- Comment Popup ----------------*/}
@@ -489,10 +526,16 @@ const PostCard = () => {
                 />
               )}
 
-<SharePopup
-              isOpen={isSharePopup}
-              onClose={() => setIsSharePopup(false)}
+              <SharePopup
+                isOpen={isSharePopup}
+                onClose={() => setIsSharePopup(false)}
+              />
+
+<SavedPopup
+              isOpen={isCommentWithSavedPopup}
+              onClose={() => setIsCommentWithSavedPopup(false)}
             />
+
 
             </div>
 
@@ -517,7 +560,7 @@ const PostCard = () => {
                   {/* Comment Content */}
                   <div className="bg-[#EEF0F29C] p-2 rounded-lg w-[120px]">
                     <p className="font-semibold text-[#415365] text-[15px] text-left">
-                      {allPosts[index]?.last_comment_user_name}
+                      {allPosts[index]?.last_comment_user_full_name}
                     </p>
                     <p className="text-[#415365] text-[14px] text-left">
                       {allPosts[index]?.last_comment_content}
@@ -531,7 +574,8 @@ const PostCard = () => {
                         <img src={ok} alt="Green Icon" className="w-4 h-4" />
                       </div>
                       <div className="">
-                        {allPosts[index]?.last_comment_likes_count} <sup>Comments</sup>
+                        {allPosts[index]?.last_comment_likes_count}{" "}
+                        <sup>Comments</sup>
                       </div>
                     </div>
                     <div className="">
@@ -570,9 +614,19 @@ const PostCard = () => {
 
                   {/* Icons */}
                   <div className="flex items-center space-x-3 text-gray-400">
-                    <button className="hover:text-gray-600" onClick={() => document.getElementById("commentImageUpload").click()}>
+                    <button
+                      className="hover:text-gray-600"
+                      onClick={() =>
+                        document.getElementById("commentImageUpload").click()
+                      }
+                    >
                       <FontAwesomeIcon icon={faImage} className="w-5 h-5" />
-                      <input type="file" id="commentImageUpload" hidden onChange={(e) => handleCommentImage(e)} />
+                      <input
+                        type="file"
+                        id="commentImageUpload"
+                        hidden
+                        onChange={(e) => handleCommentImage(e)}
+                      />
                     </button>
                     <div className="relative">
                       <button
@@ -586,7 +640,7 @@ const PostCard = () => {
                         <div
                           className="absolute bg-white border rounded-lg shadow-lg p-3 grid grid-cols-8 gap-2 z-50 max-h-48 overflow-y-auto"
                           style={{
-                            right: 2, 
+                            right: 2,
                             top: "-210px",
                             width: "23rem",
                           }}

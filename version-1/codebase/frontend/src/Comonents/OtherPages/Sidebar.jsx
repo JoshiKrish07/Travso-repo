@@ -385,10 +385,19 @@ const Sidebar = () => {
           {/* Dynamically render images and titles */}
           {visiblePosts.map((post) => (
             <div key={post.id}>
-              {
+              {/* {
                   getFirstImage(post.media_url) && (
                     <img
                       src={getFirstImage(post.media_url)}
+                      alt={post.description}
+                      className="w-full h-[130px] rounded-sm object-cover"
+                    />
+                  )
+                } */}
+                {
+                  (post.media_url).length > 0 && (
+                    <img
+                      src={post.media_url[0]}
                       alt={post.description}
                       className="w-full h-[130px] rounded-sm object-cover"
                     />
