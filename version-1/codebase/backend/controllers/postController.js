@@ -765,6 +765,85 @@ async function replyOnComment(req , res){
         }
       }
 
+
+// delete comment
+async function   deleteComments(req, res) {
+  try {
+    const UserId = req.user.userId; // extrcting from token
+    const { id } = req.params;       // Extract comment ID from request body
+
+    // Begin a database transaction
+    // await pool.execute('START TRANSACTION');
+
+    // Delete replies associated with the comment
+    const [replyData] = await pool.execute(
+      'DELETE FROM comment_reply WHERE comment_id = ?', [id ]
+    );
+
+    // Delete the comment
+    const [commentData] = await pool.execute(
+      'DELETE FROM comments WHERE id = ? AND user_id = ?', [id, UserId]
+    );
+    console.log("===Comment Deleted===>", commentData);
+
+    if(commentData.affectedRows === 0) {
+      return res.status(404).json({ error: "comment not found" });
+    }
+
+    // Commit the transaction
+    // await pool.execute('COMMIT');
+
+    return res.status(200).json({
+      message: "Comment and associated replies deleted successfully"
+    });
+
+  } catch (error) {
+    console.error("===Error===>", error);
+
+    // Rollback the transaction in case of an error
+    await pool.execute('ROLLBACK');
+
+    return res.status(500).json({
+      error: "Internal Server Error"
+    });
+  }
+}
+
+// delete a reply
+async function deleteReply(req , res){
+  try {
+       
+      const { replyId } = req.params;
+      console.log('====output===>',replyId);
+      const [ existingComment] = await pool.execute(
+         `SELECT * FROM comment_reply WHERE id = ?`,[replyId]
+      );
+
+      console.log("reply not found",existingComment);
+
+      if(existingComment.length === 0) {
+          return res.status(409).json({
+             error:"comment not found"
+         });
+      }
+
+      const [data] = await pool.execute(
+          `DELETE FROM comment_reply WHERE id = ?`,[replyId]
+      );
+
+      console.log("===comment=deleted====>",data);
+      return res.status(200).json({
+          message:"comment Deleted successfully"
+      });
+      
+  } catch (error) {
+      console.log("===error deleting comment===>",error);
+      return res.status(500).json({
+          error:"Internal Server Error"
+      });
+  }
+}
+
 module.exports = {
     allPosts,
     postWithlikes,
@@ -777,5 +856,7 @@ module.exports = {
     postLike,
     likeAnyComment,
     replyOnComment,
-    storePost
+    storePost,
+    deleteComments,
+    deleteReply
 }

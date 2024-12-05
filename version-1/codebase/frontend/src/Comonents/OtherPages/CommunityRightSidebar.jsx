@@ -1,9 +1,13 @@
 
-import React from "react";
+import React, { useState } from "react";
 import Boy1 from "../../assets/headerIcon/boy1.png";
 import Girl from "../../assets/headerIcon/girl.jpg";
+import { useSelector } from "react-redux";
+// import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
+import dummyUserImage from "../../assets/user_image-removebg-preview.png"
 
 const CommunityRightSidebar = () => {
+  const [showAllActives, setShowAllActives] = useState(false);
   const data = [
     { id: 1, src: Boy1, label: "Arjun Kumar" },
     { id: 2, src: Girl, label: "Priya Sharma" },
@@ -40,29 +44,43 @@ const CommunityRightSidebar = () => {
     },
   ];
 
+  /* redux state data starts */
+
+  const { onlineFriends } = useSelector((state) => state.auth);
+
+  /* redux state data ends */
+
+  // Toggle friends to show only 8 or all
+  const displayedFriends = onlineFriends ? showAllActives ? onlineFriends : onlineFriends.slice(0, 8) : null;
+
   return (
     <>
       <div className="bg-white rounded-lg shadow-[0_2px_6px_rgba(0,0,0,0.10)] p-5">
         <h2 className="mb-4 font-poppins text-[20px] font-semibold text-[#212626] text-left">
-          Active Friends
+          Active Friends {`(${(onlineFriends && onlineFriends.length) || '0'})`}
         </h2>
         <div className="grid grid-cols-4 gap-1">
-          {data.map((item) => (
-            <div key={item.id} className="flex flex-col items-center mb-2">
+          {displayedFriends && displayedFriends.map((userData) => (
+            <div key={userData.id} className="flex flex-col userDatas-center mb-2">
               <img
-                src={item.src}
-                alt={item.label}
+                src={userData.profile_image || dummyUserImage}
                 className="w-[64px] h-[64px] object-cover rounded-full border-2 border-[#2DC6BE] p-[2px]"
               />
               <p className="font-inter font-medium text-[14px] mt-2 text-[#212626]">
-                {item.label.slice(0,7)}...
+                {userData.full_name.slice(0,7)}...
               </p>
             </div>
           ))}
         </div>
-        <button className="font-inter font-medium text-[#2DC6BE] text-[14px] px-4 py-2 hover:px-4 hover:py-2 rounded-md hover:bg-teal-600 hover:text-white">
-          See All
+        {
+          onlineFriends && onlineFriends.length > 8 &&
+        <button 
+          onClick={() => setShowAllActives(!showAllActives)}
+          className="font-inter font-medium text-[#2DC6BE] text-[14px] px-4 py-2 hover:px-4 hover:py-2 rounded-md hover:bg-teal-600 hover:text-white"
+        >
+          { showAllActives ? "Show Less" : "See All" }
         </button>
+        }
       </div>
       <div className="mt-4 bg-white rounded-lg shadow-[0_2px_6px_rgba(0,0,0,0.10)] p-5">
         <div className="flex items-center justify-between">

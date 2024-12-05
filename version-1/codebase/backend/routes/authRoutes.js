@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { registerUser, sendOTP, verifyOTP, finalSignUp, resendOTP, getFollowersCount, loginUser, sendEmailOTP, sendOTPForgotPassword, forgotPassVerify, updatePassword, getUserBuddies, getUserFollower, getUserDetails, updateUser, toWhomUserFollows, insertProfileImage, removeProfileImage, getallUsers, removeCoverImage, uploadCoverImage, logOut, addSearch, updateFollowSelect } = require('../controllers/authController');
+const { registerUser, sendOTP, verifyOTP, finalSignUp, resendOTP, getFollowersCount, loginUser, sendEmailOTP, sendOTPForgotPassword, forgotPassVerify, updatePassword, getUserBuddies, getUserFollower, getUserDetails, updateUser, toWhomUserFollows, insertProfileImage, removeProfileImage, getallUsers, removeCoverImage, uploadCoverImage, logOut, addSearch, updateFollowSelect, onlineFriends } = require('../controllers/authController');
 const verifyToken = require("../utils/verifyToken");
 
 router.post('/signup', registerUser);
@@ -29,5 +29,6 @@ router.get("/get-all-users", getallUsers);
 router.get("/logout",verifyToken, logOut);
 router.post("/add-search",verifyToken, addSearch);
 router.post("/update-follow-select",verifyToken, updateFollowSelect);
+router.get("/online-friends",verifyToken, onlineFriends);
 
 module.exports = router;

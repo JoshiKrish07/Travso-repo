@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import CommunityLeftSidebar from "./CommunityLeftSidebar";
 import CommunityRightSidebar from "./CommunityRightSidebar";
@@ -18,8 +18,11 @@ import p1 from "../../assets/headerIcon/p1.png";
 import p2 from "../../assets/headerIcon/p2.png";
 import p3 from "../../assets/headerIcon/p3.png";
 import floxy from "../../assets/floxy.png";
+import { useDispatch, useSelector } from "react-redux";
+import { getOnlineFriends } from "../../redux/slices/authSlice";
 
 const CommunityPage = () => {
+  const dispatch = useDispatch();
   const data = [
     { id: 1, src: story, label: "My Story" },
     { id: 2, src: Girl, label: "Priya Sharma" },
@@ -48,6 +51,18 @@ const CommunityPage = () => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullTextVisible, setIsFullTextVisible] = useState(false);
+
+  /* redux state data starts */
+
+  const { onlineFriends } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if(!onlineFriends) {
+      dispatch(getOnlineFriends());
+    }
+  },[dispatch]);
+
+  /* redux state data ends */
 
   // Function to toggle the full text
   const toggleFullText = () => {
