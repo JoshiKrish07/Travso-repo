@@ -11,8 +11,10 @@ import First from "../../../assets/1.png";
 import Boy1 from "../../../assets/headerIcon/boy1.png";
 import leftIcon from "../../../assets/lefticon.png";
 import "./AllPopupPage.css";
+import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
+import { useSelector } from "react-redux";
 
-const PostDetailPopup = ({ isOpen }) => {
+const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [selectedOption, setSelectedOption] = React.useState("Select View");
   //   const [isFullTextVisible, setIsFullTextVisible] = useState(false);
@@ -38,9 +40,12 @@ const PostDetailPopup = ({ isOpen }) => {
     hastag: "#arsitek #art #creative",
   };
 
-  const images = postDetails.image;
+  // const images = postDetails.image;
+  const images = postData?.media_url;
 
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const { user: userDetails, userBuddies } = useSelector((state) => state.auth);
 
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) =>
@@ -82,7 +87,7 @@ const PostDetailPopup = ({ isOpen }) => {
             <div className="flex items-center gap-2">
               <div>
                 <img
-                  src={postDetails.avtar}
+                  src={userDetails?.profile_image || dummyUserImage}
                   alt="Girl"
                   className="w-[44px] h-[44px] object-cover rounded-full"
                 />
@@ -91,7 +96,7 @@ const PostDetailPopup = ({ isOpen }) => {
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
                   <h5 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
-                    Pankaj Reet Tech
+                    {userDetails?.full_name}
                   </h5>
                   <img
                     src={BadgesIconFirst}
@@ -115,7 +120,7 @@ const PostDetailPopup = ({ isOpen }) => {
                   className="flex items-center justify-end w-[120px] h-[24px] bg-[#FFFFFF] text-[#6D6D6D] font-normal text-[14px] rounded-full focus:outline-none"
                   onClick={() => setDropdownOpen((prev) => !prev)}
                 >
-                  Public View
+                  { postData.is_public ? "Public" : "Private" } View
                   {/* <img
                     src={chevron_down}
                     alt="Chevron"
@@ -147,7 +152,10 @@ const PostDetailPopup = ({ isOpen }) => {
 
         {/*---------- Scrollable Part ---------*/}
         <div className="mb-3 px-4 flex-1 overflow-y-auto scrollbar-hidden">
-          <div className="relative w-full max-w-4xl mx-auto">
+         {
+          images.length > 0 && (
+            <>
+              <div className="relative w-full max-w-4xl mx-auto">
             {/* Slider */}
             <div className="overflow-hidden relative">
               <div>
@@ -177,7 +185,7 @@ const PostDetailPopup = ({ isOpen }) => {
 
             {/* Dots */}
             <div className="flex justify-center mt-1 absolute items-center justify-center inline-flex top-[310px] bg-[#FFFFFFBF] w-[68px] h-[16px] rounded-[16px]">
-              {images.map((_, index) => (
+              {postData.media_url.map((_, index) => (
                 <div
                   key={index}
                   onClick={() => goToSlide(index)}
@@ -190,9 +198,13 @@ const PostDetailPopup = ({ isOpen }) => {
               ))}
             </div>
           </div>
+            </>
+          ) 
+         }
+
           {/* Post Description */}
           <p className="mt-3 font-inter font-medium text-[14px] text-[#212626] text-left text-justify mb-1">
-            {postDetails.description}
+            {postData?.description}
             {/* {isFullTextVisible
               ? postDetails.description
               : `${postDetails.description.slice(0, 170)}...`} */}
@@ -205,15 +217,22 @@ const PostDetailPopup = ({ isOpen }) => {
           </p>
 
           {/* Hashtags */}
-          <p className="text-left text-[#1DB2AA] mb-2">{postDetails.hastag}</p>
+          {
+            postData.tags.length > 0 && (
+              <>
+                <p className="text-left text-[#1DB2AA] mb-2">{postData.tags}</p>
+              </>
+            )
+          }
+          
         </div>
         {/*---------- Scrollable Part ---------*/}
 
         <div className="px-4 flex items-center justify-between">
-          <button className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#F0F7F7] text-[#2DC6BE] rounded-[7px] w-[312px] h-[48px]">
+          <button type="button" className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#F0F7F7] text-[#2DC6BE] rounded-[7px] w-[312px] h-[48px]" onClick={() => onClose()}>
             Edit
           </button>
-          <button className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[312px] h-[48px]">
+          <button className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[312px] h-[48px]" onClick={() => handlePostUpload()}>
             Upload
           </button>
         </div>

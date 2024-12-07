@@ -19,8 +19,10 @@ import p2 from "../../assets/headerIcon/p2.png";
 import p3 from "../../assets/headerIcon/p3.png";
 import floxy from "../../assets/floxy.png";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllUsers, getOnlineFriends } from "../../redux/slices/authSlice";
+import { getAllUsers, getOnlineFriends, getUserPosts } from "../../redux/slices/authSlice";
 import CreateaPostPopup from "./AllPopupComponent/CreateaPostPopup";
+import PostDetailPopup from "./AllPopupComponent/PostDetailPopup";
+import { commitPost } from "../../redux/slices/postSlice";
 
 const CommunityPage = () => {
   const dispatch = useDispatch();
@@ -28,7 +30,6 @@ const CommunityPage = () => {
   let isDragging = false;
   let startX;
   let scrollLeft;
-
 
   const handleMouseDown = (e) => {
     isDragging = true;
@@ -40,7 +41,7 @@ const CommunityPage = () => {
     if (!isDragging) return;
     e.preventDefault();
     const x = e.pageX - sliderRef.current.offsetLeft;
-    const walk = (x - startX) * 2; 
+    const walk = (x - startX) * 2;
     sliderRef.current.scrollLeft = scrollLeft - walk;
   };
 
@@ -83,20 +84,30 @@ const CommunityPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullTextVisible, setIsFullTextVisible] = useState(false);
   const [isCreatePostPopup, setIsCreatePostPopup] = useState(false);
+  const [isPostDetailPopup, setIsPostDetailPopup] = useState(false);
 
+  const [postData, setPostData] = useState({
+    description: "",
+    location: "",
+    buddies: [],
+    tags: [],
+    media_url: [],
+    is_public: true,
+    buddies_id: []
+  });
   /* redux state data starts */
 
   const { onlineFriends, allUsers } = useSelector((state) => state.auth);
-  
+
   useEffect(() => {
-    if(!onlineFriends) {
+    if (!onlineFriends) {
       dispatch(getOnlineFriends());
     }
 
-    if(!allUsers) {
+    if (!allUsers) {
       dispatch(getAllUsers());
     }
-  },[dispatch]);
+  }, [dispatch]);
 
   /* redux state data ends */
 
@@ -215,6 +226,38 @@ const CommunityPage = () => {
     setReelIndex(index);
   };
 
+  const handlePostDetailPopup = () =>{
+    setIsPostDetailPopup(false);
+    setIsCreatePostPopup(true);
+    // isOpen();
+  }
+
+  const handlePostUpload = async() => {
+    try {
+      console.log("postData", postData)
+      const commentResult = await dispatch(
+        commitPost(postData)
+      ).unwrap();
+      if (commentResult) {
+        console.log("=====commentResult===>", commentResult.message);
+        // await dispatch(getAllPosts());
+        await dispatch(getUserPosts());
+        setPostData({
+          description: "",
+          location: "",
+          buddies: [],
+          tags: [],
+          media_url: [],
+          is_public: true,
+          buddies_id: []
+        })
+        // handleFlashMessage(commentResult.message, 'success');
+      }
+    } catch (error) {
+      console.log("error in handlePostUpload", error)
+    }
+  }
+
   return (
     <>
       <Header />
@@ -232,16 +275,17 @@ const CommunityPage = () => {
               <h2 className="mb-4 font-poppins text-[20px] font-semibold text-[#212626] text-left">
                 TravSo Moments
               </h2>
-              <div ref={sliderRef}
-                  className="flex overflow-x-auto scroll-smooth no-scrollbar scrollbar-hidden"
-                  onMouseDown={handleMouseDown}
-                  onMouseMove={handleMouseMove}
-                  onMouseUp={handleMouseUpOrLeave}
-                  onMouseLeave={handleMouseUpOrLeave}
-                  onTouchStart={(e) => handleMouseDown(e.touches[0])}
-                  onTouchMove={(e) => handleMouseMove(e.touches[0])} 
-                  onTouchEnd={handleMouseUpOrLeave}>
-                
+              <div
+                ref={sliderRef}
+                className="flex overflow-x-auto scroll-smooth no-scrollbar scrollbar-hidden"
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUpOrLeave}
+                onMouseLeave={handleMouseUpOrLeave}
+                onTouchStart={(e) => handleMouseDown(e.touches[0])}
+                onTouchMove={(e) => handleMouseMove(e.touches[0])}
+                onTouchEnd={handleMouseUpOrLeave}
+              >
                 {data.map((item) => (
                   <div
                     key={item.id}
@@ -275,13 +319,26 @@ const CommunityPage = () => {
                     className="flex-1 bg-transparent border-none outline-none placeholder:font-inter font-medium text-[14px] text-[#869E9D] ml-2 "
                     onClick={() => setIsCreatePostPopup(true)}
                   />
-                  {
-                    isCreatePostPopup && 
-                  <CreateaPostPopup
-                    isOpen={isCreatePostPopup}
-                    onClose={() => setIsCreatePostPopup(false)}
-                  />
-                  }
+                  {isCreatePostPopup && (
+                    <CreateaPostPopup
+                      isOpen={isCreatePostPopup}
+                      onClose={() => setIsCreatePostPopup(false)}
+                      openPostDetail={() => setIsPostDetailPopup(true)}
+                      postData={postData}
+                      setPostData={setPostData}
+                    />
+                  )}
+
+                  {isPostDetailPopup && (
+                    <>
+                      <PostDetailPopup
+                        isOpen={isPostDetailPopup}
+                        onClose={handlePostDetailPopup}
+                        postData={postData}
+                        handlePostUpload={handlePostUpload}
+                      />
+                    </>
+                  )}
                 </div>
               </div>
             </div>

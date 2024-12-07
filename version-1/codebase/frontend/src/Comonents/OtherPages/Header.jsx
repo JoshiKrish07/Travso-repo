@@ -39,6 +39,7 @@ const Header = () => {
   const [seacrhResult, setSearchResult] = useState([]);
   const [searchAction, setSearchAction] = useState(null);
   const [searchedKeyword, setSearchedKeyword] = useState(null);
+  const [activeFilter, setActiveFilter] = useState("");
   const [suggestionShow, setSuggestionShow] = useState([{ id: 1,name: "Reet sharma", img: girl },
     {
       id: 2,
@@ -69,6 +70,8 @@ const Header = () => {
         !searchBarRef.current.contains(event.target)
       ) {
         setIsSearchActive(false); // Close dropdown if clicked outside
+        setSearchAction(false);
+        setActiveFilter("");
       }
     };
 
@@ -160,6 +163,7 @@ const Header = () => {
       }
       setSearchResult(searchBuddies);
       setSearchAction("Buddies");
+      setActiveFilter("Buddies");
     }
 
     if (option === "Hashtags") {
@@ -173,10 +177,12 @@ const Header = () => {
       }
       setSearchResult(seacrhTags);
       setSearchAction("Hashtags");
+      setActiveFilter("Hashtags");
     }
 
     if (option === "Place") {
       setSearchAction("Place");
+      setActiveFilter("Place");
     }
 
     if (option === "Post") {
@@ -190,10 +196,12 @@ const Header = () => {
       }
       setSearchResult(searchPosts);
       setSearchAction("Post");
+      setActiveFilter("Post");
     }
 
     if (option === "Badges") {
       setSearchAction("Badges");
+      setActiveFilter("Badges");
     }
 
     // setIsSearchActive(false)
@@ -253,6 +261,7 @@ const Header = () => {
       setSearchResult([]);
       setSearchedKeyword(null);
       setSearchAction(null);
+      setActiveFilter("");
     }
   };
 
@@ -353,7 +362,12 @@ const Header = () => {
                       (filter, index) => (
                         <button
                           key={index}
-                          className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200"
+                          className={`px-3 py-1 rounded-full text-sm ${
+                            activeFilter === filter
+                              ? "bg-blue-500 text-white" // Active styles
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200" // Default styles
+                          }`}
+                          // className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200"
                           onClick={() => seacrhAccordingTo(filter)}
                         >
                           {filter}

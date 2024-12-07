@@ -501,103 +501,251 @@ try {
 // function to like a comment
 
 
-async function getPostComments(req , res){
-  try {
-      const { postId } = req.params;
-      console.log("=====postId====>", postId);
-      const [getComments] = await pool.execute(
-      //   SELECT    FROM comments where post_id = ?,[postId]
-      `SELECT 
-              c.user_id,
-              c.post_id,
-              c.id,
-              c.content,
-              u.full_name,
-              u.profile_image,
-              c.created_at,
-              -- Count total likes for each comment
-              (SELECT COUNT(*) FROM comments_like cl WHERE cl.comment_id = c.id) AS total_likes_on_comment,
-              -- Count total replies for each comment
-              (SELECT COUNT(*) FROM comment_reply cr WHERE cr.comment_id = c.id) AS total_reply_on_comment
+// async function getPostComments(req , res){
+//   try {
+//       const { postId } = req.params;
+//       console.log("=====postId====>", postId);
+//       const [getComments] = await pool.execute(
+//       //   SELECT    FROM comments where post_id = ?,[postId]
+//       `SELECT 
+//               c.user_id,
+//               c.post_id,
+//               c.id,
+//               c.content,
+//               u.full_name,
+//               u.profile_image,
+//               c.created_at,
+//               -- Count total likes for each comment
+//               (SELECT COUNT(*) FROM comments_like cl WHERE cl.comment_id = c.id) AS total_likes_on_comment,
+//               -- Count total replies for each comment
+//               (SELECT COUNT(*) FROM comment_reply cr WHERE cr.comment_id = c.id) AS total_reply_on_comment
            
-          FROM 
-              comments c
-          JOIN
-              users u
-          ON 
-              c.user_id = u.id
-          WHERE
-              c.post_id = ?
-          ORDER BY 
-              c.created_at ASC
-              `,[postId]
-      );
+//           FROM 
+//               comments c
+//           JOIN
+//               users u
+//           ON 
+//               c.user_id = u.id
+//           WHERE
+//               c.post_id = ?
+//           ORDER BY 
+//               c.created_at ASC
+//               `,[postId]
+//       );
 
-        // Fetch all replies
-        const [replies] = await pool.execute(
-          `
-          SELECT 
-              cr.id AS reply_id,
-              cr.comment_id,
-              cr.user_id,
-              cr.content AS reply_content,
-              u.full_name AS reply_user_full_name,
-              u.user_name AS reply_user_user_name,
-              u.profile_image AS reply_user_profile_image,
-              cr.created_at AS reply_created_at
-          FROM 
-              comment_reply cr
-              JOIN
-              users u
-          ON 
-              cr.user_id = u.id
-          WHERE 
-              cr.comment_id IN (
-                  SELECT id FROM comments WHERE post_id = ?
-              )
-          `,
-          [postId]
-      );
+//         // Fetch all replies
+//         const [replies] = await pool.execute(
+//           `
+//           SELECT 
+//               cr.id AS reply_id,
+//               cr.comment_id,
+//               cr.user_id,
+//               cr.content AS reply_content,
+//               u.full_name AS reply_user_full_name,
+//               u.user_name AS reply_user_user_name,
+//               u.profile_image AS reply_user_profile_image,
+//               cr.created_at AS reply_created_at
+//           FROM 
+//               comment_reply cr
+//               JOIN
+//               users u
+//           ON 
+//               cr.user_id = u.id
+//           WHERE 
+//               cr.comment_id IN (
+//                   SELECT id FROM comments WHERE post_id = ?
+//               )
+//           `,
+//           [postId]
+//       );
 
-      console.log("======replies====>", replies);
+//       console.log("======replies====>", replies);
 
-      // Group replies by comment ID
-      const groupedReplies = await replies.reduce((acc, reply) => {
-        if (!acc[reply.comment_id]) {
-          acc[reply.comment_id] = [];
-        }
-        console.log("===acc[reply.comment_id]===>", acc[reply.comment_id]);
-          acc[reply.comment_id].push({
-              reply_id: reply.reply_id,
-              reply_content: reply.reply_content,
-              reply_user_full_name: reply.reply_user_full_name,
-              reply_user_user_name: reply.reply_user_user_name,
-              reply_user_profile_image: reply.reply_user_profile_image,
-              reply_created_at: reply.reply_created_at,
-          });
-          return acc;
-      }, {});
+//       // Group replies by comment ID
+//       const groupedReplies = await replies.reduce((acc, reply) => {
+//         if (!acc[reply.comment_id]) {
+//           acc[reply.comment_id] = [];
+//         }
+//         // console.log("===acc[reply.comment_id]===>", acc[reply.comment_id]);
+//           acc[reply.comment_id].push({
+//               reply_id: reply.reply_id,
+//               reply_content: reply.reply_content,
+//               reply_user_full_name: reply.reply_user_full_name,
+//               reply_user_user_name: reply.reply_user_user_name,
+//               reply_user_profile_image: reply.reply_user_profile_image,
+//               reply_created_at: reply.reply_created_at,
+//           });
+//           return acc;
+//       }, {});
 
-      // Attach replies to their respective comments
-      const finalComments = await getComments.map((comment) => ({
-          ...comment,
-          replies: groupedReplies[comment.id] || [],
-      }));
+//       // Attach replies to their respective comments
+//       const finalComments = await getComments.map((comment) => ({
+//           ...comment,
+//           replies: groupedReplies[comment.id] || [],
+//       }));
 
-     console.log("==data Fetched==>",getComments)
-     return res.status(200).json({
-      message: "All comments of post",
-      data: finalComments
-     });
+//      console.log("==data Fetched==>",getComments)
+//      return res.status(200).json({
+//       message: "All comments of post",
+//       data: finalComments
+//      });
       
 
-  } catch (error) {
+//   } catch (error) {
       
-      console.log(" Error to get data",error)
-      res.status(500).json({
-          error: "Internal Server Error"
+//       console.log(" Error to get data",error)
+//       res.status(500).json({
+//           error: "Internal Server Error"
+//       });
+
+//   }
+// }
+
+
+async function getPostComments(req, res) {
+  try {
+    const { postId } = req.params;
+    
+    // Fetch all comments
+    const [getComments] = await pool.execute(
+      `SELECT 
+                c.user_id,
+                c.post_id,
+                c.id,
+                c.content,
+                u.full_name,
+                u.profile_image,
+                c.created_at,
+                -- Count total likes for each comment
+                (SELECT COUNT(*) FROM comments_like cl WHERE cl.comment_id = c.id) AS total_likes_on_comment,
+                -- Count total replies for each comment
+                (SELECT COUNT(*) FROM comment_reply cr WHERE cr.comment_id = c.id) AS total_reply_on_comment
+            FROM 
+                comments c
+            JOIN
+                users u
+            ON 
+                c.user_id = u.id
+            WHERE
+                c.post_id = ?
+            ORDER BY 
+                c.created_at ASC
+                `,
+      [postId]
+    );
+
+    // Fetch all replies (for comments)
+    const [replies] = await pool.execute(
+      `SELECT 
+                cr.id AS reply_id,
+                cr.comment_id,
+                cr.user_id,
+                cr.content AS reply_content,
+                u.full_name AS reply_user_full_name,
+                u.user_name AS reply_user_user_name,
+                u.profile_image AS reply_user_profile_image,
+                cr.created_at AS reply_created_at,
+                 (SELECT COUNT(*) FROM reply_like crl WHERE crl.reply_id = cr.id) AS total_likes_on_reply,
+                 (SELECT COUNT(*) FROM reply_comment rc WHERE rc.reply_id = cr.id) AS total_comment_on_reply
+            FROM 
+                comment_reply cr
+            JOIN
+                users u
+            ON 
+                cr.user_id = u.id
+            WHERE 
+                cr.comment_id IN (
+                    SELECT id FROM comments WHERE post_id = ?
+                )`,
+      [postId]
+    );
+
+    // Fetch all replies to replies (nested replies)
+    const [nestedReplies] = await pool.execute(
+      `SELECT 
+                rc.id AS nested_reply_id,
+                rc.reply_id AS parent_reply_id,
+                rc.user_id AS nested_reply_user_id,
+                rc.content AS nested_reply_content,
+                u.full_name AS nested_reply_user_full_name,
+                u.user_name AS nested_reply_user_user_name,
+                u.profile_image AS nested_reply_user_profile_image 
+            FROM 
+                reply_comment rc
+            JOIN
+                users u
+            ON 
+                rc.user_id = u.id
+            WHERE
+                rc.reply_id IN (
+                    SELECT id FROM comment_reply WHERE comment_id IN (
+                        SELECT id FROM comments WHERE post_id = ?
+                    )
+                )`,
+      [postId]
+    );
+
+    // Group replies by comment ID
+    const groupedReplies = replies.reduce((acc, reply) => {
+      if (!acc[reply.comment_id]) {
+        acc[reply.comment_id] = [];
+      }
+      acc[reply.comment_id].push({
+        reply_id: reply.reply_id,
+        reply_content: reply.reply_content,
+        reply_user_full_name: reply.reply_user_full_name,
+        reply_user_user_name: reply.reply_user_user_name,
+        reply_user_profile_image: reply.reply_user_profile_image,
+        reply_created_at: reply.reply_created_at,
+        total_likes_on_reply: reply.total_likes_on_reply,
+        total_comment_on_reply: reply.total_comment_on_reply,
+        // Nested replies (reply to reply)
+        nested_replies: [],
       });
+      return acc;
+    }, {});
 
+    // Group nested replies by reply ID
+    const groupedNestedReplies = nestedReplies.reduce((acc, nestedReply) => {
+      if (!acc[nestedReply.parent_reply_id]) {
+        acc[nestedReply.parent_reply_id] = [];
+      }
+      acc[nestedReply.parent_reply_id].push({
+        nested_reply_id: nestedReply.nested_reply_id,
+        nested_reply_content: nestedReply.nested_reply_content,
+        nested_reply_user_full_name: nestedReply.nested_reply_user_full_name,
+        nested_reply_user_user_name: nestedReply.nested_reply_user_user_name,
+        nested_reply_user_profile_image: nestedReply.nested_reply_user_profile_image,
+        nested_reply_created_at: nestedReply.nested_reply_created_at,
+      });
+      return acc;
+    }, {});
+
+    // Attach nested replies to their respective replies
+    for (const reply of replies) {
+      const nested = groupedNestedReplies[reply.reply_id] || [];
+      const replyIndex = groupedReplies[reply.comment_id].findIndex(r => r.reply_id === reply.reply_id);
+      if (replyIndex !== -1) {
+        groupedReplies[reply.comment_id][replyIndex].nested_replies = nested;
+      }
+    }
+
+    // Attach replies (with nested replies) to their respective comments
+    const finalComments = getComments.map((comment) => ({
+      ...comment,
+      replies: groupedReplies[comment.id] || [],
+    }));
+
+    console.log("==data Fetched==>", getComments);
+    return res.status(200).json({
+      message: "All comments of post",
+      data: finalComments,
+    });
+  } catch (error) {
+    console.log("Error to get data", error);
+    res.status(500).json({
+      error: "Internal Server Error",
+    });
   }
 }
 
@@ -683,68 +831,68 @@ async function replyOnComment(req , res){
     }
     }
 
-    async function storePost(req, res) {
-        try {
-      const user_id = req.user.userId; // extrcting from token
+async function storePost(req, res) {
+    try {
+  const user_id = req.user.userId; // extrcting from token
 
-          const {
-            is_public,
-            description,
-            buddies_id,
-            tag_id,
-            location_id,
-            media_url,
-            status,
-            block_post,
-          } = req.body;
-      
-          // Validate required fields
-          if (!user_id || !description) {
-            return res.status(400).json({
-              message: "Missing required fields (user_id, description).",
-            });
-          }
-      
-          // Insert the post into the database
-          const [result] = await pool.execute(
-            `INSERT INTO posts (
-              user_id,
-              is_public,
-              description,
-              buddies_id,
-              tag_id,
-              location_id,
-              media_url,
-              status,
-              block_post,
-              created_at,
-              updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-            [
-              user_id,
-              is_public !== undefined ? is_public : 1, // Default to 1 (true) if not provided
-              description || null, // Allow null for optional fields
-              buddies_id || null,
-              tag_id || null,
-              location_id || null,
-              media_url || "[]", // Default to empty JSON array
-              status || "active", // Default to 'active'
-              block_post !== undefined ? block_post : 0, // Default to 0 (false)
-            ]
-          );
-      
-          // Respond with success message
-          return res.status(200).json({
-            message: "Post created successfully.",
-            post_id: result.insertId, // Return the ID of the newly created post
-          });
-        } catch (error) {
-          console.error("Error in storing post:", error);
-          return res.status(500).json({
-            error: "Internal Server Error",
-          });
-        }
+      const {
+        is_public,
+        description,
+        buddies_id,
+        tags,
+        location,
+        media_url,
+        status,
+        block_post,
+      } = req.body;
+
+      // Validate required fields
+      if (!user_id || !description) {
+        return res.status(400).json({
+          message: "Missing required fields (user_id, description).",
+        });
       }
+  
+      // Insert the post into the database
+      const [result] = await pool.execute(
+        `INSERT INTO posts (
+          user_id,
+          is_public,
+          description,
+          buddies_id,
+          tag_id,
+          location_id,
+          media_url,
+          status,
+          block_post,
+          created_at,
+          updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+        [
+          user_id,
+          is_public !== undefined ? is_public : 1, // Default to 1 (true) if not provided
+          description || null, // Allow null for optional fields
+          JSON.stringify(buddies_id) || [],
+          JSON.stringify(tags) || [],
+          location || null,
+          JSON.stringify(media_url) || [], // Default to empty JSON array
+          status || "active", // Default to 'active'
+          block_post !== undefined ? block_post : 0, // Default to 0 (false)
+        ]
+      );
+  
+      // Respond with success message
+      return res.status(200).json({
+        message: "Post created successfully.",
+        post_id: result.insertId, // Return the ID of the newly created post
+      });
+    } catch (error) {
+      console.error("Error in storing post:", error);
+      return res.status(500).json({
+        error: "Internal Server Error",
+      });
+    }
+  }
 
 
 // delete comment
@@ -871,6 +1019,63 @@ try {
 }
 }
 
+async function likeToReply(req, res) {
+
+  const user_id = req.user.userId; // extracting from token
+  const { reply_id } = req.params;
+  console.log("===reply_id==>", reply_id);
+  console.log("===user_id==>", user_id);
+  try {
+    //check reply exist or not.
+    // const [
+    //   reply,
+    // ] = await pool.execute(`SELECT * FROM reply_comment WHERE id = ? `, [
+    //   reply_id,
+    // ]);
+    // if (reply.length === 0) {
+    //   return res.status(404).json({
+    //     error: "Reply not found",
+    //   });
+    // }
+
+    const [
+      existingLike,
+    ] = await pool.execute(
+      `SELECT * FROM reply_like WHERE reply_id = ? AND user_id = ?`,
+      [reply_id, user_id]
+    );
+
+    if (existingLike.length > 0) {
+      await pool.execute(
+        `DELETE FROM reply_like WHERE reply_id = ? AND user_id = ?`,
+        [reply_id, user_id]
+      );
+
+      return res.status(200).json({
+        message: "Like Removed Successfully",
+      });
+    } else {
+      await pool.execute(
+        `INSERT INTO reply_like (reply_id, user_id ) VALUE (?,?)`,
+        [reply_id, user_id]
+      );
+
+      return res.status(201).json({
+        message: "Like Added SUccessfully.",
+        data: {
+          reply_id,
+          user_id,
+        },
+      });
+    }
+  } catch (error) {
+    console.log("===ERROR====>", error);
+    return res.status(500).json({
+      error: "Internal Server Error",
+    });
+  }
+}
+
 module.exports = {
     allPosts,
     postWithlikes,
@@ -886,5 +1091,6 @@ module.exports = {
     storePost,
     deleteComments,
     deleteReply,
-    followAndUnfollow
+    followAndUnfollow,
+    likeToReply
 }

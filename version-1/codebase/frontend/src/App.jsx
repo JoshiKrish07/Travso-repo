@@ -12,6 +12,7 @@ import ProtectedRoute from './Comonents/OtherPages/ProtectedRoute';
 import SuggestionPage from './Comonents/OtherPages/SuggestionPage';
 import CommunityPage from './Comonents/OtherPages/CommunityPage';
 import ChatPage from './Comonents/OtherPages/ChatModule/ChatPage';
+import BucketList from './Comonents/OtherPages/BucketList';
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
         <Route path="/suggestion" element={<SuggestionPage />} />
         <Route path="/community" element={<CommunityPage />} />
         <Route path="/chat" element={<ChatPage />} />
+        <Route path="/bucketlist" element={<BucketList />} />
 
       </Routes>
     </Router>

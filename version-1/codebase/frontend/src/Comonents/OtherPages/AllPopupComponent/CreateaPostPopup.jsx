@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Girl from "../../../assets/headerIcon/girl.jpg";
 import chevron_down from "../../../assets/chevron-down.png";
 import ImageBoxed from "../../../assets/ImageBoxed.png";
@@ -9,6 +9,7 @@ import "./AllPopupPage.css"
 import { useDispatch, useSelector } from "react-redux";
 import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
 import PostDetailPopup from "./PostDetailPopup";
+import { fetchCities } from "../../../redux/slices/stateCitySlice";
 
 
 const options = [
@@ -17,23 +18,30 @@ const options = [
   { value: "vanilla", label: "Vanilla" },
 ];
 
-const CreateaPostPopup = ({ isOpen, onClose }) => {
+const CreateaPostPopup = ({ isOpen, onClose, openPostDetail, postData, setPostData }) => {
   const dispatch = useDispatch();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Select View");
-  const [wordsCount, setWordsCount] = useState(0);
+  const [wordsCount, setWordsCount] = useState(postData?.description.length || 0);
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
   const [showTagBuddySuggestions, setShowBuddyTagSuggestions] = useState(false);
   const [buddyInput, setBuddyInput] = useState("");
   const [tagInput, setTagInput] = useState("");
   const [showTagSuggestion, setShowTagSuggestion] = useState(false);
   const [filteredTagSuggestions, setFilteredTagSuggestions] = useState([]);
-  const [isPostDetailPopup, setIsPostDetailPopup] = useState(false)
+  const [isPostDetailPopup, setIsPostDetailPopup] = useState(false);
+  const fileInputRef = useRef(null); // Create a ref for the file input
 
+  const validate = async() => {
 
-  const handlePostUpload =()=>{
-    setIsPostDetailPopup(true)
+  }
+
+  const handlePostUpload = async() => {
+    console.log("running");
+    const isValid = await validate()
     onClose();
+    // setIsPostDetailPopup(true);
+    openPostDetail();
   }
 
   const handlePostDetailPopup = () =>{
@@ -46,15 +54,15 @@ const CreateaPostPopup = ({ isOpen, onClose }) => {
   const { user: userDetails, userBuddies } = useSelector((state) => state.auth);
 
   /* store data for post */
-  const [postData, setPostData] = useState({
-    description: "",
-    location: "",
-    buddies: [],
-    tags: [],
-    media_url: [],
-    is_public: true,
-    buddies_id: []
-  });
+  // const [postData, setPostData] = useState({
+  //   description: "",
+  //   location: "",
+  //   buddies: [],
+  //   tags: [],
+  //   media_url: [],
+  //   is_public: true,
+  //   buddies_id: []
+  // });
 
 
   const handleLocationChange = (selectedOption) => {
@@ -110,6 +118,7 @@ const CreateaPostPopup = ({ isOpen, onClose }) => {
     };
   }, [isOpen]);
 
+
   /* handle description change value and show words count*/
   const handleDescriptionChange = (e) => {
     const { value } = e.target;
@@ -136,7 +145,6 @@ const CreateaPostPopup = ({ isOpen, onClose }) => {
     setShowBuddyTagSuggestions(false);
   };
   
-  console.log("=====postData====>", postData);
   // Remove buddy from tagged list
   const handleRemoveBuddy = (id) => {
     setPostData((prevData) => ({
@@ -148,7 +156,6 @@ const CreateaPostPopup = ({ isOpen, onClose }) => {
 
   // Remove tag
   const handleRemoveTag = (tagName) => {
-    console.log("====tagName====>", tagName);
     setPostData((prevData) => ({
       ...prevData,
       tags: prevData.tags.filter((tag) => tag !== tagName),
@@ -160,21 +167,24 @@ const CreateaPostPopup = ({ isOpen, onClose }) => {
     console.log("form")
   }
 
+  /* when user hits enter after writing tag */
   const handleTagEnter = async(e) => {
-      
+    if(postData?.tags.length > 10) {
+      alert("Only 10 tags are acceptable");
+      return;
+    }
     if (e.key === "Enter" && !e.shiftKey) {
-       // Add selected buddy to postData.buddies
+      e.preventDefault();
     if(!tagInput.includes('#')){
-        console.log("# lagao");
+        console.log("need keyword #");
         return;
     }
     setPostData((prevData) => {
         const isAlreadyAdded = prevData.tags.some((tag) => tag === tagInput);
-        console.log("====isAlreadyAdded===>", isAlreadyAdded);
         if (isAlreadyAdded) return prevData; // Avoid duplicates
         return {
           ...prevData,
-          tags: [tagInput]
+          tags: [...prevData.tags, tagInput]
         };
       });
       setTagInput("");
@@ -182,8 +192,89 @@ const CreateaPostPopup = ({ isOpen, onClose }) => {
   }
 
   const handleTagInputChange = async(e) => {
-    setTagInput(e.target.value)
+    if(postData?.tags.length > 10) {
+      alert("Only 10 tags are acceptable");
+      return;
+    }
+    setTagInput(e.target.value);
   }
+
+  /* for image drag */
+  const handleDragOver = (e) => {
+    e.preventDefault(); // Prevent default behavior to allow drop
+  };
+
+  const handleClick = () => {
+    fileInputRef.current.click(); // Trigger the file input when Browse is clicked
+  };
+
+  // const handleFileChange = (e) => {
+  //   const files = e.target.files;
+  //   if (files.length > 0) {
+  //     const fileUrls = Array.from(files).map((file) => URL.createObjectURL(file));
+  //     setPostData((prevState) => ({
+  //       ...prevState,
+  //       media_url: [...prevState.media_url, ...fileUrls],
+  //     }));
+  //   }
+  // };
+
+  const handleFileChange = (e) => {
+    const files = e.target.files;
+    if (files.length > 0) {
+      handleFileSelect(files);
+    }
+  };
+
+  /* for image drop in drag and drop field */
+  // const handleDrop = (e) => {
+  //   e.preventDefault();
+  //   const files = e.dataTransfer.files;
+  //   console.log("===files====>", files)
+  //   if (files.length > 0) {
+  //     const fileUrls = Array.from(files).map((file) => URL.createObjectURL(file));
+  //     setPostData((prevState) => ({
+  //       ...prevState,
+  //       media_url: [...prevState.media_url, ...fileUrls],
+  //     }));
+  //   }
+  // };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFileSelect(files);
+    }
+  };
+
+/* for setting image in postData */
+  const handleFileSelect = (files) => {
+    const file = files[0];
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      const imageUrl = reader.result; // Base64 encoded image
+      setPostData((prevState) => ({
+        ...prevState,
+        media_url: [...prevState.media_url, imageUrl], // Add image URL to media_url array
+      }));
+    };
+
+    reader.readAsDataURL(file); // Read the file as base64
+  };
+
+  // Remove image from media_url
+  const handleRemoveImage = (index) => {
+    console.log("=====index====>",index);
+    setPostData((prevState) => {
+      const newMediaUrl = prevState.media_url.filter((_, i) => i !== index);
+      return {
+        ...prevState,
+        media_url: newMediaUrl, // Remove the selected image from the array
+      };
+    });
+  };
 
   if (!isOpen) return null;
 
@@ -243,7 +334,7 @@ const CreateaPostPopup = ({ isOpen, onClose }) => {
                   className="flex items-center justify-center w-[120px] h-[24px] bg-[#FFFFFF] border border-[#D5D5D5] text-[#6D6D6D] font-normal text-[14px] rounded-full focus:outline-none"
                   onClick={() => setDropdownOpen((prev) => !prev)}
                 >
-                  {selectedOption}
+                  { postData?.is_public ? 'Public' : 'Private' }
                   <img
                     src={chevron_down}
                     alt="Chevron"
@@ -363,7 +454,7 @@ const CreateaPostPopup = ({ isOpen, onClose }) => {
                 />
               </div>
 
-              <div className="font-inter font-medium text-[16px] text-[#869E9D] w-full p-3 h-[133px] bg-[#F0F7F7] rounded-[8px] border-1 border-[#F5F5F5] placeholder:text-[#869E9D] focus:outline-none focus:ring-1 focus:ring-[#5E6F78] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]">
+              {/* <div className="font-inter font-medium text-[16px] text-[#869E9D] w-full p-3 h-[133px] bg-[#F0F7F7] rounded-[8px] border-1 border-[#F5F5F5] placeholder:text-[#869E9D] focus:outline-none focus:ring-1 focus:ring-[#5E6F78] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]">
                 <div className="flex flex-col items-center justify-center gap-2">
                   <div className="cursor-pointer">
                     <img src={ImageBoxed} alt="" className="w-[32px] h-[32px]" />
@@ -372,19 +463,89 @@ const CreateaPostPopup = ({ isOpen, onClose }) => {
                     <h2 className="font-inter font-medium text-[14px] text-[#212626]">
                     Drag and drop an Image or,
                     </h2>
-                    <button className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[82px] h-[36px]">
+                    <button type="button" className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[82px] h-[36px]">
                     Browse
                     </button>
                   </div>
                 </div>
-              </div>
+              </div> */}
+
+      <div
+        className="font-inter font-medium text-[16px] text-[#869E9D] w-full p-3 h-[133px] bg-[#F0F7F7] rounded-[8px] border-1 border-[#F5F5F5] placeholder:text-[#869E9D] focus:outline-none focus:ring-1 focus:ring-[#5E6F78] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]"
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+      >
+      <div className="flex flex-col items-center justify-center gap-2">
+        <div className="cursor-pointer">
+          {postData.media_url.length > 0 ? (
+            <div className="flex gap-2">
+              {postData.media_url.map((url, index) => (
+                <div key={index} className="relative inline-block">
+                 <img key={index} src={url} alt={`Uploaded ${index}`} className="w-[32px] h-[32px]" />
+                 {/* Cancel button */}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(index)}
+                    className="absolute top-0 right-0 text-red-500 p-1"
+                  >
+                    cancel
+                  </button>
+                </div>
+              ))}
+              <button
+                  type="button"
+                  onClick={handleClick}
+                  className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[82px] h-[36px]"
+                >
+                  Add
+                </button>
+            </div>
+          ) : (
+            <>
+                <img src={ImageBoxed} alt="" className="w-[32px] h-[32px]" />
+                <div className="flex flex-col items-center justify-center gap-3">
+                <h2 className="font-inter font-medium text-[14px] text-[#212626]">
+                  Drag and drop Images or,
+                </h2>
+                <button
+                  type="button"
+                  onClick={handleClick}
+                  className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[82px] h-[36px]"
+                >
+                  Browse
+                </button>
+                </div>
+            </>
+          )}
+        </div>
+        
+      </div>
+
+      {/* Hidden file input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        className="hidden"
+        accept="image/*"
+        multiple // Allows multiple file selection
+      />
+    </div>
+
               <div className="mt-4 flex justify-end" >
-                <button className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[82px] h-[36px]" onClick={handlePostUpload}>Next</button>
-                <PostDetailPopup
-                    isOpen={isPostDetailPopup}
-                    onClose={handlePostDetailPopup}
-                  />
+                <button type="button" className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[82px] h-[36px]" onClick={() => handlePostUpload()}>Next</button>
+                
               </div>
+              {/* {
+                isPostDetailPopup && (
+                  <>
+                  <PostDetailPopup
+                      isOpen={isPostDetailPopup}
+                      onClose={handlePostDetailPopup}
+                  />
+                  </>
+                )
+              } */}
             </form>
           </div>
         </div>

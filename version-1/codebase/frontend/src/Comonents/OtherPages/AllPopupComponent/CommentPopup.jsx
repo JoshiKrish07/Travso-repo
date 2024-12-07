@@ -32,7 +32,7 @@ import Send from "../../../assets/Send.png";
 import trash from "../../../assets/trash.png";
 import alert from "../../../assets/alert.png";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserDetails, getUserPosts } from "../../../redux/slices/authSlice";
+import { getUserBuddies, getUserDetails, getUserPosts } from "../../../redux/slices/authSlice";
 import {
   commentOnPost,
   commentOnReply,
@@ -40,6 +40,7 @@ import {
   deleteReplyByPostOwner,
   getCommentOnPost,
   likeAnyComment,
+  likeUnlikeAnyReply,
   LikeUnlikePost,
 } from "../../../redux/slices/postSlice";
 import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
@@ -59,6 +60,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
   const [allPosts, setAllPosts] = useState(null);
   const [showReplyField, setShowReplyField] = useState(false);
   const [replyToCommentId, setReplyToCommentId] = useState(null);
+  const [replyToReplyId, setReplyToReplyId] = useState(null);
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const [openDropdownReplyId, setOpenDropdownReplyId] = useState(null);
   const [showShareFilePopup, setShowShareFilePopup] = useState(false);
@@ -83,7 +85,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
 
   const handleSuggestionClick = (person) => {
     // Replace the @mention in input with the selected person's name
-    const newText = commentInputVal.replace(/@\w*$/, `@${person.name} `);
+    const newText = commentInputVal.replace(/@\w*$/, `@${person.full_name} `);
     setCommentInputVal(newText);
 
     // Add the tagged user's ID to the taggedUsers array
@@ -110,9 +112,16 @@ const handleViewLessReplies = (commentId) => {
 };
 
 
+  /* handle reply to comment click */
   const handleReplyClick = (commentId) => {
     // console.log("====replyToCommentId===>", replyToCommentId)
     setReplyToCommentId(replyToCommentId === commentId ? null : commentId);
+  };
+
+  /* handle reply on reply click */
+  const handleReplyToReplyClick = (replyId) => {
+    console.log("====replyId===>", replyId)
+    setReplyToReplyId(replyToReplyId === replyId ? null : replyId);
   };
 
   const toggleSetting = () => {
@@ -125,7 +134,7 @@ const handleViewLessReplies = (commentId) => {
   };
 
   const { postComment } = useSelector((state) => state.postSlice);
-  const { userPosts, user: userDetails } = useSelector((state) => state.auth);
+  const { userPosts, user: userDetails, userBuddies } = useSelector((state) => state.auth);
 
   /* emoji functionality starts */
   const [showEmojiPicker, setShowEmojiPicker] = useState(false); // working on reply on comment
@@ -166,6 +175,10 @@ const handleViewLessReplies = (commentId) => {
 
     if (!userDetails) {
       dispatch(getUserDetails());
+    }
+
+    if (!userBuddies) {
+      dispatch(getUserBuddies());
     }
 
     const foundPost = userPosts.find((post) => post.id === postId);
@@ -370,11 +383,25 @@ const handleViewLessReplies = (commentId) => {
       if (response) {
         await dispatch(getCommentOnPost(postId));
       }
-      console.log("=====response=====>", response);
+      // console.log("=====response=====>", response);
     } catch (error) {
       console.log("error in handleCommentLikeUnlike", error);
     }
   };
+
+  
+  const handleCommentLikeUnlikeOnReply = async(replyId) => {
+    try {
+      const response = await dispatch(likeUnlikeAnyReply(replyId)).unwrap();
+      if (response) {
+        await dispatch(getCommentOnPost(postId));
+      }
+      // console.log("=====response=====>", response);
+      
+    } catch (error) {
+      console.log("error in handleCommentLikeUnlikeOnReply", error);
+    }
+  }
 
   // to show post images
   // const mediaArray =
@@ -390,12 +417,11 @@ const handleViewLessReplies = (commentId) => {
     const { value } = e.target;
     
     setCommentInputVal(value);
-
     const match = value.match(/@(\w*)$/); // Match word after @
     if (match) {
       const query = match[1].toLowerCase();
-      const filtered = people.filter((person) =>
-        person.name.toLowerCase().includes(query)
+      const filtered = userBuddies.filter((person) =>
+        person.full_name.toLowerCase().includes(query)
       );
       setFilteredSuggestions(filtered);
       setShowTagSuggestions(filtered.length > 0);
@@ -406,13 +432,11 @@ const handleViewLessReplies = (commentId) => {
 
   // to detect tag if user deleted any character
   const detectRemovedTag = (text) => {
-    console.log("======text=====>", text);
     return taggedUsers.find((tag) => !text.includes(`@${tag.name}`));
   };
 
   // to remove tag name from input field if any character from tagged name is removed
   const removeTag = (tag) => {
-    console.log("tag====", tag)
     setTaggedUsers((prev) => prev.filter((t) => t.id !== tag.id));
   };
 
@@ -428,8 +452,8 @@ const handleViewLessReplies = (commentId) => {
     const match = value.match(/@(\w*)$/); // Match word after @
     if (match) {
       const query = match[1].toLowerCase();
-      const filtered = people.filter((person) =>
-        person.name.toLowerCase().includes(query)
+      const filtered = userBuddies.filter((person) =>
+        person.full_name.toLowerCase().includes(query)
       );
       setFilteredSuggestionsForReply(filtered);
       setShowTagSuggestionsForReply(filtered.length > 0);
@@ -439,11 +463,10 @@ const handleViewLessReplies = (commentId) => {
   }
 
   const handleSuggestionClickForReply = (person, commentId) => {
-      console.log("======commentId====>", commentId);
     // Replace the @mention in input with the selected person's name
     // Replace the @mention in input with the selected person's name
       const currentText = commentReplyInputVal[commentId] || ""; // Retrieve the current value for the commentId
-      const newText = currentText.replace(/@\w*$/, `@${person.name} `);
+      const newText = currentText.replace(/@\w*$/, `@${person.full_name} `);
 
       // Update the input value for the specific commentId
       setCommentReplyInputVal((prev) => ({
@@ -488,53 +511,57 @@ const handleViewLessReplies = (commentId) => {
     }
   };
 
-  const sendReplyComment = async (commentId, postId) => {
-    try {
-      const replyResponse = await dispatch(
-        commentOnReply({
-          comment_id: commentId,
-          content: commentReplyInputVal[commentId],
-        })
-      ).unwrap();
-      console.log("====replyResponse===>", replyResponse);
-      if (replyResponse) {
-        await dispatch(getCommentOnPost(postId));
-        await dispatch(getUserPosts());
-        setCommentReplyInputVal({});
+const sendReplyComment = async (commentId, postId) => {
+  try {
+    const replyResponse = await dispatch(
+      commentOnReply({
+        comment_id: commentId,
+        content: commentReplyInputVal[commentId],
+      })
+    ).unwrap();
+    console.log("====replyResponse===>", replyResponse);
+    if (replyResponse) {
+      await dispatch(getCommentOnPost(postId));
+      await dispatch(getUserPosts());
+      setCommentReplyInputVal({});
+    }
+  } catch (error) {
+    console.log("error in sendReplyComment commentpopup page", error);
+  }
+};
+
+const handleCommentImageUpload = async (e) => {
+  console.log("file handleCommentImageUpload===>");
+  const file = e.target.files[0];
+  console.log("===file===>", file);
+  if (file) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = async () => {
+      try {
+        setImagePreview(reader.result);
+        setImagePreview(reader.result); // Set the image preview
+
+        // Append the image preview as part of the comment (you can also append it to a markdown or HTML format)
+        setCommentInputVal(
+          (prevComment) =>
+            prevComment + `<img src="${reader.result}" alt="comment-image" />`
+        );
+        console.log("Image uploaded successfully");
+      } catch (error) {
+        console.error("Image upload failed handleCommentImageUpload:", error);
+      } finally {
+        e.target.value = null;
       }
-    } catch (error) {
-      console.log("error in sendReplyComment commentpopup page", error);
-    }
-  };
-
-  const handleCommentImageUpload = async (e) => {
-    console.log("file handleCommentImageUpload===>");
-    const file = e.target.files[0];
-    console.log("===file===>", file);
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = async () => {
-        try {
-          setImagePreview(reader.result);
-          setImagePreview(reader.result); // Set the image preview
-
-          // Append the image preview as part of the comment (you can also append it to a markdown or HTML format)
-          setCommentInputVal(
-            (prevComment) =>
-              prevComment + `<img src="${reader.result}" alt="comment-image" />`
-          );
-          console.log("Image uploaded successfully");
-        } catch (error) {
-          console.error("Image upload failed handleCommentImageUpload:", error);
-        } finally {
-          e.target.value = null;
-        }
-      };
-    }
-  };
+    };
+  }
+};
 
   // console.log("======allPosts[0].description.length====>", allPosts[0].description.length);
+
+  const handleReplyToReply = async(replyId) => {
+    setReplyToReplyId(replyId);
+  }
 
   if (!isOpen) return null;
 
@@ -781,11 +808,14 @@ const handleViewLessReplies = (commentId) => {
                                 &nbsp;{" "}
                                 <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>{" "}
                                 &nbsp;{" "}
-                                <span className="font-inter font-medium text-[16px] text-[#667877]">
+                                {/* <span className="font-inter font-medium text-[16px] text-[#667877]">
                                   {getTimeDifferenceFromNow(
                                     userPosts?.created_at
                                   )}{" "}
                                   ago
+                                </span> */}
+                                <span className="font-inter font-medium text-[16px] text-[#667877]">
+                                  {getTimeDifferenceFromNow(userPosts?.created_at) == '0m' ? 'just now' : `${getTimeDifferenceFromNow(userPosts?.created_at)} ago`}{" "}
                                 </span>
                               </p>
                               <img
@@ -921,7 +951,7 @@ const handleViewLessReplies = (commentId) => {
                                             <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>{" "}
                                             &nbsp;{" "}
                                             <span className="font-inter font-medium text-[16px] text-[#667877]">
-                                              {getTimeDifferenceFromNow(userReply?.reply_created_at)} ago
+                                              {getTimeDifferenceFromNow(userReply?.reply_created_at) == '0m' ? 'just now' : `${getTimeDifferenceFromNow(userReply?.reply_created_at)} ago`}{" "}
                                             </span>
                                           </p>
                                           <img
@@ -975,8 +1005,15 @@ const handleViewLessReplies = (commentId) => {
                                       </div>
 
                                       <div className="flex items-center gap-2 cursor-pointer">
-                                        <div className="flex items-center">
-                                          <div className="flex items-center">
+                                        <div 
+                                          className="flex items-center"
+                                          onClick={() =>
+                                            handleCommentLikeUnlikeOnReply(
+                                              userReply?.reply_id
+                                            )
+                                          }   
+                                        >
+                                          <div className="flex items-center" >
                                             <img
                                               src={noto_fire}
                                               alt="noto_fire"
@@ -985,9 +1022,34 @@ const handleViewLessReplies = (commentId) => {
                                           </div>
                                           <div className="flex items-center">
                                             <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
-                                              62 likes
+                                            {/* {userReply?.total_likes_on_reply > 1 ? "like" : "likes"} */}
+                                            {userReply?.total_likes_on_reply || ""}{" "}
+                                            {userReply?.total_likes_on_reply > 1
+                                              ? "likes"
+                                              : "like"}{" "}
                                             </p>
                                           </div>
+                                        </div>
+                                        <div
+                                          className="flex items-center"
+                                          onClick={() => handleReplyToReplyClick(userReply?.reply_id)}
+                                        >
+                                          <div className="flex items-center">
+                                            <img
+                                              src={Dialog}
+                                              alt="Dialog"
+                                              className="w-4 h-4"
+                                            />
+                                          </div>
+                                          <div className="flex items-center cursor-pointer">
+                                            <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
+                                              {userPosts?.total_reply_on_comment || ""}{" "}
+                                              {userPosts?.total_reply_on_comment > 1
+                                                ? "replies"
+                                                : "reply"}{" "}
+                                            </p>
+                                          </div>
+                                        
                                         </div>
                                         <div className="flex items-center">
                                           {/* <div className="flex items-center">
@@ -1033,7 +1095,7 @@ const handleViewLessReplies = (commentId) => {
                                         <ul className="suggestions">
                                           {filteredSuggestionsForReply.map((person) => (
                                             <li key={person.id} onClick={() => handleSuggestionClickForReply(person, replyToCommentId)}>
-                                              {person.name}
+                                              {person.full_name}
                                             </li>
                                           ))}
                                         </ul>
@@ -1156,7 +1218,7 @@ const handleViewLessReplies = (commentId) => {
                     <ul className="suggestions">
                       {filteredSuggestions.map((person) => (
                         <li key={person.id} onClick={() => handleSuggestionClick(person)}>
-                          {person.name}
+                          {person.full_name}
                         </li>
                       ))}
                     </ul>

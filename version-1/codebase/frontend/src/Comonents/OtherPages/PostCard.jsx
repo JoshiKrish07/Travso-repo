@@ -1,691 +1,532 @@
-/* eslint-disable no-useless-escape */
-import React, { useEffect, useState, useRef } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faImage,
-  faSmile,
-  faUser,
-  faPaperclip,
-  faEllipsis,
-} from "@fortawesome/free-solid-svg-icons";
+import React, { useState } from "react";
 import Girl from "../../assets/headerIcon/girl.jpg";
 import Boy from "../../assets/headerIcon/boy2.jpg";
 import Boywithgirl from "../../assets/headerIcon/boywithgirl.png";
 import yellowgirl from "../../assets/headerIcon/yellowGirl.png";
-import bucket from "../../assets/headerIcon/bucket.png";
 import Dialog from "../../assets/headerIcon/Dialog.png";
-import fire from "../../assets/headerIcon/fire.png";
+import like from "../../assets/like.png";
 import send from "../../assets/headerIcon/send.png";
 import ok from "../../assets/headerIcon/ok.png";
+import CommentPopup from "./AllPopupComponent/CommentPopup";
+import Saved from "../../assets/headerIcon/archive-minus.png";
+import SharePopup from "./AllPopupComponent/SharePopup";
+import SavedPopup from "./AllPopupComponent/SavedPopup";
+import Travel from "../../assets/travel.png";
+import leftIcon from "../../assets/lefticon.png";
+import BucketImageSecond from "../../assets/bucketimageSecond.png";
+import First from "../../assets/1.png";
+import Boy1 from "../../assets/headerIcon/boy1.png";
 import p1 from "../../assets/headerIcon/p1.png";
 import p2 from "../../assets/headerIcon/p2.png";
 import p3 from "../../assets/headerIcon/p3.png";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  commentOnPost,
-  commitPost,
-  getAllPosts,
-  LikeUnlikePost,
-} from "../../redux/slices/postSlice";
-import SuccessError from "./SuccessError";
-import CommentPopup from "./AllPopupComponent/CommentPopup";
-import dummyUserImage from "../../assets/user_image-removebg-preview.png";
-import SharePopup from "./AllPopupComponent/SharePopup";
-import Saved from "../../assets/headerIcon/archive-minus.png";
-import { getUserPosts } from "../../redux/slices/authSlice";
-import SavedPopup from "./AllPopupComponent/SavedPopup";
-
-const posts = [
-  {
-    user: {
-      name: "John Doe",
-      avatar: Boy,
-      time: "12 October at 09:00AM",
-    },
-    text: "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
-    image: Boywithgirl,
-  },
-  {
-    user: {
-      name: "Jane Smith",
-      avatar: Boy,
-      time: "12 October at 09:00AM",
-    },
-    text: "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
-    image: yellowgirl,
-  },
-];
+import dotThree from "../../assets/dotThree.png";
+import entypo_bucket from "../../assets/entypo_bucket.png";
+import noto_fire from "../../assets/noto_fire.png";
 
 const PostCard = () => {
-  const dispatch = useDispatch();
-  const [isSharePopup, setIsSharePopup] = useState(false);
-  const [commentInputVal, setCommentInputVal] = useState("");
-  const [commentInputValForPost, setCommentInputValForPost] = useState("");
-  const [flashMessage, setFlashMessage] = useState("");
-  const [flashMsgType, setFlashMsgType] = useState("");
   const [isCommentPopup, setIsCommentPopup] = useState(false);
-  const [activePostId, setActivePostId] = useState(null);
-  const triggerRef = useRef(null);
   const [isCommentWithSavedPopup, setIsCommentWithSavedPopup] = useState(false);
-
-  // const { allPosts } = useSelector((state) => state.postSlice);
-  const { user: userDetails, userPosts: allPosts } = useSelector(
-    (state) => state.auth
-  );
-  // console.log("=====userPosts====>", allPosts);
-  useEffect(() => {
-    if (!allPosts) {
-      // dispatch(getAllPosts());
-      dispatch(getUserPosts());
-    }
-  }, [dispatch]);
-
-  /* emoji functionality starts */
-  const emojis = [
-    "😀",
-    "😁",
-    "😂",
-    "🤣",
-    "😃",
-    "😄",
-    "😅",
-    "😆",
-    "😉",
-    "😊",
-    "😎",
-    "😍",
-    "😘",
-    "🥰",
-    "😋",
-    "😜",
-    "🤔",
-    "🤩",
-    "😏",
-    "🙃",
-    "🤯",
-    "😱",
-    "😴",
-    "😷",
-    "🤗",
-    "🤠",
-    "🤡",
-    "👻",
-    "💀",
-    "👽",
-    "🎃",
-    "😺",
-    "😸",
-    "😹",
-    "😻",
-    "🙀",
-    "😿",
-    "😾",
-    "🐶",
-    "🐱",
-  ];
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [showEmojiPickerForPost, setShowEmojiPickerForPost] = useState(false);
-
-  const handleEmojiClick = (emoji) => {
-    setCommentInputVal((prevComment) => prevComment + emoji);
-    setShowEmojiPicker(false); // Close the emoji picker after selection
+  const [isSharePopup, setIsSharePopup] = useState(false);
+  // Sample data for the popup
+  const postDetails = {
+    title: "Pankaj Reet Tech",
+    subtitle: "Solo Traveler",
+    subtitleData: "Rameswaram",
+    description:
+      "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
+    image: [Travel, BucketImageSecond, First],
+    avtar: Boy1,
+    hastag: "#arsitek #art #creative",
   };
 
-  const handleEmojiClickForPost = (emoji) => {
-    console.log("==handleEmojiClickForPost===>");
-    setCommentInputValForPost((prevComment) => prevComment + emoji);
-    setShowEmojiPickerForPost(false); // Close the emoji picker after selection
+  const postDetailsData = {
+    title: "Ramesh",
+    subtitle: "Tracking",
+    subtitleData: "Indore",
+    description:
+      "Adipiscing sapien felis in semper porttitor massa senectus nunc. Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam morbi egestas. Et integer eget porttitor venenatis sed turpis ut eu. Viverra malesuada lorem sagittis risus aliquam urna duis.",
+    image: [Travel, BucketImageSecond, First],
+    avtar: Girl,
+    hastag: "#arsitek #art #creative",
   };
 
-  const handleInputEnterForPost = async (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      try {
-        const commentResult = await dispatch(
-          commitPost({ description: commentInputValForPost })
-        ).unwrap();
-        if (commentResult) {
-          console.log("=====commentResult===>", commentResult.message);
-          // await dispatch(getAllPosts());
-          await dispatch(getUserPosts());
-          setCommentInputValForPost("");
-          // handleFlashMessage(commentResult.message, 'success');
-        }
-      } catch (error) {
-        console.log("error in comment api", error);
-        const errorMessage = error.error || "Unexpected Error Occured";
-        handleFlashMessage(errorMessage, "error");
-      }
-    }
+  const images = postDetails.image;
+  const imagesData = postDetailsData.image;
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isFullTextVisible, setIsFullTextVisible] = useState(false);
+
+  // Function to toggle the full text
+  const toggleFullText = () => {
+    setIsFullTextVisible(!isFullTextVisible);
   };
 
-  /* emoji functionality starts */
-
-  // handle flash messages show
-  const handleFlashMessage = (errorMessage, msgType) => {
-    setFlashMessage(errorMessage);
-    setFlashMsgType(msgType);
-    setTimeout(() => {
-      setFlashMessage("");
-      setFlashMsgType("");
-    }, 3000); // Hide the message after 3 seconds
+  const goToPrevious = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+    );
   };
 
-  const handleInputEnter = async (e, postId) => {
-    // console.log("=====commentInputVal====>", commentInputVal);
-    if (e.key === "Enter" && !e.shiftKey) {
-      try {
-        const commentResult = await dispatch(
-          commentOnPost({ post_id: postId, content: commentInputVal })
-        ).unwrap();
-        if (commentResult) {
-          console.log("=====commentResult===>", commentResult.message);
-          // await dispatch(getAllPosts());
-          await dispatch(getUserPosts());
-          // handleFlashMessage(commentResult.message, 'success');
-        }
-      } catch (error) {
-        console.log("error in comment api", error);
-        const errorMessage = error.error || "Unexpected Error Occured";
-        handleFlashMessage(errorMessage, "error");
-      }
-      setCommentInputVal("");
-    }
+  const goToNext = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1
+    );
   };
 
-  // const handleSubmit = (event) => {
-  //   if (event.key === 'Enter' && commentInputVal.trim()) {
-  //     event.preventDefault(); // Prevent new line in input
-  //     setCommentInputVal([...comments, inputValue]);
-  //     setInputValue(''); // Clear input after submitting
-  //   }
-  // };
-
-  const handleLikeUnlike = async (postId) => {
-    try {
-      const likeUnlikeResult = await dispatch(
-        LikeUnlikePost({ post_id: postId })
-      ).unwrap();
-      if (likeUnlikeResult) {
-        // await dispatch(getAllPosts());
-        await dispatch(getUserPosts());
-        // handleFlashMessage(likeUnlikeResult.message, 'success');
-      }
-    } catch (error) {
-      console.log("error in likeunlike api", error);
-      const errorMessage = error.error || "Unexpected Error Occured";
-      // handleFlashMessage(errorMessage, 'error')
-    }
-  };
-
-  // show post date and time
-  function formatISODate(isoDate) {
-    const date = new Date(isoDate);
-
-    // Format options
-    const options = {
-      day: "numeric",
-      month: "long",
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    };
-
-    // Format the date and adjust the output
-    const formattedDate = date.toLocaleString("en-GB", options);
-    return formattedDate.replace(",", " at").replace(/\s([AP]M)$/, "$1"); // Remove space before AM/PM
-  }
-
-  // for comment time difference
-  function getHoursFromNow(timestamp) {
-    const givenDate = new Date(timestamp);
-    const currentDate = new Date();
-
-    // Calculate the absolute difference in milliseconds
-    const timeDifference = Math.abs(givenDate - currentDate);
-
-    // Convert the difference to hours
-    const hoursDifference = Math.floor(timeDifference / (1000 * 60 * 60));
-    const minutesDifference = Math.floor(timeDifference / (1000 * 60)) % 60;
-
-
-    if (hoursDifference >= 24) {
-      const days = Math.floor(hoursDifference / 24);
-      return `${days}d`;
-    }
-
-    if (hoursDifference >= 1) {
-      return `${hoursDifference}h`;
-    }
-  
-    return `${minutesDifference}m`;
-  }
-
-  // to extract the media URLs for a specific post
-  // const getFirstImage = (mediaUrl) => {
-  //   // Clean the string and split it into an array
-  //   const mediaArray = mediaUrl.replace(/^\[\"|\"?\]$/g, '').split('","');
-  //   return mediaArray[0]; // Return the first image URL
-  // };
-
-  const getFirstImage = (mediaUrl) => {
-    // If mediaUrl is an empty array string, return null
-    if (mediaUrl === "[]") return null;
-
-    // Clean the string and split it into an array
-    const mediaArray = mediaUrl.replace(/^\[\"|\"?\]$/g, "").split('","');
-
-    // Return the first image URL or null if the array is empty
-    return mediaArray.length > 0 ? mediaArray[0] : null;
-  };
-
-  // console.log("===allposts====>", allPosts);
-
-  // handle onchange of image upload on post section
-  const handlePostImageUpload = (e) => {
-    console.log("=====handlePostImageUpload=====>", e.target.files[0]);
-  };
-
-  // handle onchange of image upload on comment section
-  const handleCommentImage = (e) => {
-    console.log("====handleCommentImage===>", e.target.files[0]);
+  const goToSlide = (index) => {
+    setCurrentIndex(index);
   };
 
   return (
     <>
-      {flashMessage && (
-        <SuccessError message={flashMessage} messageType={flashMsgType} />
-      )}
-
-      <div className="bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.25)] p-4 mb-4">
-        <div className="flex items-center gap-1">
+      <div className="bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] p-4 px-4 mb-4">
+        <h5 className="text-left font-poppins font-semibold text-[20px] text-[#212626]">
+          Create a post
+        </h5>
+        <div className="flex items-center gap-1 mt-4 mb-1">
           {/* Profile Image */}
           <img
-            src={userDetails?.profile_image || dummyUserImage}
+            src={Girl}
             alt="Profile"
-            className="w-12 h-12 rounded-full"
+            className="w-[44px] h-[44px] rounded-full"
           />
 
           {/* Input Field */}
           <input
             type="text"
-            value={commentInputValForPost}
-            onChange={(e) => setCommentInputValForPost(e.target.value)}
-            onKeyDown={(e) => handleInputEnterForPost(e)}
-            placeholder={`Write your story today ...`}
-            className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-500 ml-3 text-sm"
+            placeholder="Post a story about your travel..."
+            className="h-[44px] flex-1 bg-[#F0F7F7] border border-[#F0F7F7] rounded-[24px] outline-none placeholder:text-[#869E9D] pl-3 placeholder:text-[14px] placeholder:font-medium placeholder:font-inter"
           />
-
-          {/* Icons */}
-          <div className="flex items-center space-x-3 text-gray-400">
-            <button
-              className="hover:text-gray-600"
-              onClick={() => document.getElementById("postGallery").click()}
-            >
-              <FontAwesomeIcon icon={faImage} className="w-5 h-5" />
-              <input
-                type="file"
-                id="postGallery"
-                onChange={(e) => handlePostImageUpload(e)}
-                hidden
-              />
-            </button>
-
-            <button className="hover:text-gray-600">
-              <div className="relative">
-                <button
-                  className="hover:text-gray-600"
-                  ref={triggerRef}
-                  onClick={() =>
-                    setShowEmojiPickerForPost(!showEmojiPickerForPost)
-                  }
-                >
-                  <FontAwesomeIcon icon={faSmile} className="w-5 h-5" />
-                </button>
-                {showEmojiPickerForPost && (
-                  <div
-                    className="absolute bg-white border rounded-lg shadow-lg p-3 grid grid-cols-8 gap-2 z-50 max-h-48 overflow-y-auto"
-                    style={{
-                      right: 2,
-                      top: "-210px",
-                      width: "23rem",
-                    }}
-                  >
-                    {emojis.map((emoji, index) => (
-                      <button
-                        key={index}
-                        className="text-2xl hover:bg-gray-200 p-2 rounded"
-                        onClick={() => handleEmojiClickForPost(emoji)}
-                      >
-                        {emoji}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              {/* <FontAwesomeIcon icon={faSmile} className="w-5 h-5" /> */}
-            </button>
-            <button className="hover:text-gray-600">
-              <FontAwesomeIcon icon={faUser} className="w-5 h-5" />
-            </button>
-            <button
-              className="hover:text-gray-600"
-              onClick={() => document.getElementById("postGallery").click()}
-            >
-              <FontAwesomeIcon icon={faPaperclip} className="w-5 h-5" />
-            </button>
-          </div>
         </div>
       </div>
-      {allPosts &&
-        allPosts?.map((post, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.25)] p-4 mb-4"
-          >
-            <div className="flex items-center gap-4 mb-4">
-              <img
-                src={allPosts[index]?.profile_image || dummyUserImage}
-                // alt={allPosts[index].profile_image}
-                className="w-10 h-10 rounded-full"
-              />
-              <div className="flex flex-1 items-center justify-between">
-                {/* Left Content */}
-                <div className="flex flex-col">
-                  <div className="flex items-center space-x-2">
-                    <h3 className="font-semibold text-left">
-                      {allPosts[index]?.full_name}
-                    </h3>
 
-                    {/* Images beside h3 */}
-                    <div className="flex space-x-1">
-                      <img
-                        src={p1}
-                        alt="Image 1"
-                        className="w-4 h-4 rounded-full object-cover"
-                      />
-                      <img
-                        src={p2}
-                        alt="Image 2"
-                        className="w-4 h-4 rounded-full object-cover"
-                      />
-                      <img
-                        src={p3}
-                        alt="Image 3"
-                        className="w-4 h-4 rounded-full object-cover"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Time */}
-                  <p className="text-sm text-gray-500 text-left">
-                    {formatISODate(allPosts[index].post_created_at)}
-                  </p>
-                </div>
-                <FontAwesomeIcon
-                  icon={faEllipsis}
-                  className="text-gray-500 cursor-pointer"
-                />
-              </div>
-            </div>
-            <p className="mb-4 text-left">{allPosts[index].description}</p>
-            <p className="mb-3 text-left text-[#1DB2AA]">
-              #arsitek #art #creative
-            </p>
-            
-            {/* {getFirstImage(allPosts[index].media_url) && (
-              <img
-                src={getFirstImage(allPosts[index].media_url)}
-                alt="Post"
-                className="w-full h-[548px] rounded-lg object-cover"
-              />
-            )} */}
-
-              {(allPosts[index].media_url).length > 0 && (
-                <img
-                  src={allPosts[index].media_url[0]}
-                  alt="Post"
-                  className="w-full h-[548px] rounded-lg object-cover"
-                />
-              )}
-
-            {/* )} */}
-            <div className="flex items-center justify-between mt-4">
-              <button
-                aria-label="Edit Info"
-                className="flex items-center justify-center w-[197px] h-[40px] bg-[#2DC6BE] text-white text-[#434C50] hover:text-gray-800 py-1 px-3 rounded-full hover:bg-[#2DC6BE] hover:text-white"
-                onClick={() => handleLikeUnlike(allPosts[index].id)}
-              >
-                <img src={fire} alt="Edit Icon" className="mr-2 w-6 h-6" />
-                {/* <span className="text-md font-normal">72K Liked</span> */}
-                <span className="text-md font-normal">
-                  {allPosts[index].total_likes > 0
-                    ? allPosts[index].total_likes
-                    : ""}{" "}
-                  Liked
-                </span>
-              </button>
-
-              <button
-                aria-label="Edit Info"
-                className="flex items-center justify-center w-[197px] h-[40px] bg-[#cdd0d499] text-[#434C50] hover:text-gray-800 py-1 px-3 rounded-full "
-                // onClick={() => setIsCommentPopup(true)}
-                onClick={() => setActivePostId(allPosts[index].id)}
-              >
-                <img src={Dialog} alt="Edit Icon" className="mr-2 w-6 h-6" />
-                {/* <span className="text-md font-normal">50K Comments</span> */}
-                <span className="text-md font-normal">
-                  {allPosts[index].total_comments > 0
-                    ? allPosts[index].total_comments
-                    : ""}{" "}
-                  Comments
-                </span>
-              </button>
-
-              <button
-                aria-label="Edit Info"
-                className="flex items-center justify-center w-[197px] h-[40px] bg-[#cdd0d499] text-[#434C50] hover:text-gray-800 py-1 px-3 rounded-full "
-                onClick={() => setIsCommentWithSavedPopup(true)}
-              >
-                <img src={bucket} alt="Edit Icon" className="mr-2 w-6 h-6" />
-                {/* <span className="text-md font-normal">2.3K Saved</span> */}
-                <span className="text-md font-normal">
-                  {allPosts[index].total_buckets > 0
-                    ? allPosts[index].total_buckets
-                    : ""}{" "}
-                  Saved
-                </span>
-              </button>
-
-              <button
-                aria-label="Edit Info"
-                className="flex items-center justify-center w-[197px] h-[40px] bg-[#cdd0d499] text-[#434C50] hover:text-gray-800 py-1 px-3 rounded-full "
-                onClick={() => setIsSharePopup(true)}
-              >
-                <img src={send} alt="Edit Icon" className="mr-2 w-6 h-6" />
-                {/* <span className="text-md font-normal">1K Share</span> */}
-                <span className="text-md font-normal">
-                  {allPosts[index].total_shared > 0
-                    ? allPosts[index].total_shared
-                    : ""}{" "}
-                  Share
-                </span>
-              </button>
-              {/*--------------- Comment Popup ----------------*/}
-
-              {/* <CommentPopup
-              isOpen={isCommentPopup}
-              onClose={() => setIsCommentPopup(false)}
-              postId= {allPosts[index].id}
-            /> */}
-
-              {activePostId === allPosts[index].id && (
-                <CommentPopup
-                  isOpen={true}
-                  onClose={() => setActivePostId(null)}
-                  postId={allPosts[index].id}
-                />
-              )}
-
-              <SharePopup
-                isOpen={isSharePopup}
-                onClose={() => setIsSharePopup(false)}
-              />
-
-<SavedPopup
-              isOpen={isCommentWithSavedPopup}
-              onClose={() => setIsCommentWithSavedPopup(false)}
+      {/* First Data */}
+      <div className="bg-white rounded-lg shadow-[0_2px_6px_rgba(0,0,0,0.10)] p-5 mb-4">
+        {/* Top Fixed Section */}
+        <div className="flex items-center justify-between space-x-4 mb-1 pb-2">
+          <div className="flex items-center gap-2">
+            <img
+              src={postDetails.avtar}
+              alt="Avatar"
+              className="w-10 h-10 object-cover rounded-full"
             />
-
-
-            </div>
-
-            {/* Comment Section */}
-            <div className="mt-6">
-              <div className="text-[15px] text-[#415365] mb-2 text-left font-semibold">
-                Previous comments
-              </div>
-              <div className="flex items-start space-x-3 rounded-md">
-                {/* Profile Image */}
-                <img
-                  src={
-                    allPosts[index].last_comment_user_profile_image ||
-                    dummyUserImage
-                  }
-                  alt="User"
-                  className="w-8 h-8 rounded-full"
-                />
-
-                {/* Content Section */}
-                <div className="flex flex-col space-y-2">
-                  {/* Comment Content */}
-                  <div className="bg-[#EEF0F29C] p-2 rounded-lg w-[120px]">
-                    <p className="font-semibold text-[#415365] text-[15px] text-left">
-                      {allPosts[index]?.last_comment_user_full_name}
-                    </p>
-                    <p className="text-[#415365] text-[14px] text-left">
-                      {allPosts[index]?.last_comment_content}
-                    </p>
-                  </div>
-
-                  {/* Interaction Section */}
-                  <div className="flex items-center justify-between text-black text-sm mt-2 gap-4">
-                    <div className="flex items-center space-x-2">
-                      <div className="flex items-center">
-                        <img src={ok} alt="Green Icon" className="w-4 h-4" />
-                      </div>
-                      <div className="">
-                        {allPosts[index]?.last_comment_likes_count}{" "}
-                        <sup>Comments</sup>
-                      </div>
-                    </div>
-                    <div className="">
-                      62{" "}
-                      <sup>
-                        {getHoursFromNow(
-                          allPosts[index]?.last_comment_created_at
-                        )}
-                      </sup>
-                    </div>
-                  </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h3 className="font-poppins font-semibold text-left text-[16px] text-[#212626]">
+                  {postDetails.title}
+                </h3>
+                {/* Images beside h3 */}
+                <div className="flex space-x-1">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M8 0L14.2547 3.01208L15.7994 9.78017L11.4711 15.2078H4.52893L0.200577 9.78017L1.74535 3.01208L8 0Z"
+                      fill="#9747FF"
+                    />
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M11.6846 5.53463C11.8636 5.71362 11.8636 6.00382 11.6846 6.18281L7.4068 10.4606C7.22781 10.6396 6.93761 10.6396 6.75862 10.4606L4.31417 8.01615C4.13518 7.83716 4.13518 7.54696 4.31417 7.36797C4.49316 7.18898 4.78337 7.18898 4.96236 7.36797L7.08271 9.48832L11.0364 5.53463C11.2154 5.35564 11.5056 5.35564 11.6846 5.53463Z"
+                      fill="white"
+                    />
+                  </svg>
                 </div>
               </div>
-            </div>
-
-            <div className="mt-6 mb-2">
-              <div className="flex items-center gap-1">
-                {/* Profile Image */}
-                <img
-                  src={userDetails?.profile_image || dummyUserImage}
-                  alt="Profile"
-                  className="w-10 h-10 rounded-full"
-                />
-
-                <div className="flex items-center justify-between bg-gray-200 p-2 rounded-md w-[100%]">
-                  {/* Input Field */}
-
-                  <input
-                    type="text"
-                    placeholder="What’s on your mind?"
-                    className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-500 ml-3 text-sm"
-                    value={commentInputVal || ""}
-                    onKeyDown={(e) => handleInputEnter(e, allPosts[index]?.id)}
-                    onChange={(e) => setCommentInputVal(e.target.value)}
-                  />
-
-                  {/* Icons */}
-                  <div className="flex items-center space-x-3 text-gray-400">
-                    <button
-                      className="hover:text-gray-600"
-                      onClick={() =>
-                        document.getElementById("commentImageUpload").click()
-                      }
-                    >
-                      <FontAwesomeIcon icon={faImage} className="w-5 h-5" />
-                      <input
-                        type="file"
-                        id="commentImageUpload"
-                        hidden
-                        onChange={(e) => handleCommentImage(e)}
-                      />
-                    </button>
-                    <div className="relative">
-                      <button
-                        className="hover:text-gray-600"
-                        ref={triggerRef}
-                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                      >
-                        <FontAwesomeIcon icon={faSmile} className="w-5 h-5" />
-                      </button>
-                      {showEmojiPicker && (
-                        <div
-                          className="absolute bg-white border rounded-lg shadow-lg p-3 grid grid-cols-8 gap-2 z-50 max-h-48 overflow-y-auto"
-                          style={{
-                            right: 2,
-                            top: "-210px",
-                            width: "23rem",
-                          }}
-                        >
-                          {emojis.map((emoji, index) => (
-                            <button
-                              key={index}
-                              className="text-2xl hover:bg-gray-200 p-2 rounded"
-                              onClick={() => handleEmojiClick(emoji)}
-                            >
-                              {emoji}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    <button className="hover:text-gray-600">
-                      <FontAwesomeIcon icon={faUser} className="w-5 h-5" />
-                    </button>
-                    <button className="hover:text-gray-600">
-                      <FontAwesomeIcon icon={faPaperclip} className="w-5 h-5" />
-                    </button>
-
-                    {/* {showEmojiPicker && (
-                      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                        <div className="bg-white border rounded-lg shadow-lg p-5 grid grid-cols-8 gap-2 max-h-48 overflow-y-auto">
-                          {emojis.map((emoji, index) => (
-                            <button
-                              key={index}
-                              className="text-2xl hover:bg-gray-200 p-2 rounded"
-                              onClick={() => handleEmojiClick(emoji)}
-                            >
-                              {emoji}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )} */}
-                  </div>
-                </div>
-              </div>
+              <p className="-mt-1 font-inter font-medium text-left text-[12px] text-[#667877]">
+                {postDetails.subtitle} • {postDetails.subtitleData}
+              </p>
             </div>
           </div>
-        ))}
+          <div>
+            <img src={dotThree} alt="dotThree" className="h-4 object-cover" />
+          </div>
+        </div>
+        {/* Top Fixed Section */}
+
+        {/*---------- Scrollable Part ---------*/}
+        <div className="flex-1 overflow-y-auto scrollbar-hidden">
+          <div className="relative w-full max-w-4xl mx-auto">
+            {/* Slider */}
+            <div className="overflow-hidden relative mb-4">
+              <div>
+                <img
+                  src={images[currentIndex]}
+                  alt={`Slide ${currentIndex}`}
+                  className="rounded-lg w-full h-[432px] object-cover transition duration-500"
+                />
+              </div>
+            </div>
+
+            {/* Left Button */}
+            <button
+              onClick={goToPrevious}
+              className="absolute top-1/2 left-4 w-9 h-9 transform -translate-y-1/2 bg-[#EEF0F299] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center"
+            >
+              <svg
+                width="8"
+                height="14"
+                viewBox="0 0 8 14"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7 13L1 7L7 1"
+                  stroke="#212626"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+
+            {/* Right Button */}
+            <button
+              onClick={goToNext}
+              className="absolute top-1/2 right-4 w-9 h-9 transform -translate-y-1/2 bg-[#EEF0F299] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center rotate-180"
+            >
+              <svg
+                width="8"
+                height="14"
+                viewBox="0 0 8 14"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7 13L1 7L7 1"
+                  stroke="#212626"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+
+            {/* Dots */}
+            <div className="flex justify-center mt-1 absolute items-center justify-center inline-flex top-[400px] bg-[#FFFFFFBF] w-[68px] h-[16px] rounded-[16px]">
+              {images.map((_, index) => (
+                <div
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`w-2 h-2 mx-1 rounded-full transform transition-transform duration-300 ${
+                    index === currentIndex
+                      ? "bg-[#2DC6BE] scale-150"
+                      : "bg-[#869E9D] hover:bg-[#2DC6BE] scale-100"
+                  } cursor-pointer`}
+                ></div>
+              ))}
+            </div>
+          </div>
+          {/* Post Description */}
+          <p className="font-inter font-medium text-[14px] text-[#212626] text-left text-justify mb-1 mt-3">
+            {isFullTextVisible
+              ? postDetails.description
+              : `${postDetails.description.slice(0, 170)}...`}
+            <span
+              onClick={toggleFullText}
+              className="text-[#2DC6BE] cursor-pointer"
+            >
+              {isFullTextVisible ? " Show less" : " See more"}
+            </span>
+          </p>
+
+          {/* Hashtags */}
+          <p className="text-left text-[#1DB2AA] mb-4">{postDetails.hastag}</p>
+        </div>
+        {/*---------- Scrollable Part ---------*/}
+
+        {/* Bottom Fixed Section */}
+        <div className="flex items-center justify-between mb-2">
+          <ul className="flex gap-2">
+            <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
+              72K Love &nbsp; &nbsp;{" "}
+              <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>
+            </li>
+            <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
+              50K comments &nbsp; &nbsp;{" "}
+              <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>
+            </li>
+            <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
+              2.3K Bucket listed &nbsp; &nbsp;{" "}
+              <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>
+            </li>
+            <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
+              1K Shared &nbsp; &nbsp;
+            </li>
+          </ul>
+          <p className="font-inter font-medium text-[12px] text-[#667877] ">
+            {" "}
+            12 Oct 2024{" "}
+          </p>
+        </div>
+        <div className="flex items-center justify-between mt-3">
+          <button
+            aria-label="Edit Info"
+            className="flex items-center justify-center w-[144px] h-[36px] bg-[#F0F7F7] text-white text-[#434C50] hover:text-gray-800 py-1 px-2 rounded-full hover:bg-[#2DC6BE] hover:text-white"
+          >
+            <img
+              src={noto_fire}
+              alt="like"
+              className="mr-2 w-[20px] h-[20px]"
+            />
+            <span className="font-inter font-medium text-[14px] text-[#212626] hover:text-white">
+              Liked
+            </span>
+          </button>
+
+          <button
+            aria-label="Edit Info"
+            className="flex items-center justify-center w-[144px] h-[36px] bg-[#F0F7F7] text-[#434C50] hover:text-gray-800 py-1 px-2 rounded-full "
+          >
+            <img src={Dialog} alt="dialog" className="mr-1 w-[20px] h-[20px]" />
+            <span className="font-inter font-medium text-[14px] text-[#212626]">
+              Comment
+            </span>
+          </button>
+
+          <button
+            aria-label="Edit Info"
+            className="flex items-center justify-center w-[144px] h-[36px] bg-[#F0F7F7] text-[#434C50] hover:text-gray-800 py-1 px-2 rounded-full relative"
+          >
+            <img
+              src={entypo_bucket}
+              alt="saved"
+              className="mr-1 w-[20px] h-[20px]"
+            />
+            <span className="font-inter font-medium text-[14px] text-[#212626]">
+              Bucket List
+            </span>
+          </button>
+
+          <button
+            aria-label="Edit Info"
+            className="flex items-center justify-center w-[144px] h-[36px] bg-[#F0F7F7] text-[#434C50] hover:text-gray-800 py-1 px-2 rounded-full "
+          >
+            <img src={send} alt="send" className="mr-2 w-[20px] h-[20px]" />
+            <span className="font-inter font-medium text-[14px] text-[#212626] ">
+              {postDetails.share} Share
+            </span>
+          </button>
+        </div>
+        {/* Bottom Fixed Section */}
+      </div>
+
+      {/* Second Data */}
+      <div className="bg-white rounded-lg shadow-[0_2px_6px_rgba(0,0,0,0.10)] p-5 mb-4">
+        {/* Top Fixed Section */}
+        <div className="flex items-center justify-between space-x-4 mb-1 pb-2">
+          <div className="flex items-center gap-2">
+            <img
+              src={postDetailsData.avtar}
+              alt="Avatar"
+              className="w-10 h-10 object-cover rounded-full"
+            />
+            <div>
+              <div className="flex items-center space-x-2">
+                <h3 className="font-poppins font-semibold text-left text-[16px] text-[#212626]">
+                  {postDetailsData.title}
+                </h3>
+                {/* Images beside h3 */}
+                <div className="flex space-x-1">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M8 0L14.2547 3.01208L15.7994 9.78017L11.4711 15.2078H4.52893L0.200577 9.78017L1.74535 3.01208L8 0Z"
+                      fill="#9747FF"
+                    />
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M11.6846 5.53463C11.8636 5.71362 11.8636 6.00382 11.6846 6.18281L7.4068 10.4606C7.22781 10.6396 6.93761 10.6396 6.75862 10.4606L4.31417 8.01615C4.13518 7.83716 4.13518 7.54696 4.31417 7.36797C4.49316 7.18898 4.78337 7.18898 4.96236 7.36797L7.08271 9.48832L11.0364 5.53463C11.2154 5.35564 11.5056 5.35564 11.6846 5.53463Z"
+                      fill="white"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <p className="-mt-1 font-inter font-medium text-left text-[12px] text-[#667877]">
+                {postDetailsData.subtitle} • {postDetailsData.subtitleData}
+              </p>
+            </div>
+          </div>
+          <div>
+            <img src={dotThree} alt="dotThree" className="h-4 object-cover" />
+          </div>
+        </div>
+        {/* Top Fixed Section */}
+
+        {/*---------- Scrollable Part ---------*/}
+        <div className="flex-1 overflow-y-auto scrollbar-hidden">
+          <div className="relative w-full max-w-4xl mx-auto">
+            {/* Slider */}
+            <div className="overflow-hidden relative mb-4">
+              <div>
+                <img
+                  src={imagesData[currentIndex]}
+                  alt={`Slide ${currentIndex}`}
+                  className="rounded-lg w-full h-[432px] object-cover transition duration-500"
+                />
+              </div>
+            </div>
+
+            {/* Left Button */}
+            <button
+              onClick={goToPrevious}
+              className="absolute top-1/2 left-4 w-9 h-9 transform -translate-y-1/2 bg-[#EEF0F299] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center"
+            >
+              <svg
+                width="8"
+                height="14"
+                viewBox="0 0 8 14"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7 13L1 7L7 1"
+                  stroke="#212626"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+
+            {/* Right Button */}
+            <button
+              onClick={goToNext}
+              className="absolute top-1/2 right-4 w-9 h-9 transform -translate-y-1/2 bg-[#EEF0F299] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center rotate-180"
+            >
+              <svg
+                width="8"
+                height="14"
+                viewBox="0 0 8 14"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M7 13L1 7L7 1"
+                  stroke="#212626"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+
+            {/* Dots */}
+            <div className="flex justify-center mt-1 absolute items-center justify-center inline-flex top-[400px] bg-[#FFFFFFBF] w-[68px] h-[16px] rounded-[16px]">
+              {imagesData.map((_, index) => (
+                <div
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`w-2 h-2 mx-1 rounded-full transform transition-transform duration-300 ${
+                    index === currentIndex
+                      ? "bg-[#2DC6BE] scale-150"
+                      : "bg-[#869E9D] hover:bg-[#2DC6BE] scale-100"
+                  } cursor-pointer`}
+                ></div>
+              ))}
+            </div>
+          </div>
+          {/* Post Description */}
+          <p className="font-inter font-medium text-[14px] text-[#212626] text-left text-justify mb-1 mt-3">
+            {isFullTextVisible
+              ? postDetailsData.description
+              : `${postDetailsData.description.slice(0, 170)}...`}
+            <span
+              onClick={toggleFullText}
+              className="text-[#2DC6BE] cursor-pointer"
+            >
+              {isFullTextVisible ? " Show less" : " See more"}
+            </span>
+          </p>
+
+          {/* Hashtags */}
+          <p className="text-left text-[#1DB2AA] mb-4">
+            {postDetailsData.hastag}
+          </p>
+        </div>
+        {/*---------- Scrollable Part ---------*/}
+
+        {/* Bottom Fixed Section */}
+        <div className="flex items-center justify-between mb-2">
+          <ul className="flex gap-2">
+            <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
+              72K Love &nbsp; &nbsp;{" "}
+              <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>
+            </li>
+            <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
+              50K comments &nbsp; &nbsp;{" "}
+              <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>
+            </li>
+            <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
+              2.3K Bucket listed &nbsp; &nbsp;{" "}
+              <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>
+            </li>
+            <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
+              1K Shared &nbsp; &nbsp;
+            </li>
+          </ul>
+          <p className="font-inter font-medium text-[12px] text-[#667877] ">
+            {" "}
+            12 Oct 2024{" "}
+          </p>
+        </div>
+        <div className="flex items-center justify-between mt-3">
+          <button
+            aria-label="Edit Info"
+            className="flex items-center justify-center w-[130px] h-[36px] bg-[#2DC6BE] text-white text-[#434C50] hover:text-gray-800 py-1 px-2 rounded-full hover:bg-[#2DC6BE] hover:text-white"
+          >
+            <img src={like} alt="like" className="mr-2 w-[20px] h-[20px]" />
+            <span className="font-inter font-medium text-[14px] text-[#212626] hover:text-white">
+              Liked
+            </span>
+          </button>
+
+          <button
+            aria-label="Edit Info"
+            className="flex items-center justify-center w-[130px] h-[36px] bg-[#F0F7F7] text-[#434C50] hover:text-gray-800 py-1 px-2 rounded-full "
+          >
+            <img src={Dialog} alt="dialog" className="mr-1 w-[20px] h-[20px]" />
+            <span className="font-inter font-medium text-[14px] text-[#212626]">
+              Comment
+            </span>
+          </button>
+
+          <button
+            aria-label="Edit Info"
+            className="flex items-center justify-center w-[130px] h-[36px] bg-[#F0F7F7] text-[#434C50] hover:text-gray-800 py-1 px-2 rounded-full relative"
+          >
+            <img
+              src={entypo_bucket}
+              alt="saved"
+              className="mr-1 w-[20px] h-[20px]"
+            />
+            <span className="font-inter font-medium text-[14px] text-[#212626]">
+              Bucket List
+            </span>
+          </button>
+
+          <button
+            aria-label="Edit Info"
+            className="flex items-center justify-center w-[130px] h-[36px] bg-[#F0F7F7] text-[#434C50] hover:text-gray-800 py-1 px-2 rounded-full "
+          >
+            <img src={send} alt="send" className="mr-2 w-[20px] h-[20px]" />
+            <span className="font-inter font-medium text-[14px] text-[#212626] ">
+              {postDetailsData.share} Share
+            </span>
+          </button>
+        </div>
+        {/* Bottom Fixed Section */}
+      </div>
     </>
   );
 };
