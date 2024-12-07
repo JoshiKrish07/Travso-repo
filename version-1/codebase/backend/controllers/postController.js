@@ -251,25 +251,6 @@ async function getUserPosts(req , res){
     }
       
   }
-async function getdata(req , res){
-    try {
-
-        const { postId } = req.param;
-        const [ getdata ] = await pool.execute(
-
-        );
-
-        console.log('getdata',getdata)
-        return res.status(200).json({
-            message: "",
-
-        });
-        
-        console.log(``)
-    } catch (error) {
-        
-    }
-}
 
 async function addBucketList( req , res){
     try {
@@ -844,6 +825,52 @@ async function deleteReply(req , res){
   }
 }
 
+async function followAndUnfollow(req , res){
+
+  const userId = req.user.userId; // extracting from token
+  const { follwee_id } = req.body;
+
+  if(!userId || !follwee_id){
+      return res.status(400).json({
+          error:"UserID and follwee_id required"
+      });
+  }
+
+try {
+   
+   const [existingdata] = await pool.execute(
+      `SELECT * FROM followers WHERE follower_id = ? AND followee_id = ?` ,[userId, follwee_id ]
+   );
+   if(existingdata.length > 0){
+     await pool.execute(
+      `DELETE FROM followers WHERE follower_id = ? AND followee_id  = ?`, [userId, follwee_id ]
+     );
+
+     return res.status(200).json({
+      message:"Successfully Unfollowed"
+     });
+
+   }
+    else{
+
+      await pool.execute(
+         `INSERT INTO followers (follower_id , followee_id) VALUE (?,?)`, [userId ,follwee_id ] 
+      );
+   
+      return res.status(200).json({
+          message:"Successfully follow"
+      });
+   }
+
+} catch (error) {
+  console.log("===error===>",error)
+  return res.status(500).json({
+      error:"Internal Server Error"
+  });
+
+}
+}
+
 module.exports = {
     allPosts,
     postWithlikes,
@@ -858,5 +885,6 @@ module.exports = {
     replyOnComment,
     storePost,
     deleteComments,
-    deleteReply
+    deleteReply,
+    followAndUnfollow
 }

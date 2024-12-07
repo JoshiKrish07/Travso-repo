@@ -66,6 +66,8 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
   const [flashMsgType, setFlashMsgType] = useState("");
   const [visibleReplies, setVisibleReplies] = useState({}); // Object to track visible replies for each comment
   
+  const [showTagSuggestionsForReply, setShowTagSuggestionsForReply] = useState(false);
+  const [filteredSuggestionsForReply, setFilteredSuggestionsForReply] = useState([]);
   /* for tag people suggestion starts */
 
   const [showTagSuggestions, setShowTagSuggestions] = useState(false);
@@ -389,16 +391,6 @@ const handleViewLessReplies = (commentId) => {
     
     setCommentInputVal(value);
 
-    // Check if the user has backspaced over a tag
-    const lastChar = value[value.length - 1];
-    console.log("=====lastChar===>", lastChar);
-    if (lastChar === ' ' || lastChar === undefined) {
-      const removedTag = detectRemovedTag(value);
-      if (removedTag) {
-        removeTag(removedTag);
-      }
-    }
-
     const match = value.match(/@(\w*)$/); // Match word after @
     if (match) {
       const query = match[1].toLowerCase();
@@ -410,8 +402,6 @@ const handleViewLessReplies = (commentId) => {
     } else {
       setShowTagSuggestions(false);
     }
-
-    
   }
 
   // to detect tag if user deleted any character
@@ -426,6 +416,46 @@ const handleViewLessReplies = (commentId) => {
     setTaggedUsers((prev) => prev.filter((t) => t.id !== tag.id));
   };
 
+  // handle input change on reply input
+  const handleReplyCommentInputChange = (e, commentId) => {
+    const { value } = e.target;
+
+    setCommentReplyInputVal((prev) => ({
+      ...prev,
+      [commentId]: value,
+    }))
+
+    const match = value.match(/@(\w*)$/); // Match word after @
+    if (match) {
+      const query = match[1].toLowerCase();
+      const filtered = people.filter((person) =>
+        person.name.toLowerCase().includes(query)
+      );
+      setFilteredSuggestionsForReply(filtered);
+      setShowTagSuggestionsForReply(filtered.length > 0);
+    } else {
+      setShowTagSuggestionsForReply(false);
+    }
+  }
+
+  const handleSuggestionClickForReply = (person, commentId) => {
+      console.log("======commentId====>", commentId);
+    // Replace the @mention in input with the selected person's name
+    // Replace the @mention in input with the selected person's name
+      const currentText = commentReplyInputVal[commentId] || ""; // Retrieve the current value for the commentId
+      const newText = currentText.replace(/@\w*$/, `@${person.name} `);
+
+      // Update the input value for the specific commentId
+      setCommentReplyInputVal((prev) => ({
+        ...prev,
+        [commentId]: newText,
+      }));
+
+    // Add the tagged user's ID to the taggedUsers array
+    setTaggedUsers((prev) => [...prev, person.id]);
+
+    setShowTagSuggestionsForReply(false);
+  };
 
   // handle when user replies on any comment and hits enter
   const handleReplyInputEnter = async (e, commentId) => {
@@ -433,14 +463,17 @@ const handleViewLessReplies = (commentId) => {
     try {
       if (e.key === "Enter" && !e.shiftKey) {
         try {
+          const commentReplyPayload = {
+            comment_id: commentId,
+            content: commentReplyInputVal[commentId], // Full comment text
+            taggedUsers: taggedUsers.length ? taggedUsers : null, // Send IDs of tagged users
+          };
           const replyResponse = await dispatch(
-            commentOnReply({
-              comment_id: commentId,
-              content: commentReplyInputVal[commentId],
-            })
+            commentOnReply(commentReplyPayload)
           ).unwrap();
           if (replyResponse) {
             setCommentReplyInputVal({});
+            setTaggedUsers([]);
             await dispatch(getCommentOnPost(postId));
             await dispatch(getUserPosts());
           }
@@ -996,6 +1029,15 @@ const handleViewLessReplies = (commentId) => {
                       {/* Input Section New */}
                       {replyToCommentId === userPosts?.id && (
                               <div className="mt-3">
+                                {showTagSuggestionsForReply && (
+                                        <ul className="suggestions">
+                                          {filteredSuggestionsForReply.map((person) => (
+                                            <li key={person.id} onClick={() => handleSuggestionClickForReply(person, replyToCommentId)}>
+                                              {person.name}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                )}
                                 <div className="flex items-center gap-2">
                                   {/* Profile Image */}
                                   <img
@@ -1064,12 +1106,13 @@ const handleViewLessReplies = (commentId) => {
                                         commentReplyInputVal[userPosts?.id] ||
                                         ""
                                       }
-                                      onChange={(e) =>
-                                        setCommentReplyInputVal((prev) => ({
-                                          ...prev,
-                                          [userPosts?.id]: e.target.value,
-                                        }))
-                                      }
+                                      // onChange={(e) =>
+                                      //   setCommentReplyInputVal((prev) => ({
+                                      //     ...prev,
+                                      //     [userPosts?.id]: e.target.value,
+                                      //   }))
+                                      // }
+                                      onChange={(e) => handleReplyCommentInputChange(e, userPosts?.id)}
                                       className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-500 ml-2 text-sm"
                                     />
 

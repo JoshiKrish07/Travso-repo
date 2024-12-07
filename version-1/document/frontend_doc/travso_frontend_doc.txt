@@ -169,6 +169,20 @@ file destination :- src/Components/OtherPages/AllPopupComponent/CommentPopup.jsx
                                -> If less than 24 hours, it returns hour.
                                -> If more than 24 hours, it return days.
 5) handleCommentLikeUnlike() :- for Like and Unlike on any comment.
+
+file destination :- src/Components/OtherPages/CommunityRightSidebar.jsx
+1) Using displayedFriends shown active friends. If user clicks on show all actives then all actives are shown otherwise 8 people are
+   shown.
+2) Shown list of suggestion people(rightnow with all user later will change in backend api) and implemented the functionality of
+   follow and unfollow using redux function followUnfollow() in handleFollow() function.
+
+
+file destination :- src/Components/OtherPages/AllPopupComponent/CreateaPostPopup.jsx
+1) Using postData state to handle all input data which a user will fill to post.
+2) handleBuddyTag() function :- As soon as user write @, a list will appear of his buddies.
+3) handleSuggestionClick() function :- When user clicks on any suggestion it is stored in postData and also shown on UI with cancel
+   mark.
+4) handleRemoveBuddy() :- Allows user to remove tagged buddy.
 =============================================================================================================================================
 
 Module :- Search Bar

@@ -61,7 +61,7 @@ export const commentOnPost = createAsyncThunk(
   }
 );
 
-// Thunk for commentOnPost details
+// Thunk for LikeUnlikePost details
 export const LikeUnlikePost = createAsyncThunk(
   'post/LikeUnlikePost',
   async ({post_id},{ rejectWithValue }) => {
@@ -154,9 +154,8 @@ export const likeAnyComment = createAsyncThunk(
 // Thunk for commentOnReply details
 export const commentOnReply = createAsyncThunk(
   'post/commentOnReply',
-  async ({comment_id, content},{ rejectWithValue }) => {
+  async (replyData,{ rejectWithValue }) => {
     try {
-      console.log("======commentId======",comment_id);
       const token = localStorage.getItem('token');
       const response = await fetch(`${apiUrl}/post/reply-on-comment`, {
         method: 'POST',
@@ -164,10 +163,7 @@ export const commentOnReply = createAsyncThunk(
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          comment_id,
-          content
-        })
+        body: JSON.stringify(replyData)
       });
 
       if (!response.ok) {
@@ -186,7 +182,7 @@ export const commentOnReply = createAsyncThunk(
 );
 
 
-// Thunk for commentOnReply details
+// Thunk for commitPost details
 export const commitPost = createAsyncThunk(
   'post/commitPost',
   async (formData,{ rejectWithValue }) => {
@@ -277,6 +273,39 @@ export const deleteReplyByPostOwner = createAsyncThunk(
     }
   }
 );
+
+
+// Thunk for followUnfollow details
+export const followUnfollow = createAsyncThunk(
+  'post/followUnfollow',
+  async (followeeId,{ rejectWithValue }) => {
+    try {
+      
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/follow-unfollow`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 'follwee_id': followeeId})
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in followUnfollow===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in followUnfollow call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 
 
 const postSlice = createSlice({
@@ -403,6 +432,18 @@ const postSlice = createSlice({
         state.loading = false;
       })
       .addCase(deleteReplyByPostOwner.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle followUnfollow
+      .addCase(followUnfollow.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(followUnfollow.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(followUnfollow.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
