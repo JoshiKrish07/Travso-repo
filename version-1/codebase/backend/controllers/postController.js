@@ -230,11 +230,17 @@ async function getUserPosts(req , res){
       `,
         [UserId]
            );
+
+           const formattedPosts =await allpost.map(post => {
+            return {
+              ...post,
+              media_url: post.media_url ? JSON.parse(post.media_url) : [] 
+            };
+          });
   
-           console.log("===allpost===>", allpost)
            return res.status(200).json({
               message: "All Posts data",
-              data : allpost
+              data : formattedPosts
            });
       
     } catch (error) {
@@ -245,25 +251,6 @@ async function getUserPosts(req , res){
     }
       
   }
-async function getdata(req , res){
-    try {
-
-        const { postId } = req.param;
-        const [ getdata ] = await pool.execute(
-
-        );
-
-        console.log('getdata',getdata)
-        return res.status(200).json({
-            message: "",
-
-        });
-        
-        console.log(``)
-    } catch (error) {
-        
-    }
-}
 
 async function addBucketList( req , res){
     try {
@@ -413,105 +400,208 @@ try {
     }
   }
       
-  async function getPostComments(req , res){
-    try {
-        const { postId } = req.params;
-        console.log("=====postId==getPostComments==>", postId)
-        const [getComments] = await pool.execute(
-        //   SELECT    FROM comments where post_id = ?,[postId]
+//   async function getPostComments(req , res){
+//     try {
+//         const { postId } = req.params;
+//         console.log("=====postId==getPostComments==>", postId)
+//         const [getComments] = await pool.execute(
+//         //   SELECT    FROM comments where post_id = ?,[postId]
 
-       `SELECT 
-                c.user_id,
-                c.post_id,
-                c.id,
-                c.content,
-                u.full_name,
-                u.profile_image,
-                c.created_at,
-                -- Count total likes for each comment
-                (SELECT COUNT(*) FROM comments_like cl WHERE cl.comment_id = c.id) AS total_likes_on_comment,
-                -- Count total replies for each comment
-                (SELECT COUNT(*) FROM comment_reply cr WHERE cr.comment_id = c.id) AS total_reply_on_comment
+//        `SELECT 
+//                 c.user_id,
+//                 c.post_id,
+//                 c.id,
+//                 c.content,
+//                 u.full_name,
+//                 u.profile_image,
+//                 c.created_at,
+//                 -- Count total likes for each comment
+//                 (SELECT COUNT(*) FROM comments_like cl WHERE cl.comment_id = c.id) AS total_likes_on_comment,
+//                 -- Count total replies for each comment
+//                 (SELECT COUNT(*) FROM comment_reply cr WHERE cr.comment_id = c.id) AS total_reply_on_comment
              
-            FROM 
-                comments c
-            JOIN
-                users u
-            ON 
-                c.user_id = u.id
-            WHERE
-                c.post_id = ?
-            ORDER BY 
-                c.created_at ASC
-                `,[postId]
-        );
+//             FROM 
+//                 comments c
+//             JOIN
+//                 users u
+//             ON 
+//                 c.user_id = u.id
+//             WHERE
+//                 c.post_id = ?
+//             ORDER BY 
+//                 c.created_at ASC
+//                 `,[postId]
+//         );
 
-          // Fetch all replies
-          const [replies] = await pool.execute(
-            `
-            SELECT 
-                cr.id AS reply_id,
-                cr.comment_id,
-                cr.user_id,
-                cr.content AS reply_content,
-                u.full_name AS reply_user_full_name,
-                u.user_name AS reply_user_user_name,
-                u.profile_image AS reply_user_profile_image,
-                cr.created_at AS reply_created_at
-            FROM 
-                comment_reply cr
-                JOIN
-                users u
-            ON 
-                cr.user_id = u.id
-            WHERE 
-                cr.comment_id IN (
-                    SELECT id FROM comments WHERE post_id = ?
-                )
-            `,
-            [postId]
-        );
+//           // Fetch all replies
+//           const [replies] = await pool.execute(
+//             `
+//             SELECT 
+//                 cr.id AS reply_id,
+//                 cr.comment_id,
+//                 cr.user_id,
+//                 cr.content AS reply_content,
+//                 u.full_name AS reply_user_full_name,
+//                 u.user_name AS reply_user_user_name,
+//                 u.profile_image AS reply_user_profile_image,
+//                 cr.created_at AS reply_created_at
+//             FROM 
+//                 comment_reply cr
+//                 JOIN
+//                 users u
+//             ON 
+//                 cr.user_id = u.id
+//             WHERE 
+//                 cr.comment_id IN (
+//                     SELECT id FROM comments WHERE post_id = ?
+//                 )
+//             `,
+//             [postId]
+//         );
 
-        // Group replies by comment ID
-        const groupedReplies = replies.reduce((acc, reply) => {
-            if (!acc[reply.comment_id]) {
-                acc[reply.comment_id] = [];
-            }
-            acc[reply.comment_id].push({
-                reply_id: reply.reply_id,
-                reply_content: reply.reply_content,
-                reply_user_full_name: reply.reply_user_full_name,
-                reply_user_user_name: reply.reply_user_user_name,
-                reply_user_profile_image: reply.reply_user_profile_image,
-                reply_created_at: reply.reply_created_at,
-            });
-            return acc;
-        }, {});
+//         // Group replies by comment ID
+//         const groupedReplies = replies.reduce((acc, reply) => {
+//             if (!acc[reply.comment_id]) {
+//                 acc[reply.comment_id] = [];
+//             }
+//             acc[reply.comment_id].push({
+//                 reply_id: reply.reply_id,
+//                 reply_content: reply.reply_content,
+//                 reply_user_full_name: reply.reply_user_full_name,
+//                 reply_user_user_name: reply.reply_user_user_name,
+//                 reply_user_profile_image: reply.reply_user_profile_image,
+//                 reply_created_at: reply.reply_created_at,
+//             });
+//             return acc;
+//         }, {});
 
-        // Attach replies to their respective comments
-        const finalComments = getComments.map((comment) => ({
-            ...comment,
-            replies: groupedReplies[comment.comment_id] || [],
-        }));
+//         // Attach replies to their respective comments
+//         const finalComments = Object.entries(getComments).map((comment) => ({
+//             ...comment,
+//             replies: groupedReplies[comment.comment_id] || [],
+//         }));
 
-       console.log("==data Fetched==>",finalComments)
-       return res.status(200).json({
-        message: "All comments of post",
-        data: finalComments
-       });
+//        console.log("==data Fetched==>",finalComments)
+//        return res.status(200).json({
+//         message: "All comments of post",
+//         data: finalComments
+//        });
         
 
-    } catch (error) {
+//     } catch (error) {
         
-        console.log(" Error to get data getPostComments function",error)
-        return res.status(500).json({
-            error: "Internal Server Error"
-        });
+//         console.log(" Error to get data getPostComments function",error)
+//         return res.status(500).json({
+//             error: "Internal Server Error"
+//         });
 
-    }
-}
+//     }
+// }
 
 // function to like a comment
+
+
+async function getPostComments(req , res){
+  try {
+      const { postId } = req.params;
+      console.log("=====postId====>", postId);
+      const [getComments] = await pool.execute(
+      //   SELECT    FROM comments where post_id = ?,[postId]
+      `SELECT 
+              c.user_id,
+              c.post_id,
+              c.id,
+              c.content,
+              u.full_name,
+              u.profile_image,
+              c.created_at,
+              -- Count total likes for each comment
+              (SELECT COUNT(*) FROM comments_like cl WHERE cl.comment_id = c.id) AS total_likes_on_comment,
+              -- Count total replies for each comment
+              (SELECT COUNT(*) FROM comment_reply cr WHERE cr.comment_id = c.id) AS total_reply_on_comment
+           
+          FROM 
+              comments c
+          JOIN
+              users u
+          ON 
+              c.user_id = u.id
+          WHERE
+              c.post_id = ?
+          ORDER BY 
+              c.created_at ASC
+              `,[postId]
+      );
+
+        // Fetch all replies
+        const [replies] = await pool.execute(
+          `
+          SELECT 
+              cr.id AS reply_id,
+              cr.comment_id,
+              cr.user_id,
+              cr.content AS reply_content,
+              u.full_name AS reply_user_full_name,
+              u.user_name AS reply_user_user_name,
+              u.profile_image AS reply_user_profile_image,
+              cr.created_at AS reply_created_at
+          FROM 
+              comment_reply cr
+              JOIN
+              users u
+          ON 
+              cr.user_id = u.id
+          WHERE 
+              cr.comment_id IN (
+                  SELECT id FROM comments WHERE post_id = ?
+              )
+          `,
+          [postId]
+      );
+
+      console.log("======replies====>", replies);
+
+      // Group replies by comment ID
+      const groupedReplies = await replies.reduce((acc, reply) => {
+        if (!acc[reply.comment_id]) {
+          acc[reply.comment_id] = [];
+        }
+        console.log("===acc[reply.comment_id]===>", acc[reply.comment_id]);
+          acc[reply.comment_id].push({
+              reply_id: reply.reply_id,
+              reply_content: reply.reply_content,
+              reply_user_full_name: reply.reply_user_full_name,
+              reply_user_user_name: reply.reply_user_user_name,
+              reply_user_profile_image: reply.reply_user_profile_image,
+              reply_created_at: reply.reply_created_at,
+          });
+          return acc;
+      }, {});
+
+      // Attach replies to their respective comments
+      const finalComments = await getComments.map((comment) => ({
+          ...comment,
+          replies: groupedReplies[comment.id] || [],
+      }));
+
+     console.log("==data Fetched==>",getComments)
+     return res.status(200).json({
+      message: "All comments of post",
+      data: finalComments
+     });
+      
+
+  } catch (error) {
+      
+      console.log(" Error to get data",error)
+      res.status(500).json({
+          error: "Internal Server Error"
+      });
+
+  }
+}
+
+
 async function likeAnyComment(req , res){
 
     try {
@@ -656,6 +746,131 @@ async function replyOnComment(req , res){
         }
       }
 
+
+// delete comment
+async function   deleteComments(req, res) {
+  try {
+    const UserId = req.user.userId; // extrcting from token
+    const { id } = req.params;       // Extract comment ID from request body
+
+    // Begin a database transaction
+    // await pool.execute('START TRANSACTION');
+
+    // Delete replies associated with the comment
+    const [replyData] = await pool.execute(
+      'DELETE FROM comment_reply WHERE comment_id = ?', [id ]
+    );
+
+    // Delete the comment
+    const [commentData] = await pool.execute(
+      'DELETE FROM comments WHERE id = ? AND user_id = ?', [id, UserId]
+    );
+    console.log("===Comment Deleted===>", commentData);
+
+    if(commentData.affectedRows === 0) {
+      return res.status(404).json({ error: "comment not found" });
+    }
+
+    // Commit the transaction
+    // await pool.execute('COMMIT');
+
+    return res.status(200).json({
+      message: "Comment and associated replies deleted successfully"
+    });
+
+  } catch (error) {
+    console.error("===Error===>", error);
+
+    // Rollback the transaction in case of an error
+    await pool.execute('ROLLBACK');
+
+    return res.status(500).json({
+      error: "Internal Server Error"
+    });
+  }
+}
+
+// delete a reply
+async function deleteReply(req , res){
+  try {
+       
+      const { replyId } = req.params;
+      console.log('====output===>',replyId);
+      const [ existingComment] = await pool.execute(
+         `SELECT * FROM comment_reply WHERE id = ?`,[replyId]
+      );
+
+      console.log("reply not found",existingComment);
+
+      if(existingComment.length === 0) {
+          return res.status(409).json({
+             error:"comment not found"
+         });
+      }
+
+      const [data] = await pool.execute(
+          `DELETE FROM comment_reply WHERE id = ?`,[replyId]
+      );
+
+      console.log("===comment=deleted====>",data);
+      return res.status(200).json({
+          message:"comment Deleted successfully"
+      });
+      
+  } catch (error) {
+      console.log("===error deleting comment===>",error);
+      return res.status(500).json({
+          error:"Internal Server Error"
+      });
+  }
+}
+
+async function followAndUnfollow(req , res){
+
+  const userId = req.user.userId; // extracting from token
+  const { follwee_id } = req.body;
+
+  if(!userId || !follwee_id){
+      return res.status(400).json({
+          error:"UserID and follwee_id required"
+      });
+  }
+
+try {
+   
+   const [existingdata] = await pool.execute(
+      `SELECT * FROM followers WHERE follower_id = ? AND followee_id = ?` ,[userId, follwee_id ]
+   );
+   if(existingdata.length > 0){
+     await pool.execute(
+      `DELETE FROM followers WHERE follower_id = ? AND followee_id  = ?`, [userId, follwee_id ]
+     );
+
+     return res.status(200).json({
+      message:"Successfully Unfollowed"
+     });
+
+   }
+    else{
+
+      await pool.execute(
+         `INSERT INTO followers (follower_id , followee_id) VALUE (?,?)`, [userId ,follwee_id ] 
+      );
+   
+      return res.status(200).json({
+          message:"Successfully follow"
+      });
+   }
+
+} catch (error) {
+  console.log("===error===>",error)
+  return res.status(500).json({
+      error:"Internal Server Error"
+  });
+
+}
+}
+
 module.exports = {
     allPosts,
     postWithlikes,
@@ -668,5 +883,8 @@ module.exports = {
     postLike,
     likeAnyComment,
     replyOnComment,
-    storePost
+    storePost,
+    deleteComments,
+    deleteReply,
+    followAndUnfollow
 }

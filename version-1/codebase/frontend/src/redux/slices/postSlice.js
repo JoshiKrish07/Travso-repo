@@ -33,7 +33,8 @@ export const getAllPosts = createAsyncThunk(
 // Thunk for commentOnPost details
 export const commentOnPost = createAsyncThunk(
   'post/commentOnPost',
-  async ({post_id,content},{ rejectWithValue }) => {
+  async (commentData,{ rejectWithValue }) => {
+    console.log("=====commentData====>", commentData);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${apiUrl}/post/comment-on-post`, {
@@ -42,7 +43,7 @@ export const commentOnPost = createAsyncThunk(
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({post_id, content})
+        body: JSON.stringify(commentData)
       });
 
       if (!response.ok) {
@@ -60,7 +61,7 @@ export const commentOnPost = createAsyncThunk(
   }
 );
 
-// Thunk for commentOnPost details
+// Thunk for LikeUnlikePost details
 export const LikeUnlikePost = createAsyncThunk(
   'post/LikeUnlikePost',
   async ({post_id},{ rejectWithValue }) => {
@@ -153,9 +154,8 @@ export const likeAnyComment = createAsyncThunk(
 // Thunk for commentOnReply details
 export const commentOnReply = createAsyncThunk(
   'post/commentOnReply',
-  async ({comment_id, content},{ rejectWithValue }) => {
+  async (replyData,{ rejectWithValue }) => {
     try {
-      console.log("======commentId======",comment_id);
       const token = localStorage.getItem('token');
       const response = await fetch(`${apiUrl}/post/reply-on-comment`, {
         method: 'POST',
@@ -163,10 +163,7 @@ export const commentOnReply = createAsyncThunk(
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          comment_id,
-          content
-        })
+        body: JSON.stringify(replyData)
       });
 
       if (!response.ok) {
@@ -185,7 +182,7 @@ export const commentOnReply = createAsyncThunk(
 );
 
 
-// Thunk for commentOnReply details
+// Thunk for commitPost details
 export const commitPost = createAsyncThunk(
   'post/commitPost',
   async (formData,{ rejectWithValue }) => {
@@ -215,6 +212,100 @@ export const commitPost = createAsyncThunk(
     }
   }
 );
+
+
+// Thunk for deleteComment details(user can delete comment on it's post)
+export const deleteCommentByPostOwner = createAsyncThunk(
+  'post/deleteCommentByPostOwner',
+  async (commentId,{ rejectWithValue }) => {
+    try {
+      console.log("======commentId======",commentId);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/owner-delete-comment/${commentId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      console.log("=====data===in deleteCommentByPostOwner===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in deleteCommentByPostOwner call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Thunk for deleteComment details(user can delete comment on it's post)
+export const deleteReplyByPostOwner = createAsyncThunk(
+  'post/deleteReplyByPostOwner',
+  async (replyId,{ rejectWithValue }) => {
+    try {
+      console.log("======commentId======",replyId);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/owner-delete-reply/${replyId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      console.log("=====data===in deleteReplyByPostOwner===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in deleteReplyByPostOwner call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
+// Thunk for followUnfollow details
+export const followUnfollow = createAsyncThunk(
+  'post/followUnfollow',
+  async (followeeId,{ rejectWithValue }) => {
+    try {
+      
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/follow-unfollow`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 'follwee_id': followeeId})
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in followUnfollow===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in followUnfollow call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 
 
 const postSlice = createSlice({
@@ -317,6 +408,42 @@ const postSlice = createSlice({
         state.loading = false;
       })
       .addCase(commitPost.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle deleteCommentByPostOwner
+      .addCase(deleteCommentByPostOwner.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteCommentByPostOwner.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(deleteCommentByPostOwner.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle deleteReplyByPostOwner
+      .addCase(deleteReplyByPostOwner.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteReplyByPostOwner.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(deleteReplyByPostOwner.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle followUnfollow
+      .addCase(followUnfollow.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(followUnfollow.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(followUnfollow.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

@@ -32,7 +32,7 @@ const SharePopup = ({ isOpen, onClose }) => {
   ];
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.15)] flex items-center justify-center z-50">
       <div className="bg-white rounded-[16px] shadow-lg w-[696px] px-5 py-5 md:w-[696px] h-[660px] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex justify-between items-center border-b border-gray-200 sticky top-0 bg-white z-10 md:h-[55px]">

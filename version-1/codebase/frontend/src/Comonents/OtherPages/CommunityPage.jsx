@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Header from "./Header";
 import CommunityLeftSidebar from "./CommunityLeftSidebar";
 import CommunityRightSidebar from "./CommunityRightSidebar";
@@ -18,8 +18,36 @@ import p1 from "../../assets/headerIcon/p1.png";
 import p2 from "../../assets/headerIcon/p2.png";
 import p3 from "../../assets/headerIcon/p3.png";
 import floxy from "../../assets/floxy.png";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllUsers, getOnlineFriends } from "../../redux/slices/authSlice";
+import CreateaPostPopup from "./AllPopupComponent/CreateaPostPopup";
 
 const CommunityPage = () => {
+  const dispatch = useDispatch();
+  const sliderRef = useRef(null);
+  let isDragging = false;
+  let startX;
+  let scrollLeft;
+
+
+  const handleMouseDown = (e) => {
+    isDragging = true;
+    startX = e.pageX - sliderRef.current.offsetLeft;
+    scrollLeft = sliderRef.current.scrollLeft;
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - sliderRef.current.offsetLeft;
+    const walk = (x - startX) * 2; 
+    sliderRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseUpOrLeave = () => {
+    isDragging = false;
+  };
+
   const data = [
     { id: 1, src: story, label: "My Story" },
     { id: 2, src: Girl, label: "Priya Sharma" },
@@ -30,6 +58,12 @@ const CommunityPage = () => {
     { id: 7, src: Girl, label: "Anjali Mehta" },
     { id: 8, src: Boy1, label: "Karan Thakur" },
     { id: 9, src: Boy1, label: "Vikram Das" },
+    { id: 10, src: Boy1, label: "Vikram Das" },
+    { id: 11, src: Boy1, label: "Vikram Das" },
+    { id: 12, src: Boy1, label: "Amit Verma" },
+    { id: 13, src: Girl, label: "Anjali Mehta" },
+    { id: 14, src: Boy1, label: "Karan Thakur" },
+    { id: 15, src: Boy1, label: "Vikram Das" },
   ];
 
   // Sample data for the popup
@@ -48,6 +82,23 @@ const CommunityPage = () => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullTextVisible, setIsFullTextVisible] = useState(false);
+  const [isCreatePostPopup, setIsCreatePostPopup] = useState(false);
+
+  /* redux state data starts */
+
+  const { onlineFriends, allUsers } = useSelector((state) => state.auth);
+  
+  useEffect(() => {
+    if(!onlineFriends) {
+      dispatch(getOnlineFriends());
+    }
+
+    if(!allUsers) {
+      dispatch(getAllUsers());
+    }
+  },[dispatch]);
+
+  /* redux state data ends */
 
   // Function to toggle the full text
   const toggleFullText = () => {
@@ -181,21 +232,21 @@ const CommunityPage = () => {
               <h2 className="mb-4 font-poppins text-[20px] font-semibold text-[#212626] text-left">
                 TravSo Moments
               </h2>
-              <div className="flex flex-wrap justify-between items-center">
-                {/* <div className="flex flex-col items-center mb-2">
-                  <img
-                    src={story} 
-                    alt="Add"
-                    className="w-[64pxpx] h-[64pxpx] object-cover p-[2px]"
-                  />
-                  <p className="font-inter font-medium text-[14px] mt-2 text-[#212626]">
-                      My Story
-                    </p>
-                </div> */}
+              <div ref={sliderRef}
+                  className="flex overflow-x-auto scroll-smooth no-scrollbar scrollbar-hidden"
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUpOrLeave}
+                  onMouseLeave={handleMouseUpOrLeave}
+                  onTouchStart={(e) => handleMouseDown(e.touches[0])}
+                  onTouchMove={(e) => handleMouseMove(e.touches[0])} 
+                  onTouchEnd={handleMouseUpOrLeave}>
+                
                 {data.map((item) => (
                   <div
                     key={item.id}
-                    className="flex flex-col items-center mb-2"
+                    className="flex flex-col items-center mb-2 mr-2"
+                    style={{ flex: "0 0 auto" }}
                   >
                     <img
                       src={item.src}
@@ -222,7 +273,15 @@ const CommunityPage = () => {
                     type="text"
                     placeholder="Post a story about your travel..."
                     className="flex-1 bg-transparent border-none outline-none placeholder:font-inter font-medium text-[14px] text-[#869E9D] ml-2 "
+                    onClick={() => setIsCreatePostPopup(true)}
                   />
+                  {
+                    isCreatePostPopup && 
+                  <CreateaPostPopup
+                    isOpen={isCreatePostPopup}
+                    onClose={() => setIsCreatePostPopup(false)}
+                  />
+                  }
                 </div>
               </div>
             </div>

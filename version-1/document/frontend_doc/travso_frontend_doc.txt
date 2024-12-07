@@ -96,9 +96,14 @@ Process :- Login and forgot Password
  iii) Verify OTP :- OTP fields to enter OTP and calling handleVerify() function which in return calls verifyForgotPassOTP() function from redux.
   iv) Change Password :- Inputs for password and confirm password and calling handleSubmitPassword() function which calls updatePassword() from redux.
 
+
 For validation :-
   i) Login :- validateInputs() function is used.
  ii) Forgot Password :- validateFpInputs() is used.
+
+ Note:- Updated functionality on 02-dec-2024 for new flow:-
+    In handleSubmit function on LoginPage.jsx, Updated the condition for, If user didn't picked three categories or followed 3 persons he will
+    be redirected to edit profile, else he will be redirected to profile page.
 
  =========================================================================================================
 
@@ -145,6 +150,39 @@ file destination :- src/Components/OtherPages/EditProfile.jsx
 3) handleImageRemove() function :- Using redux function removeProfileImage(), removing profile image of user.
 4) Showing all the details of user using getUserDetails() function.
 5) Using redux function fetchCities(), giving dropdown to select city for edit.
+
+
+file destination :- src/Components/OtherPages/SuggestionPage.jsx.(static page on 02-dec-2024)
+
+1) checkFollowedCount() function :- Implemented the functionality to follow 3 categories or people, then only Next button is enabled.
+2) handleNext() function :- When User selects 3 people or community and clicks on Next Button, using redux function updateSelectFollow() function
+                           to update the check of is_follow_selected in Database.
+
+
+file destination :- src/Components/OtherPages/AllPopupComponent/CommentPopup.jsx
+1) sendReplyComment() function :- It is taking commentId, postId and using redux function commentOnReply(), implemented reply on
+   comment functionality.
+2) handleReplyInputEnter() function :- Handling comment on reply for if user writes something and hit enter button.
+3) sendComment() function :- For commenting on post.Uses commentOnPost() redux function.
+4) getTimeDifferenceFromNow() :- It returns the time of comment in minutes, hours and days
+                               -> If less than 60 minutes, it returns minutes.
+                               -> If less than 24 hours, it returns hour.
+                               -> If more than 24 hours, it return days.
+5) handleCommentLikeUnlike() :- for Like and Unlike on any comment.
+
+file destination :- src/Components/OtherPages/CommunityRightSidebar.jsx
+1) Using displayedFriends shown active friends. If user clicks on show all actives then all actives are shown otherwise 8 people are
+   shown.
+2) Shown list of suggestion people(rightnow with all user later will change in backend api) and implemented the functionality of
+   follow and unfollow using redux function followUnfollow() in handleFollow() function.
+
+
+file destination :- src/Components/OtherPages/AllPopupComponent/CreateaPostPopup.jsx
+1) Using postData state to handle all input data which a user will fill to post.
+2) handleBuddyTag() function :- As soon as user write @, a list will appear of his buddies.
+3) handleSuggestionClick() function :- When user clicks on any suggestion it is stored in postData and also shown on UI with cancel
+   mark.
+4) handleRemoveBuddy() :- Allows user to remove tagged buddy.
 =============================================================================================================================================
 
 Module :- Search Bar
@@ -157,4 +195,4 @@ Module :- Search Bar
     v) Badges
 3) removeFromSeacrh() function :- Removes a option from search list.
 
-===========================================================================================================
+===========================================================================================================================

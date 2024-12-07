@@ -1191,6 +1191,63 @@ async function updateFollowSelect(req, res) {
   }
 }
 
+// async function onlineFriends(req , res){
+//   try {
+//     const userId = req.user.userId; // Extract user ID from token
+//     console.log("======userId====onlineFriends===>", userId);
+//     const [online]  = await pool.execute(
+//     `SELECT * FROM users WHERE is_online = 1`, 
+//     );
+
+//     return res.status(200).json({
+//       message: "My online friends.",
+//       data: online,
+//     });
+//   } catch (error) {
+//       console.log("==erro fetch data===>",error);
+//     return res.status(500).json({
+//       error: "Internal Server Error"
+//     })
+//   }
+// }
+
+async function onlineFriends(req, res) {
+  try {
+    const userId = req.user.userId; // Extract user ID from token
+
+    // Query to get online buddies and followers
+    const [onlineFriends] = await pool.execute(
+      `
+      SELECT DISTINCT
+       u.id,
+       u.profile_image,
+       u.user_name,
+       u.full_name,
+       u.is_active
+
+      FROM users u
+       JOIN buddies b 
+        ON (u.id = b.user_id OR u.id = b.buddies_id)
+       JOIN followers f
+        ON (u.id = f.follower_id OR u.id = f.followee_id)
+      WHERE (b.user_id = ? OR b.buddies_id = ? OR f.followee_id = ?) 
+        AND u.is_online = 1
+      `,
+      [userId, userId, userId]
+    );
+
+    return res.status(200).json({
+      message: "My online friends.",
+      data: onlineFriends,
+    });
+  } catch (error) {
+    console.error("==Error fetching data===>", error);
+    return res.status(500).json({
+      error: "Internal Server Error",
+    });
+  }
+}
+
 module.exports = {
   registerUser,
   sendOTP,
@@ -1215,5 +1272,6 @@ module.exports = {
   uploadCoverImage,
   logOut,
   addSearch,
-  updateFollowSelect
+  updateFollowSelect,
+  onlineFriends
 };

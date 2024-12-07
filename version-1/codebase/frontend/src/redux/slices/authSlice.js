@@ -551,7 +551,6 @@ export const removeProfileImage = createAsyncThunk(
 
 
 // Thunk for removeProfileImage details
-
 export const uploadProfileImage = createAsyncThunk(
   'auth/uploadProfileImage',
   async (imageData, { rejectWithValue }) => {
@@ -693,9 +692,11 @@ export const getOnlineFriends = createAsyncThunk(
   'auth/getOnlineFriends',
   async (_,{ rejectWithValue }) => {
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(`${apiUrl}/auth/online-friends`, {
         method: 'GET',
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
@@ -710,6 +711,36 @@ export const getOnlineFriends = createAsyncThunk(
       return data;
     } catch (error) {
       console.log("error in getOnlineFriends call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
+// Thunk for getSuggestionList details
+export const getSuggestionList = createAsyncThunk(
+  'auth/getSuggestionList',
+  async (_,{ rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${apiUrl}/auth/online-friends`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in getSuggestionList=>", data);
+      return data;
+    } catch (error) {
+      console.log("error in getSuggestionList call thunk", error.message)
       return rejectWithValue(error.message);
     }
   }
@@ -761,7 +792,8 @@ const authSlice = createSlice({
     userFollowers: null,
     toWhomUserFollows: null,
     allUsers: null,
-    onlineFriends: null
+    onlineFriends: null,
+    suggestionList: null
   },
   reducers: {
     resetAuthState: (state) => {
@@ -1066,6 +1098,32 @@ const authSlice = createSlice({
         state.loading = false;
       })
       .addCase(updateSelectFollow.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle getOnlineFriends
+      .addCase(getOnlineFriends.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getOnlineFriends.fulfilled, (state, action) => {
+        state.loading = false;
+        state.onlineFriends = action.payload.data;
+      })
+      .addCase(getOnlineFriends.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle getOnlineFriends
+      .addCase(getSuggestionList.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getSuggestionList.fulfilled, (state, action) => {
+        state.loading = false;
+        state.suggestionList = action.payload.data;
+      })
+      .addCase(getSuggestionList.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
