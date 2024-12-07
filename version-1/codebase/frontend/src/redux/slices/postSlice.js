@@ -111,7 +111,8 @@ export const getCommentOnPost = createAsyncThunk(
       }
 
       const data = await response.json();
-      console.log("=====data===in getCommentOnPost=>", data);
+
+      // console.log("=====data===in getCommentOnPost=>", data);
       return data;
     } catch (error) {
       console.log("error in getCommentOnPost call thunk", error.message)
@@ -185,7 +186,7 @@ export const commentOnReply = createAsyncThunk(
 // Thunk for commitPost details
 export const commitPost = createAsyncThunk(
   'post/commitPost',
-  async (formData,{ rejectWithValue }) => {
+  async (postData,{ rejectWithValue }) => {
     try {
   
       const token = localStorage.getItem('token');
@@ -195,7 +196,7 @@ export const commitPost = createAsyncThunk(
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(postData)
       });
 
       if (!response.ok) {
@@ -305,6 +306,37 @@ export const followUnfollow = createAsyncThunk(
     }
   }
 );
+
+// Thunk for likeUnlikeAnyReply details
+export const likeUnlikeAnyReply = createAsyncThunk(
+  'post/likeUnlikeAnyReply',
+  async (replyId,{ rejectWithValue }) => {
+    try {
+      console.log("======replyId======",replyId);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/like-unlike-reply/${replyId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in likeUnlikeAnyReply===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in likeUnlikeAnyReply call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 
 
 

@@ -32,7 +32,7 @@ import Send from "../../../assets/Send.png";
 import trash from "../../../assets/trash.png";
 import alert from "../../../assets/alert.png";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserDetails, getUserPosts } from "../../../redux/slices/authSlice";
+import { getUserBuddies, getUserDetails, getUserPosts } from "../../../redux/slices/authSlice";
 import {
   commentOnPost,
   commentOnReply,
@@ -40,6 +40,7 @@ import {
   deleteReplyByPostOwner,
   getCommentOnPost,
   likeAnyComment,
+  likeUnlikeAnyReply,
   LikeUnlikePost,
 } from "../../../redux/slices/postSlice";
 import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
@@ -125,7 +126,7 @@ const handleViewLessReplies = (commentId) => {
   };
 
   const { postComment } = useSelector((state) => state.postSlice);
-  const { userPosts, user: userDetails } = useSelector((state) => state.auth);
+  const { userPosts, user: userDetails, userBuddies } = useSelector((state) => state.auth);
 
   /* emoji functionality starts */
   const [showEmojiPicker, setShowEmojiPicker] = useState(false); // working on reply on comment
@@ -166,6 +167,10 @@ const handleViewLessReplies = (commentId) => {
 
     if (!userDetails) {
       dispatch(getUserDetails());
+    }
+
+    if (!userBuddies) {
+      dispatch(getUserBuddies());
     }
 
     const foundPost = userPosts.find((post) => post.id === postId);
@@ -376,6 +381,20 @@ const handleViewLessReplies = (commentId) => {
     }
   };
 
+  
+  const handleCommentLikeUnlikeOnReply = async(replyId) => {
+    try {
+      const response = await dispatch(likeUnlikeAnyReply(replyId)).unwrap();
+      if (response) {
+        await dispatch(getCommentOnPost(postId));
+      }
+      // console.log("=====response=====>", response);
+      
+    } catch (error) {
+      console.log("error in handleCommentLikeUnlikeOnReply", error);
+    }
+  }
+
   // to show post images
   // const mediaArray =
   //   allPosts && allPosts[0].media_url.replace(/^\[\"|\"?\]$/g, "").split('","'); // Split the string into individual URLs
@@ -390,7 +409,7 @@ const handleViewLessReplies = (commentId) => {
     const { value } = e.target;
     
     setCommentInputVal(value);
-
+    console.log("====userBuddies===>", userBuddies);
     const match = value.match(/@(\w*)$/); // Match word after @
     if (match) {
       const query = match[1].toLowerCase();
@@ -444,8 +463,6 @@ const handleViewLessReplies = (commentId) => {
     // Replace the @mention in input with the selected person's name
       const currentText = commentReplyInputVal[commentId] || ""; // Retrieve the current value for the commentId
       const newText = currentText.replace(/@\w*$/, `@${person.name} `);
-
-      console.log("======currentText====>", currentText);
 
       // Update the input value for the specific commentId
       setCommentReplyInputVal((prev) => ({
@@ -783,11 +800,14 @@ const handleViewLessReplies = (commentId) => {
                                 &nbsp;{" "}
                                 <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>{" "}
                                 &nbsp;{" "}
-                                <span className="font-inter font-medium text-[16px] text-[#667877]">
+                                {/* <span className="font-inter font-medium text-[16px] text-[#667877]">
                                   {getTimeDifferenceFromNow(
                                     userPosts?.created_at
                                   )}{" "}
                                   ago
+                                </span> */}
+                                <span className="font-inter font-medium text-[16px] text-[#667877]">
+                                  {getTimeDifferenceFromNow(userPosts?.created_at) == '0m' ? 'just now' : `${getTimeDifferenceFromNow(userPosts?.created_at)} ago`}{" "}
                                 </span>
                               </p>
                               <img
@@ -923,7 +943,7 @@ const handleViewLessReplies = (commentId) => {
                                             <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>{" "}
                                             &nbsp;{" "}
                                             <span className="font-inter font-medium text-[16px] text-[#667877]">
-                                              {getTimeDifferenceFromNow(userReply?.reply_created_at)} ago
+                                              {getTimeDifferenceFromNow(userReply?.reply_created_at) == '0m' ? 'just now' : `${getTimeDifferenceFromNow(userReply?.reply_created_at)} ago`}{" "}
                                             </span>
                                           </p>
                                           <img
@@ -977,8 +997,15 @@ const handleViewLessReplies = (commentId) => {
                                       </div>
 
                                       <div className="flex items-center gap-2 cursor-pointer">
-                                        <div className="flex items-center">
-                                          <div className="flex items-center">
+                                        <div 
+                                          className="flex items-center"
+                                          onClick={() =>
+                                            handleCommentLikeUnlikeOnReply(
+                                              userReply?.reply_id
+                                            )
+                                          }   
+                                        >
+                                          <div className="flex items-center" >
                                             <img
                                               src={noto_fire}
                                               alt="noto_fire"
@@ -987,7 +1014,11 @@ const handleViewLessReplies = (commentId) => {
                                           </div>
                                           <div className="flex items-center">
                                             <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
-                                              62 likes
+                                            {/* {userReply?.total_likes_on_reply > 1 ? "like" : "likes"} */}
+                                            {userReply?.total_likes_on_reply || ""}{" "}
+                                            {userReply?.total_likes_on_reply > 1
+                                              ? "likes"
+                                              : "like"}{" "}
                                             </p>
                                           </div>
                                         </div>

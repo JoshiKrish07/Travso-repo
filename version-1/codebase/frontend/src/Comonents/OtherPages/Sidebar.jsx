@@ -1,7 +1,4 @@
-/* eslint-disable no-useless-escape */
-import React, { useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Objects from "../../assets/Objects.png";
+import React, { useState } from "react";
 import First from "../../assets/PostImage/first.png";
 import Second from "../../assets/PostImage/second.png";
 import Third from "../../assets/PostImage/third.png";
@@ -12,23 +9,10 @@ import Seventh from "../../assets/PostImage/seventh.png";
 import Eighth from "../../assets/PostImage/eigth.png";
 import Ninth from "../../assets/PostImage/ninth.png";
 import Tenth from "../../assets/PostImage/first.png";
-import Girl from "../../assets/headerIcon/girl.jpg";
-import Boy1 from "../../assets/headerIcon/boy1.png";
-import Boy2 from "../../assets/headerIcon/boy2.jpg";
-import dummyUserImage from "../../assets/user_image-removebg-preview.png";
-
-import {
-  faCalendarAlt,
-  faMapMarkerAlt,
-  faEdit,
-} from "@fortawesome/free-solid-svg-icons";
-import { faUser, faClock } from "@fortawesome/free-regular-svg-icons";
-import { useDispatch, useSelector } from "react-redux";
-import { getUserBuddies, getUserDetails, getUserFollowers, getUserPosts, toWhomUserIsFollowing } from "../../redux/slices/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
-
-  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [posts, setPosts] = useState([
     {
@@ -93,495 +77,223 @@ const Sidebar = () => {
     },
   ]);
 
-  const [buddies, setbuddies] = useState([
+  const sampleData = [
     {
-      id: 1,
-      name: "Madhulika",
-      handle: "@Madhu.lika",
-      image: Girl,
-      follow: "Followed",
+      title: "Europe Bucket List",
+      images: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgRYMoFhRn57IhIcTXWTPbhzqwmWBC1IxFDA&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHSxJDZIHumlGbMxGb77Uj2KhVlmRrdclAcw&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHSxJDZIHumlGbMxGb77Uj2KhVlmRrdclAcw&s",
+      ],
     },
     {
-      id: 2,
-      name: "Pankaj",
-      handle: "@Reet.Pankaj",
-      image: Boy1,
-      follow: "Followed",
+      title: "Asia Bucket List",
+      images: [
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQutHQ734KtvKx-8La1Yprpvl4w769XbzThkw&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCmdZy7i30h7n6b7GRNA5vJV_hdQGwUyu8_g&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCmdZy7i30h7n6b7GRNA5vJV_hdQGwUyu8_g&s",
+      ],
     },
-    {
-      id: 3,
-      name: "Rishab",
-      handle: "@frontend",
-      image: Boy2,
-      follow: "Followed",
-    },
-    {
-      id: 4,
-      name: "Madhulika",
-      handle: "@Madhu.lika",
-      image: Boy1,
-      follow: "Followed",
-    },
-    {
-      id: 5,
-      name: "Pankaj",
-      handle: "@Reet.Pankaj",
-      image: Girl,
-      follow: "Followed",
-    },
-    {
-      id: 6,
-      name: "Rishab",
-      handle: "@frontend",
-      image: Boy2,
-      follow: "Followed",
-    },
-  ]);
-
-  const [followers, setfollowers] = useState([
-    {
-      id: 1,
-      name: "Madhulika",
-      handle: "@Madhu.lika",
-      image: Girl,
-      follow: "Follow",
-    },
-    {
-      id: 2,
-      name: "Pankaj",
-      handle: "@Reet.Pankaj",
-      image: Boy1,
-      follow: "Following",
-    },
-    {
-      id: 3,
-      name: "Rishab",
-      handle: "@frontend",
-      image: Boy2,
-      follow: "Follow",
-    },
-    {
-      id: 4,
-      name: "Madhulika",
-      handle: "@Madhu.lika",
-      image: Boy1,
-      follow: "Following",
-    },
-    {
-      id: 5,
-      name: "Pankaj",
-      handle: "@Reet.Pankaj",
-      image: Girl,
-      follow: "Following",
-    },
-    {
-      id: 6,
-      name: "Rishab",
-      handle: "@frontend",
-      image: Boy2,
-      follow: "Following",
-    },
-  ]);
-
-  const [following, setfollowing] = useState([
-    {
-      id: 1,
-      name: "Madhulika",
-      handle: "@Madhu.lika",
-      image: Girl,
-      follow: "Follow",
-    },
-    {
-      id: 2,
-      name: "Pankaj",
-      handle: "@Reet.Pankaj",
-      image: Boy1,
-      follow: "Following",
-    },
-    {
-      id: 3,
-      name: "Rishab",
-      handle: "@frontend",
-      image: Boy2,
-      follow: "Follow",
-    },
-    {
-      id: 4,
-      name: "Madhulika",
-      handle: "@Madhu.lika",
-      image: Boy1,
-      follow: "Following",
-    },
-    {
-      id: 5,
-      name: "Pankaj",
-      handle: "@Reet.Pankaj",
-      image: Girl,
-      follow: "Following",
-    },
-    {
-      id: 6,
-      name: "Rishab",
-      handle: "@frontend",
-      image: Boy2,
-      follow: "Following",
-    },
-  ]);
+  ];
 
   // State to toggle visibility of more posts
   const [showAllPost, setShowAllPost] = useState(false);
-  const [showAllbuddies, setShowAllbuddies] = useState(false);
-  const [showAllfollowers, setShowAllfollowers] = useState(false);
-  const [showAllfollowing, setShowAllfollowing] = useState(false);
-
- const { userBuddies, user: userDetails, userPosts, userFollowers, toWhomUserFollows } = useSelector((state) => state.auth);
- 
-//  console.log("=======userBuddies====>", userBuddies);
-//  console.log("=======userDetails====>", userDetails);
-//  console.log("=======userPosts======>", userPosts);
-//  console.log("=======userFollowers======>", userFollowers);
-//  console.log("=======toWhomUserFollows======>", toWhomUserFollows);
-
-  useEffect(() => {
-    dispatch(getUserBuddies());
-    dispatch(getUserDetails());
-    dispatch(getUserPosts());
-    dispatch(getUserFollowers());
-    dispatch(toWhomUserIsFollowing());
-  }, [dispatch]);
-
 
   // Show only first 9 posts or all posts based on state
-  const visiblePosts = showAllPost ? (userPosts ? userPosts : []) : (userPosts ? userPosts.slice(0, 9) : []);
+  const visiblePosts = showAllPost ? posts : posts.slice(0, 9);
 
-  // Show only first 9 posts or all posts based on state
-  const visiblePostsbuddies = showAllbuddies ? (userBuddies ? userBuddies : []) : userBuddies ? userBuddies.slice(0, 3) : [];
-
-  const visiblePostsfollowes = showAllfollowers
-    ? (userFollowers ? userFollowers : [])
-    : (userFollowers ? userFollowers.slice(0, 3) : []);
-
-    const visiblePostsfollowing = showAllfollowing
-    ? (toWhomUserFollows ? toWhomUserIsFollowing : [])
-    : (toWhomUserFollows ? toWhomUserFollows.slice(0, 3) : []);
-
-
-  // for capitalizing first word of string
-  function capitalizeFirstLetter(str) {
-    if (!str) return str; // Handle empty or null strings
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  const handleAllBucketList =()=>{
+    navigate("/bucketlist")
   }
-
-  // format in format for dob like 25 Aug 2002 and for joined Feb 2022
-  function formatDate(isoDate, type) {
-    const date = new Date(isoDate);
-  
-    // Array of month names
-    const months = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
-  
-    const day = date.getUTCDate(); // Day of the month
-    const month = months[date.getUTCMonth()]; // Full month name
-    const shortMonth = month.slice(0, 3); // Abbreviated month name
-    const year = date.getUTCFullYear(); // Full year
-  
-    // Handle different formats
-    if (type === "dob") {
-      return `${day} ${shortMonth} ${year}`; // Example: 25 Aug 2002
-    } else if (type === "joined") {
-      return `${month} ${year}`; // Example: September 2022
-    } else {
-      throw new Error("Invalid type. Use 'dob' or 'joined'.");
-    }
-  }
-
-  // to extract the media URLs for a specific post
-  // const getFirstImage = (mediaUrl) => {
-  //   // Clean the string and split it into an array
-  //   const mediaArray = mediaUrl.replace(/^\[\"|\"?\]$/g, '').split('","');
-  //   return mediaArray[0]; // Return the first image URL
-  // };
-
-  const getFirstImage = (mediaUrl) => {
-    // If mediaUrl is an empty array string, return null
-    if (mediaUrl === "[]") return null;
-  
-    // Clean the string and split it into an array
-    const mediaArray = mediaUrl.replace(/^\[\"|\"?\]$/g, '').split('","');
-  
-    // Return the first image URL or null if the array is empty
-    return mediaArray.length > 0 ? mediaArray[0] : null;
-  };
 
   return (
-    <div className="flex flex-col">
-      <div className="w-[405px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.25)] p-4 px-6 mb-4">
+    <>
+      <div className="w-[340px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] p-4 px-4 mb-4">
         {/* Header Section */}
         <div className="flex justify-between items-center pb-3">
-          <h2 className="text-lg font-semibold text-gray-800">Info</h2>
+          <h2 className="text-lg font-semibold text-gray-800">About me</h2>
           <button
             aria-label="Edit Info"
-            className="flex items-center text-gray-500 hover:text-gray-800 border border-gray-400 py-1 px-3 rounded-full"
+            className="flex items-center text-[#2DC6BE]"
           >
-            <FontAwesomeIcon icon={faEdit} className="mr-2 text-sm" />
-            <span className="text-sm">Edit</span>
+            <span className="font-inter font-medium text-[14px] text-[#2DC6BE] cursor-pointer hover:underline">
+              Edit
+            </span>
           </button>
         </div>
-        {/* Description */}
-        <div className="text-left mt-4">
-          <p className="text-sm text-gray-600">
-            {userDetails ? `${userDetails?.description}`: ''}
-          </p>
-          <div className="mt-6">
-            <img src={Objects} alt="Traveler Badge" className="" />
-          </div>
-        </div>
+
         {/* Info List */}
-        <div className="mt-6">
+        <div className="mt-2">
           <ul className="space-y-4">
             <li className="flex items-center text-gray-700">
-              <FontAwesomeIcon
-                icon={faCalendarAlt}
-                className="mr-2 text-gray-400"
-              />
-              {/* <span>DOB: 25 Aug 2002</span> */}
-              <span>DOB: {userDetails ? formatDate(userDetails?.dob, 'dob') : ''}</span>
+              <svg
+                width="16"
+                height="18"
+                viewBox="0 0 18 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="mr-3"
+              >
+                <path
+                  d="M17 19C17 17.6044 17 16.9067 16.8278 16.3389C16.44 15.0605 15.4395 14.06 14.1611 13.6722C13.5933 13.5 12.8956 13.5 11.5 13.5H6.5C5.10444 13.5 4.40665 13.5 3.83886 13.6722C2.56045 14.06 1.56004 15.0605 1.17224 16.3389C1 16.9067 1 17.6044 1 19M13.5 5.5C13.5 7.98528 11.4853 10 9 10C6.51472 10 4.5 7.98528 4.5 5.5C4.5 3.01472 6.51472 1 9 1C11.4853 1 13.5 3.01472 13.5 5.5Z"
+                  stroke="#212626"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+
+              <span className="font-inter font-medium text-[16px] text-[#212626]">
+                Male
+              </span>
             </li>
             <li className="flex items-center text-gray-700">
-              <FontAwesomeIcon icon={faUser} className="mr-2 text-gray-400" />
-              <span>{userDetails ? capitalizeFirstLetter(userDetails?.gender) : ''}</span>
+              <svg
+                width="16"
+                height="18"
+                viewBox="0 0 20 22"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="mr-3"
+              >
+                <path
+                  d="M19 9H1M14 1V5M6 1V5M5.8 21H14.2C15.8802 21 16.7202 21 17.362 20.673C17.9265 20.3854 18.3854 19.9265 18.673 19.362C19 18.7202 19 17.8802 19 16.2V7.8C19 6.11984 19 5.27976 18.673 4.63803C18.3854 4.07354 17.9265 3.6146 17.362 3.32698C16.7202 3 15.8802 3 14.2 3H5.8C4.11984 3 3.27976 3 2.63803 3.32698C2.07354 3.6146 1.6146 4.07354 1.32698 4.63803C1 5.27976 1 6.11984 1 7.8V16.2C1 17.8802 1 18.7202 1.32698 19.362C1.6146 19.9265 2.07354 20.3854 2.63803 20.673C3.27976 21 4.11984 21 5.8 21Z"
+                  stroke="#212626"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+
+              <span className="font-inter font-medium text-[16px] text-[#212626]">
+                DOB: 25 Aug 2002
+              </span>
             </li>
             <li className="flex items-center text-gray-700">
-              <FontAwesomeIcon
-                icon={faMapMarkerAlt}
-                className="mr-2 text-gray-400"
-              />
-              {/* <span>From: Nagpur, Maharashtra</span> */}
-              <span>From: {userDetails ? `${userDetails?.city}, ${userDetails?.state}`: ''}</span>
+              <svg
+                width="17"
+                height="19"
+                viewBox="0 0 18 22"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="mr-3"
+              >
+                <path
+                  d="M9 12C10.6569 12 12 10.6569 12 9C12 7.34315 10.6569 6 9 6C7.34315 6 6 7.34315 6 9C6 10.6569 7.34315 12 9 12Z"
+                  stroke="#212626"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M9 21C13 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 5 17 9 21Z"
+                  stroke="#212626"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+
+              <span className="font-inter font-medium text-[16px] text-[#212626]">
+                From: Nagpur, Maharashtra
+              </span>
             </li>
             <li className="flex items-center text-gray-700">
-              <FontAwesomeIcon icon={faClock} className="mr-2 text-gray-400" />
-              {/* <span>Joined: September 2022</span> */}
-              <span>Joined: {userDetails ? formatDate(userDetails?.created_at, 'joined') : ''}</span>
+              <svg
+                width="17"
+                height="19"
+                viewBox="0 0 22 22"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="mr-3"
+              >
+                <path
+                  d="M11 5V11L15 13M21 11C21 16.5228 16.5228 21 11 21C5.47715 21 1 16.5228 1 11C1 5.47715 5.47715 1 11 1C16.5228 1 21 5.47715 21 11Z"
+                  stroke="#212626"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+
+              <span className="font-inter font-medium text-[16px] text-[#212626]">
+                Joined: September 2022
+              </span>
             </li>
           </ul>
         </div>
       </div>
 
-      <div className="w-[405px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.25)] p-5 mb-4">
+      <div className="w-[340px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] p-4 px-4 mb-4">
+        <div className="flex justify-between items-center -mb-4">
+          <h2 className="font-poppins font-semibold text-[20px] text-[#212626]">
+            Bucket List
+          </h2>
+          <p
+            onClick={handleAllBucketList}
+            className="font-inter font-medium text-[14px] text-[#2DC6BE] cursor-pointer hover:underline"
+          >
+            See All
+          </p>
+        </div>
+        {sampleData.map((item, index) => (
+        <div key={index} className="mt-8">
+          {/* Flexbox for vertical and horizontal image arrangement */}
+          <div className="flex gap-2">
+            {/* Vertical image */}
+            <img
+              src={item.images[0]}
+              alt="Vertical Image"
+              className="w-1/2 h-auto object-cover rounded-md"
+            />
+            {/* Two horizontal images */}
+            <div className="flex flex-col w-1/2 gap-2">
+              {item.images.slice(1, 3).map((img, imgIndex) => (
+                <img
+                  key={imgIndex}
+                  src={img}
+                  alt="Horizontal Image"
+                  className="w-full h-24 object-cover rounded-md"
+                />
+              ))}
+            </div>
+          </div>
+          {/* Title */}
+          <p className="text-left font-inter text-[16px] font-medium text-[#212626] mt-2">
+            {item.title}
+          </p>
+        </div>
+      ))}
+      </div>
+
+      <div className="w-[340px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] p-4 px-4 mb-4">
         <div className="flex justify-between items-center mb-2">
-          {/* <h2 className="text-lg font-semibold">All Posts ({posts.length})</h2> */}
-          <h2 className="text-lg font-semibold">All Posts ({visiblePosts.length})</h2>
+          <h2 className="font-poppins font-semibold text-[20px] text-[#212626]">
+            Posts ({posts.length})
+          </h2>
           <p
             onClick={() => setShowAllPost(!showAllPost)}
-            className="text-teal-800 cursor-pointer hover:underline text-sm"
+            className="font-inter font-medium text-[14px] text-[#2DC6BE] cursor-pointer hover:underline"
           >
             {showAllPost ? "See Less" : "See All"}
           </p>
         </div>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2">
           {/* Dynamically render images and titles */}
           {visiblePosts.map((post) => (
             <div key={post.id}>
-              {/* {
-                  getFirstImage(post.media_url) && (
-                    <img
-                      src={getFirstImage(post.media_url)}
-                      alt={post.description}
-                      className="w-full h-[130px] rounded-sm object-cover"
-                    />
-                  )
-                } */}
-                {
-                  (post.media_url).length > 0 && (
-                    <img
-                      src={post.media_url[0]}
-                      alt={post.description}
-                      className="w-full h-[130px] rounded-sm object-cover"
-                    />
-                  )
-                }
-              {/* <img
-                src={getFirstImage(post.media_url)}
-                alt={post.description}
-                className="w-full h-[130px] rounded-sm object-cover"
-              /> */}
+              <img
+                src={post.imageUrl}
+                alt={post.title}
+                className="w-full h-[92px] rounded-[8px] object-cover"
+              />
             </div>
           ))}
         </div>
       </div>
-
-      <div className="w-[405px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.25)] p-5 mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="text-lg font-semibold">
-            {/* Buddies ({followers.length}) */}
-            Buddies ({userBuddies?.length || '0'})
-          </h2>
-          <p
-            onClick={() => setShowAllbuddies(!showAllbuddies)}
-            className="text-teal-800 cursor-pointer hover:underline text-sm"
-          >
-            {showAllbuddies ? "See Less" : "See All"}
-          </p>
-        </div>
-        {/* User List */}
-        <div className="mt-4 space-y-4">
-          {visiblePostsbuddies.map((buddy) => (
-            <div key={buddy.id} className="flex items-center justify-between">
-              {/* User Info */}
-              <div className="flex items-center space-x-3">
-                <img
-                  src={buddy.profile_image || dummyUserImage}
-                  alt={buddy.full_name}
-                  className="w-10 h-10 rounded-full"
-                />
-                <div>
-                  <p className="text-sm font-medium text-gray-800 text-left">
-                    {buddy.full_name}
-                  </p>
-                  <p className="text-sm text-gray-500 text-left">
-                    {buddy.user_name}
-                  </p>
-                </div>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex items-center space-x-2">
-                <button className="px-3 py-2 text-sm text-[#2DC6BE] border-2 border-[#2DC6BE] rounded-lg font-semibold">
-                  Followed
-                </button>
-                <button className="px-3 py-2 text-xs text-[#2DC6BE] border-2 border-[#2DC6BE] rounded-lg font-semibold">
-                  X
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="w-[405px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.25)] p-5 mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="text-lg font-semibold">
-            Followers ({userFollowers?.length || '0'})
-          </h2>
-          <p
-            onClick={() => setShowAllfollowers(!showAllfollowers)}
-            className="text-teal-800 cursor-pointer hover:underline text-sm"
-          >
-            {showAllfollowers ? "See Less" : "See All"}
-          </p>
-        </div>
-        {/* User List */}
-        <div className="mt-4 space-y-4">
-          {visiblePostsfollowes.map((follower) => (
-            <div key={follower.id} className="flex items-center justify-between">
-              {/* User Info */}
-              <div className="flex items-center space-x-3">
-                <img
-                  src={follower.profile_image || dummyUserImage}
-                  alt={follower.user_name}
-                  className="w-10 h-10 rounded-full"
-                />
-                <div>
-                  <p className="text-sm font-medium text-gray-800 text-left">
-                    {follower.full_name}
-                  </p>
-                  <p className="text-sm text-gray-500 text-left">
-                    {follower.user_name}
-                  </p>
-                </div>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex items-center space-x-2">
-                <button
-                  className={`w-[90px] px-3 py-2 text-sm font-semibold border-2 rounded-lg font-semibold ${
-                    !follower.isMutual
-                      ? "bg-[#2DC6BE] text-white border-[#2DC6BE]"
-                      : "text-[#2DC6BE] border-[#2DC6BE]"
-                  }`}
-                >
-                  {follower.isMutual ? 'Following' : 'Follow'}
-                </button>
-                <button
-                  className={`px-3 py-2 text-sm font-semibold border-2 rounded-lg font-semibold ${
-                    follower.isMutual === "Follow"
-                      ? "bg-[#2DC6BE] text-white border-[#2DC6BE]"
-                      : "text-[#2DC6BE] border-[#2DC6BE]"
-                  }`}
-                >
-                  {!follower.isMutual ? "+" : "X"}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="w-[405px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.25)] p-5 mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="text-lg font-semibold">
-            Following ({toWhomUserFollows?.length || '0'})
-          </h2>
-          <p
-            onClick={() => setShowAllfollowing(!showAllfollowing)}
-            className="text-teal-800 cursor-pointer hover:underline text-sm"
-          >
-            {showAllfollowing ? "See Less" : "See All"}
-          </p>
-        </div>
-        {/* User List */}
-        <div className="mt-4 space-y-4">
-          {visiblePostsfollowing.map((buddy) => (
-            <div key={buddy.id} className="flex items-center justify-between">
-              {/* User Info */}
-              <div className="flex items-center space-x-3">
-                <img
-                  src={buddy.profile_image || dummyUserImage}
-                  alt={buddy.user_name}
-                  className="w-10 h-10 rounded-full"
-                />
-                <div>
-                  <p className="text-sm font-medium text-gray-800 text-left">
-                    {buddy.full_name}
-                  </p>
-                  <p className="text-sm text-gray-500 text-left">
-                    {buddy.user_name}
-                  </p>
-                </div>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex items-center space-x-2">
-                <button
-                  className={`w-[90px] px-3 py-2 text-sm font-semibold border-2 rounded-lg font-semibold ${
-                    buddy.follow === "Follow"
-                      ? "bg-[#2DC6BE] text-white border-[#2DC6BE]"
-                      : "text-[#2DC6BE] border-[#2DC6BE]"
-                  }`}
-                >
-                  Following
-                </button>
-                <button
-                  className={`px-3 py-2 text-sm font-semibold border-2 rounded-lg font-semibold ${
-                    buddy.follow === "Follow"
-                      ? "bg-[#2DC6BE] text-white border-[#2DC6BE]"
-                      : "text-[#2DC6BE] border-[#2DC6BE]"
-                  }`}
-                >
-                  {buddy.follow === "Follow" ? "+" : "X"}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      
-    </div>
+    </>
   );
 };
 
 export default Sidebar;
+
