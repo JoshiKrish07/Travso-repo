@@ -10,9 +10,14 @@ import Eighth from "../../assets/PostImage/eigth.png";
 import Ninth from "../../assets/PostImage/ninth.png";
 import Tenth from "../../assets/PostImage/first.png";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+ const { userBuddies, user: userDetails, userPosts, userFollowers, toWhomUserFollows } = useSelector((state) => state.auth);
+
 
   const [posts, setPosts] = useState([
     {
@@ -100,11 +105,48 @@ const Sidebar = () => {
   const [showAllPost, setShowAllPost] = useState(false);
 
   // Show only first 9 posts or all posts based on state
-  const visiblePosts = showAllPost ? posts : posts.slice(0, 9);
+  // const visiblePosts = showAllPost ? posts : posts.slice(0, 9);
+  const visiblePosts = showAllPost ? (userPosts ? userPosts : []) : (userPosts ? userPosts.slice(0, 9) : []);
 
   const handleAllBucketList =()=>{
     navigate("/bucketlist")
   }
+
+  // for capitalizing first word of string
+  function capitalizeFirstLetter(str) {
+    if (!str) return str; // Handle empty or null strings
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
+  // format in format for dob like 25 Aug 2002 and for joined Feb 2022
+  function formatDate(isoDate, type) {
+    const date = new Date(isoDate);
+  
+    // Array of month names
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+  
+    const day = date.getUTCDate(); // Day of the month
+    const month = months[date.getUTCMonth()]; // Full month name
+    const shortMonth = month.slice(0, 3); // Abbreviated month name
+    const year = date.getUTCFullYear(); // Full year
+  
+    // Handle different formats
+    if (type === "dob") {
+      return `${day} ${shortMonth} ${year}`; // Example: 25 Aug 2002
+    } else if (type === "joined") {
+      return `${month} ${year}`; // Example: September 2022
+    } else {
+      throw new Error("Invalid type. Use 'dob' or 'joined'.");
+    }
+  }
+
+  const handleAllPost = () =>{
+    navigate("/postData")
+  }
+
 
   return (
     <>
@@ -144,7 +186,7 @@ const Sidebar = () => {
               </svg>
 
               <span className="font-inter font-medium text-[16px] text-[#212626]">
-                Male
+                {userDetails ? capitalizeFirstLetter(userDetails?.gender) : ""}
               </span>
             </li>
             <li className="flex items-center text-gray-700">
@@ -166,7 +208,8 @@ const Sidebar = () => {
               </svg>
 
               <span className="font-inter font-medium text-[16px] text-[#212626]">
-                DOB: 25 Aug 2002
+                {/* DOB: 25 Aug 2002 */}
+                {userDetails ? formatDate(userDetails?.dob, 'dob') : ''}
               </span>
             </li>
             <li className="flex items-center text-gray-700">
@@ -195,7 +238,8 @@ const Sidebar = () => {
               </svg>
 
               <span className="font-inter font-medium text-[16px] text-[#212626]">
-                From: Nagpur, Maharashtra
+                {/* From: Nagpur, Maharashtra */}
+                From: {userDetails ? `${userDetails?.city}, ${userDetails?.state}`: ''}
               </span>
             </li>
             <li className="flex items-center text-gray-700">
@@ -217,7 +261,7 @@ const Sidebar = () => {
               </svg>
 
               <span className="font-inter font-medium text-[16px] text-[#212626]">
-                Joined: September 2022
+                Joined: {userDetails ? formatDate(userDetails?.created_at, 'joined') : ''}
               </span>
             </li>
           </ul>
@@ -269,24 +313,33 @@ const Sidebar = () => {
       <div className="w-[340px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] p-4 px-4 mb-4">
         <div className="flex justify-between items-center mb-2">
           <h2 className="font-poppins font-semibold text-[20px] text-[#212626]">
-            Posts ({posts.length})
+            Posts ({userPosts ? userPosts?.length : "0"})
           </h2>
           <p
-            onClick={() => setShowAllPost(!showAllPost)}
+            onClick={handleAllPost}
             className="font-inter font-medium text-[14px] text-[#2DC6BE] cursor-pointer hover:underline"
           >
-            {showAllPost ? "See Less" : "See All"}
+            See All
           </p>
         </div>
         <div className="grid grid-cols-3 gap-2">
           {/* Dynamically render images and titles */}
           {visiblePosts.map((post) => (
             <div key={post.id}>
-              <img
+              {/* <img
                 src={post.imageUrl}
                 alt={post.title}
                 className="w-full h-[92px] rounded-[8px] object-cover"
-              />
+              /> */}
+              {
+                  (post.media_url).length > 0 && (
+                    <img
+                      src={post.media_url[0]}
+                      alt={post.description}
+                      className="w-full h-[130px] rounded-sm object-cover"
+                    />
+                  )
+                }
             </div>
           ))}
         </div>

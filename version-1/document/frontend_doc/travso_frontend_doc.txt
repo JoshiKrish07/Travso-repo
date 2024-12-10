@@ -178,11 +178,27 @@ file destination :- src/Components/OtherPages/CommunityRightSidebar.jsx
 
 
 file destination :- src/Components/OtherPages/AllPopupComponent/CreateaPostPopup.jsx
+=> This component takes props -> isOpen, onClose, openPostDetail, postData, setPostData
+-> postData contains all data like description,tags,buddies_id etc. which comes from parent component.
 1) Using postData state to handle all input data which a user will fill to post.
 2) handleBuddyTag() function :- As soon as user write @, a list will appear of his buddies.
 3) handleSuggestionClick() function :- When user clicks on any suggestion it is stored in postData and also shown on UI with cancel
    mark.
 4) handleRemoveBuddy() :- Allows user to remove tagged buddy.
+5) handleTagEnter() :- It is used to set tag starting with #.
+6) handleDrop() and handleFileChange() function :- Both are used to select file and then calls handleFileSelect() function and setActivePostId
+   images in postData in array. 
+7) handleRemoveImage() function :- When user wants to deselect any image, a cancel icon above image calls this function and removes 
+   image from data.
+
+file destination :- src/Components/OtherPages/AllPopupComponent/PostDetailPopup.jsx
+=> This component takes props -> isOpen, onClose, openPostDetail, postData, handlePostUpload
+-> postData contains all data like description,tags,buddies_id etc. which comes from parent component.
+This component is used to show the preview of how the post will look like.
+1) User basic details are filled up using userDetails redux state variable.
+2) onClose() function :- When clicked on Edit button, this function is called which open the CreateaPostPopup with filled data using postData variable.
+3) handlePostUpload() function :- If user clicks on upload, this function is called in parent component, which uses redux function
+   commitPost() and calls to post api.
 =============================================================================================================================================
 
 Module :- Search Bar

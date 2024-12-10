@@ -19,10 +19,11 @@ import p2 from "../../assets/headerIcon/p2.png";
 import p3 from "../../assets/headerIcon/p3.png";
 import floxy from "../../assets/floxy.png";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllUsers, getOnlineFriends, getUserPosts } from "../../redux/slices/authSlice";
+import { getAllUsers, getOnlineFriends, getUserDetails, getUserPosts } from "../../redux/slices/authSlice";
 import CreateaPostPopup from "./AllPopupComponent/CreateaPostPopup";
 import PostDetailPopup from "./AllPopupComponent/PostDetailPopup";
 import { commitPost } from "../../redux/slices/postSlice";
+import dummyUserImage from "../../assets/user_image-removebg-preview.png";
 
 const CommunityPage = () => {
   const dispatch = useDispatch();
@@ -97,7 +98,7 @@ const CommunityPage = () => {
   });
   /* redux state data starts */
 
-  const { onlineFriends, allUsers } = useSelector((state) => state.auth);
+  const { onlineFriends, allUsers, user: userDetails } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (!onlineFriends) {
@@ -107,6 +108,11 @@ const CommunityPage = () => {
     if (!allUsers) {
       dispatch(getAllUsers());
     }
+
+    if(!userDetails) {
+      dispatch(getUserDetails());
+    }
+
   }, [dispatch]);
 
   /* redux state data ends */
@@ -250,7 +256,8 @@ const CommunityPage = () => {
           media_url: [],
           is_public: true,
           buddies_id: []
-        })
+        });
+        setIsPostDetailPopup(false);
         // handleFlashMessage(commentResult.message, 'success');
       }
     } catch (error) {
@@ -306,7 +313,7 @@ const CommunityPage = () => {
               <div className="flex items-center gap-2 mt-5">
                 {/* Profile Image */}
                 <img
-                  src={Girl}
+                  src={userDetails?.profile_image || dummyUserImage}
                   alt="Profile"
                   className="w-[44px] h-[44px] rounded-full"
                 />

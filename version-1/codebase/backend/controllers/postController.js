@@ -1,7 +1,8 @@
-const { response } = require("express");
 const pool = require("../utils/db");
+const path = require("path");
+const fs = require("fs");
 
-
+const POST_UPLOAD_DIR = path.join(__dirname, "../uploads/post_img");
 
 async function allPosts(req , res){
   try {
@@ -213,7 +214,15 @@ async function getUserPosts(req , res){
            JOIN comments c ON cl.comment_id = c.id 
            WHERE c.post_id = p.id 
            ORDER BY c.created_at DESC 
-           LIMIT 1) AS last_comment_likes_count
+           LIMIT 1) AS last_comment_likes_count,
+           (SELECT 
+         CASE 
+             WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE 
+         END 
+     FROM 
+         likes l 
+     WHERE 
+         l.post_id = p.id AND l.user_id = ?) AS user_liked_post
       FROM 
           posts p
       JOIN 
@@ -228,13 +237,15 @@ async function getUserPosts(req , res){
           p.created_at DESC;
       
       `,
-        [UserId]
+        [UserId, UserId]
            );
 
            const formattedPosts =await allpost.map(post => {
             return {
               ...post,
-              media_url: post.media_url ? JSON.parse(post.media_url) : [] 
+              media_url: post.media_url ? JSON.parse(post.media_url) : [],
+              tag_id: post.tag_id ? JSON.parse(post.tag_id) : [],
+              buddies_id: post.buddies_id ? JSON.parse(post.buddies_id) : []
             };
           });
   
@@ -831,68 +842,157 @@ async function replyOnComment(req , res){
     }
     }
 
-async function storePost(req, res) {
-    try {
-  const user_id = req.user.userId; // extrcting from token
+// async function storePost(req, res) {
+//     try {
+//   const user_id = req.user.userId; // extrcting from token
 
-      const {
+//       const {
+//         is_public,
+//         description,
+//         buddies_id,
+//         tags,
+//         location,
+//         media_url,
+//         status,
+//         block_post,
+//       } = req.body;
+
+//       // Validate required fields
+//       if (!user_id || !description) {
+//         return res.status(400).json({
+//           message: "Missing required fields (user_id, description).",
+//         });
+//       }
+  
+//       // Insert the post into the database
+//       const [result] = await pool.execute(
+//         `INSERT INTO posts (
+//           user_id,
+//           is_public,
+//           description,
+//           buddies_id,
+//           tag_id,
+//           location_id,
+//           media_url,
+//           status,
+//           block_post,
+//           created_at,
+//           updated_at
+//         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+//         [
+//           user_id,
+//           is_public !== undefined ? is_public : 1, // Default to 1 (true) if not provided
+//           description || null, // Allow null for optional fields
+//           JSON.stringify(buddies_id) || [],
+//           JSON.stringify(tags) || [],
+//           location || null,
+//           JSON.stringify(media_url) || [], // Default to empty JSON array
+//           status || "active", // Default to 'active'
+//           block_post !== undefined ? block_post : 0, // Default to 0 (false)
+//         ]
+//       );
+  
+//       // Respond with success message
+//       return res.status(200).json({
+//         message: "Post created successfully.",
+//         post_id: result.insertId, // Return the ID of the newly created post
+//       });
+//     } catch (error) {
+//       console.error("Error in storing post:", error);
+//       return res.status(500).json({
+//         error: "Internal Server Error",
+//       });
+//     }
+// }
+
+
+async function storePost(req, res) {
+  try {
+    // POST_UPLOAD_DIR
+    const user_id = req.user.userId; // extrcting from token
+
+    const {
+      is_public,
+      description,
+      buddies_id,
+      tags,
+      location,
+      media_url,
+      status,
+      block_post,
+    } = req.body;
+
+    // Validate required fields
+    if (!user_id ) {
+      return res.status(400).json({
+        message: "Missing required fields (user_id).",
+      });
+    }
+
+    const postImages = [];
+
+    if(media_url.length > 0) {
+      for(let image of media_url) {
+        // Extract Base64 part of the image
+        const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
+        const extension = image.substring("data:image/".length, image.indexOf(";base64"));
+        const fileName = `post_${Date.now()}.${extension}`;
+        const filePath = path.join(POST_UPLOAD_DIR, fileName);
+        const imagePath = `${process.env.APP_SERVER_URL}/uploads/post_img/${fileName}`;
+        postImages.push(imagePath);
+
+        fs.writeFile(filePath, base64Data, { encoding: "base64" }, async(err) => {
+          if (err) {
+            return res.status(500).json({ error: "Failed to save image" });
+          }
+        });
+        console.log("=====imagePath====>", imagePath);
+      }
+    }
+
+
+    // Insert the post into the database
+    const [result] = await pool.execute(
+      `INSERT INTO posts (
+        user_id,
         is_public,
         description,
         buddies_id,
-        tags,
-        location,
+        tag_id,
+        location_id,
         media_url,
         status,
         block_post,
-      } = req.body;
+        created_at,
+        updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      [
+        user_id,
+        is_public !== undefined ? is_public : 1, // Default to 1 (true) if not provided
+        description || null, // Allow null for optional fields
+        JSON.stringify(buddies_id) || [],
+        JSON.stringify(tags) || [],
+        location || null,
+        JSON.stringify(postImages) || [], // Default to empty JSON array
+        status || "active", // Default to 'active'
+        block_post !== undefined ? block_post : 0, // Default to 0 (false)
+      ]
+    );
 
-      // Validate required fields
-      if (!user_id || !description) {
-        return res.status(400).json({
-          message: "Missing required fields (user_id, description).",
-        });
-      }
-  
-      // Insert the post into the database
-      const [result] = await pool.execute(
-        `INSERT INTO posts (
-          user_id,
-          is_public,
-          description,
-          buddies_id,
-          tag_id,
-          location_id,
-          media_url,
-          status,
-          block_post,
-          created_at,
-          updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-        [
-          user_id,
-          is_public !== undefined ? is_public : 1, // Default to 1 (true) if not provided
-          description || null, // Allow null for optional fields
-          JSON.stringify(buddies_id) || [],
-          JSON.stringify(tags) || [],
-          location || null,
-          JSON.stringify(media_url) || [], // Default to empty JSON array
-          status || "active", // Default to 'active'
-          block_post !== undefined ? block_post : 0, // Default to 0 (false)
-        ]
-      );
-  
-      // Respond with success message
-      return res.status(200).json({
-        message: "Post created successfully.",
-        post_id: result.insertId, // Return the ID of the newly created post
-      });
-    } catch (error) {
-      console.error("Error in storing post:", error);
-      return res.status(500).json({
-        error: "Internal Server Error",
-      });
-    }
+    
+
+    // Respond with success message
+    return res.status(200).json({
+      message: "Post created successfully.",
+      post_id: result.insertId, // Return the ID of the newly created post
+    });
+  } catch (error) {
+    console.error("Error in storing post:", error);
+    return res.status(500).json({
+      error: "Internal Server Error",
+    });
   }
+}
 
 
 // delete comment
