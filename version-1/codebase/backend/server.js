@@ -19,6 +19,7 @@ app.use(express.json({ limit: "10mb" })); // Allow large payloads
 const UPLOAD_DIR = path.join(__dirname, "uploads");
 const PROFILE_UPLOAD_DIR = path.join(__dirname, "uploads/profile_img");
 const COVER_UPLOAD_DIR = path.join(__dirname, "uploads/cover_img");
+const POST_UPLOAD_DIR = path.join(__dirname, "uploads/post_img");
 
 // Ensure the uploads directory exists
 if (!fs.existsSync(UPLOAD_DIR)) {
@@ -30,9 +31,14 @@ if (!fs.existsSync(PROFILE_UPLOAD_DIR)) {
   fs.mkdirSync(PROFILE_UPLOAD_DIR);
 }
 
-// Ensure the uploads directory exists
+// Ensure the uploads directory for cover image exists
 if (!fs.existsSync(COVER_UPLOAD_DIR)) {
   fs.mkdirSync(COVER_UPLOAD_DIR);
+}
+
+// Ensure the uploads directory for post exists
+if (!fs.existsSync(POST_UPLOAD_DIR)) {
+  fs.mkdirSync(POST_UPLOAD_DIR);
 }
 
 // Serve static files from the 'uploads' directory

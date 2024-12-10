@@ -1,24 +1,62 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Profile from "../../assets/profilePage.jpg";
 import ProfilePhoto from "../../assets/profilePhoto.png";
+import travel_badges from "../../assets/travel_badges.png";
+import { useDispatch, useSelector } from "react-redux";
+import dummyUserImage from "../../assets/user_image-removebg-preview.png";
+import { getUserBuddies, getUserFollowers } from "../../redux/slices/authSlice";
+import { Link } from "react-router-dom";
 
 const ProfilePageHeaderData = () => {
+  const dispatch = useDispatch();
+
+  const { user: userDetails, userFollowers, userBuddies } = useSelector(
+    (state) => state.auth
+  );
+
+  useEffect(() => {
+    if(!userFollowers) {
+      dispatch(getUserFollowers());
+    }
+
+    if(!userBuddies) {
+      dispatch(getUserBuddies());
+    }
+  }, [dispatch]);
+
+  
   return (
     <div className="mt-5 bg-[#F0F7F7] flex justify-center items-center">
       <div className="w-full max-w-[98%] h-[714px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col items-center">
         {/* Cover Photo Section */}
         <div className="flex flex-col justify-center w-full max-w-98% p-4 px-4">
-          <img
-            src={Profile}
-            alt="Cover"
-            className="w-full h-[340px] object-cover rounded-[12px]"
-          />
+        <div>
+          {
+            userDetails?.cover_image ? (
+            <div>
+            <img
+              // src={userDetails?.cover_image}
+              src={userDetails?.cover_image}
+              alt="Cover"
+              className="w-full h-[340px] object-cover rounded-[12px]"
+            />
+            </div>) : (
+              <div className="w-full h-[340px] object-cover rounded-[12px] bg-[#F0F7F7]" >
+              </div>
+            )
+          }
+            
+            <img
+              src={travel_badges}
+              className="absolute top-[138px] left-[60px] w-[192px] h-[60px]"
+            />
+          </div>
           {/* Profile Photo */}
           <div className="flex flex-col items-center justify-center">
             <div className="relative -top-20 border-4 border-white bg-white rounded-full p-[2px]">
               <div className="border-4 border-[#2DC6BE] rounded-full bg-[#F0F7F7] p-[2px]">
                 <img
-                  src={ProfilePhoto}
+                  src={userDetails?.profile_image || dummyUserImage}
                   alt="Profile"
                   className="w-[150px] h-[150px] rounded-full border-4 border-white object-cover"
                 />
@@ -26,20 +64,18 @@ const ProfilePageHeaderData = () => {
             </div>
             <div className="md:w-[720px] -mt-[70px] flex flex-col items-center justify-center">
               <h2 className="font-poppins font-medium text-[32px] text-[#212626] tems-center">
-                Pankaj Reet Tech
+                {userDetails?.full_name}
               </h2>
               <p className="-mt-2 font-inter font-medium text-[20px] items-center text-[#667877]">
-                @Pankaj.Reettech
+                @{userDetails?.user_name}
               </p>
               <p className="font-inter font-medium text-[16px] items-center text-[#667877] mt-2">
-                Adipiscing sapien felis in semper porttitor massa senectus nunc.
-                Non ac cursus nisl luctus diam dignissim. Cras tincidunt etiam
-                morbi egestas.
+                {userDetails?.description}
               </p>
               <div className="md:w-[470px] md:h-[40px] flex items-center justify-center rounded-full bg-[#E5FFFE] mt-3">
                 <p className="font-poppins font-semibold items-center text-center text-[16px] text-[#212626]">
-                  Solo Traveler &nbsp;•&nbsp; 252 Trips &nbsp;•&nbsp; 14K
-                  followers &nbsp;•&nbsp; 24 Buddies
+                  Solo Traveler &nbsp;•&nbsp; 252 Trips &nbsp;•&nbsp; {userFollowers && userFollowers.length}{" "}
+                  followers &nbsp;•&nbsp; {userBuddies && userBuddies.length} Buddies
                 </p>
               </div>
               <div className="flex items-center gap-2 mt-5">
@@ -64,7 +100,9 @@ const ProfilePageHeaderData = () => {
                     />
                   </svg>
 
+                <Link to={'/editprofile'}>
                   <span className="text-md font-normal">Edit Profile</span>
+                </Link>
                 </button>
                 <button
                   aria-label="Liked Info"

@@ -530,7 +530,7 @@ const PostCard = () => {
                 onClose={() => setIsSharePopup(false)}
               />
 
-<SavedPopup
+            <SavedPopup
               isOpen={isCommentWithSavedPopup}
               onClose={() => setIsCommentWithSavedPopup(false)}
             />

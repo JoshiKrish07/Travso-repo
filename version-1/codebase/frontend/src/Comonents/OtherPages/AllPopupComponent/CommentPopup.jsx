@@ -619,8 +619,22 @@ const handleCommentImageUpload = async (e) => {
 
             {/*---------- Scrollable Part ---------*/}
             <div className="flex-1 overflow-y-auto scrollbar-hidden">
+            { mediaArray && mediaArray.length === 1 && (
+                  <div className="relative w-full max-w-4xl mx-auto"> 
+                    <div className="overflow-hidden relative">
+                      <div>
+                        <img
+                          // src={images[currentIndex]}
+                          src={mediaArray && mediaArray.length > 0 && mediaArray[currentIndex]}
+                          alt={`Slide ${currentIndex}`}
+                          className="rounded-lg w-full h-[344px] object-cover transition duration-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+              )}
                 {/* Slider */}
-                { mediaArray && mediaArray.length > 0 && (
+                { mediaArray && mediaArray.length > 1 && (
                   <div className="relative w-full max-w-4xl mx-auto">
                 
                     <div className="overflow-hidden relative">
@@ -684,7 +698,7 @@ const handleCommentImageUpload = async (e) => {
 
               {/* Hashtags */}
               <p className="text-left text-[#1DB2AA] mb-2">
-                {postDetails.hastag}
+                {allPosts && allPosts[0].tag_id}
               </p>
             </div>
             {/*---------- Scrollable Part ---------*/}
@@ -721,12 +735,12 @@ const handleCommentImageUpload = async (e) => {
             <div className="flex items-center justify-between mt-3">
               <button
                 aria-label="Edit Info"
-                className="flex items-center justify-center w-[130px] h-[36px] bg-[#2DC6BE] text-white text-[#434C50] hover:text-gray-800 py-1 px-2 rounded-full hover:bg-[#2DC6BE] hover:text-white"
+                className={`flex items-center justify-center w-[130px] h-[36px] py-1 px-2 rounded-full ${allPosts && allPosts[0].user_liked_post == 0 ? "bg-[#cdd0d499] text-[#434C50]" : "bg-[#2DC6BE] text-white" }`}
                 onClick={() => handleLikeUnlike(allPosts[0].id)}
               >
                 <img src={like} alt="like" className="mr-2 w-[20px] h-[20px]" />
                 <span className="font-inter font-medium text-[14px] text-[#212626]">
-                  Liked
+                  {allPosts && allPosts[0].user_liked_post == 0 ? "Like" : "Liked"}
                 </span>
               </button>
 
