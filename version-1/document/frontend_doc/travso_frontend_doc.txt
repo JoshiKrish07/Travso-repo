@@ -212,3 +212,25 @@ Module :- Search Bar
 3) removeFromSeacrh() function :- Removes a option from search list.
 
 ===========================================================================================================================
+
+
+Module :- Share Post (for PostCard.jsx page and commentPopup.jsx)
+
+On commentPopup.jsx :- 
+-> handleOpenSharePopup() function :- As soon as user clicks on share button, this function is called and setActivePostId() sets
+   the postId active and setIsSharePopup() sets sharePopup true and it opens sharepopup.
+-> handleSharePopupClose() function :- If users clicks on close button or finished it's sharing process, then this function is called.
+  and updates the states to false and closes the popup.
+
+PostCard.jsx :- Same as above
+
+File destination :- src/Components/OtherPages/SharePopUp.jsx
+
+-> handleSelect() function :- Working on selecting the buddies and store their ids in shareIds state.If selected then unselect and
+   if unselected then select.
+-> handleInputChange() function :- If user wants to send some message with post, then storing it in thoughts state.
+-> handleShare() function :- When user clicks on share, this function is called and using redux function SharePostWithFriends() data is
+   sent to backend and stored in db.
+-> handleBuddiesData() function :- If user wants to search any particular buddy, then it shows buddy data according to it.
+
+=============================================================================================================================

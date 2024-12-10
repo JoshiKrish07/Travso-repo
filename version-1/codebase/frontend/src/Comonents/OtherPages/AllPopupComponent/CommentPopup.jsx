@@ -47,6 +47,7 @@ import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
 import EmojiPicker from "emoji-picker-react";
 import "./AllPopupPage.css";
 import SuccessError from "../SuccessError";
+import SharePopup from "./SharePopup";
 
 const CommentPopup = ({ isOpen, onClose, postId }) => {
   const dispatch = useDispatch();
@@ -67,9 +68,13 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
   const [flashMessage, setFlashMessage] = useState("");
   const [flashMsgType, setFlashMsgType] = useState("");
   const [visibleReplies, setVisibleReplies] = useState({}); // Object to track visible replies for each comment
-  
   const [showTagSuggestionsForReply, setShowTagSuggestionsForReply] = useState(false);
   const [filteredSuggestionsForReply, setFilteredSuggestionsForReply] = useState([]);
+
+  // to show share popup
+  const [activePostId, setActivePostId] = useState(null);
+  const [isSharePopup, setIsSharePopup] = useState(false);
+
   /* for tag people suggestion starts */
 
   const [showTagSuggestions, setShowTagSuggestions] = useState(false);
@@ -89,7 +94,14 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
     setCommentInputVal(newText);
 
     // Add the tagged user's ID to the taggedUsers array
-    setTaggedUsers((prev) => [...prev, person.id]);
+    // setTaggedUsers((prev) => [...prev, person.id]);
+    setTaggedUsers((prev) => {
+      // Check if the person.id is already in the array
+      if (!prev.includes(person.id)) {
+        return [...prev, person.id];
+      }
+      return prev; // Return the previous state if the id already exists
+    });
 
     setShowTagSuggestions(false);
   };
@@ -563,6 +575,20 @@ const handleCommentImageUpload = async (e) => {
     setReplyToReplyId(replyId);
   }
 
+
+  // to open share popup
+  const handleOpenSharePopup = (postId) => {
+    setActivePostId(postId);
+    setIsSharePopup(true);
+  }
+
+  // to close share popup
+  const handleSharePopupClose = () => {
+    setIsSharePopup(false);
+    setActivePostId(null);
+    dispatch(getUserPosts());
+  }
+
   if (!isOpen) return null;
 
   return (
@@ -775,6 +801,7 @@ const handleCommentImageUpload = async (e) => {
               <button
                 aria-label="Edit Info"
                 className="flex items-center justify-center w-[130px] h-[36px] bg-[#cdd0d499] text-[#434C50] hover:text-gray-800 py-1 px-2 rounded-full "
+                onClick={() => handleOpenSharePopup(postId)}
               >
                 <img src={send} alt="send" className="mr-2 w-[20px] h-[20px]" />
                 <span className="font-inter font-medium text-[14px] text-[#212626]">
@@ -794,6 +821,17 @@ const handleCommentImageUpload = async (e) => {
               </h3>
             </div>
             {/* Top Fixed Section */}
+
+            {
+                    activePostId === postId && isSharePopup && (
+                      <SharePopup
+                        isOpen={isSharePopup}
+                        // onClose={() => setIsSharePopup(false)}
+                        onClose={() => handleSharePopupClose()}
+                        postId={activePostId}
+                      />
+                    )
+                  }
 
             {/*---------- Scrollable Part ---------*/}
             <div className="flex-1 overflow-y-auto scrollbar-thin space-y-4">
@@ -1057,8 +1095,8 @@ const handleCommentImageUpload = async (e) => {
                                           </div>
                                           <div className="flex items-center cursor-pointer">
                                             <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
-                                              {userPosts?.total_reply_on_comment || ""}{" "}
-                                              {userPosts?.total_reply_on_comment > 1
+                                              {userPosts?.total_comment_on_reply || ""}{" "}
+                                              {userPosts?.total_comment_on_reply > 1
                                                 ? "replies"
                                                 : "reply"}{" "}
                                             </p>

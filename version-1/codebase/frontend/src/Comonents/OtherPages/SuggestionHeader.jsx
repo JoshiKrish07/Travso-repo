@@ -1,11 +1,24 @@
-import React, { useState } from "react";
+/* eslint-disable react/prop-types */
+import React, { useEffect, useState } from "react";
 import logo from "../../assets/headerIcon/logo.png";
 import girl from "../../assets/headerIcon/girl.jpg";
 import "./Header.css";
 import SearchIcon from "@mui/icons-material/Search";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserDetails } from "../../redux/slices/authSlice";
+import dummyUserImage from "../../assets/user_image-removebg-preview.png";
 
 const SuggestionHeader = () => {
+  const dispatch = useDispatch();
   const [isSearchActive, setIsSearchActive] = useState(false);
+
+  const { user: userDetails } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if(!userDetails) {
+      dispatch(getUserDetails());
+    }
+  }, [dispatch]);
 
   return (
     <>
@@ -56,7 +69,7 @@ const SuggestionHeader = () => {
             <div className="flex items-center">
               <div className="w-px h-6 bg-gray-300 mx-4"></div>
               <div className="relative">
-                <ProfileMenu />
+                <ProfileMenu userDetails={userDetails}/>
               </div>
             </div>
           </div>
@@ -67,22 +80,23 @@ const SuggestionHeader = () => {
 };
 
 // Profile Menu Component
-const ProfileMenu = () => {
+const ProfileMenu = ({userDetails}) => {
+
   return (
     <div className="flex items-center">
       <div>
         <img
-          src={girl}
+          src={userDetails?.profile_image || dummyUserImage}
           alt="Profile"
           className="w-[40px] h-[40px] rounded-full mr-2"
         />
       </div>
       <div>
         <span className="block font-inter font-medium text-[#212626] text-left text-[16px]">
-          Madhulika
+          {userDetails ? userDetails.user_name : ""}
         </span>
         <p className="font-inter font-medium text-[12px] text-[#667877] text-left">
-          Madhulika@xyz
+        {userDetails?.email?.length > 12 ? `${userDetails?.email.slice(0, 12)}...` : userDetails?.email}
         </p>
       </div>
     </div>

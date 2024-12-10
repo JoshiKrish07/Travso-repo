@@ -948,7 +948,6 @@ const IconButton = ({ icon }) => {
     </button>
   );
 };
-
 // Profile Menu Component
 const ProfileMenu = ({ userDetails }) => {
   return (
@@ -958,9 +957,15 @@ const ProfileMenu = ({ userDetails }) => {
         alt="Profile"
         className="w-8 h-8 rounded-full mr-2"
       />
+      
+      <div className="flex flex-col">
       <span className="block font-medium text-gray-700 mr-5">
         {userDetails?.user_name}
       </span>
+        <p className="font-inter font-medium text-[12px] text-[#667877] text-left">
+          {userDetails?.email?.length > 12 ? `${userDetails?.email.slice(0, 12)}...` : userDetails?.email}
+        </p>
+      </div>
       <KeyboardArrowDownIcon className="h-4 w-4 text-gray-500" />
     </div>
   );

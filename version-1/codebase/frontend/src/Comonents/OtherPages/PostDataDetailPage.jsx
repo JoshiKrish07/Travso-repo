@@ -1,8 +1,14 @@
 import React from "react";
 import Header from "./Header";
+import { useDispatch, useSelector } from "react-redux";
 // import ProfilePageHeaderData from "./ProfilePageHeaderData";
 
 const PostDataDetailPage = () => {
+  const dispatch = useDispatch();
+
+  const { userPosts } = useSelector((state) => state.auth);
+  // console.log("====userPosts=====>", userPosts);
+
   const posts = [
     {
       username: "Pankaj Reet Tech",

@@ -732,7 +732,7 @@ async function updatePassword(req, res) {
   }
 }
 
-async function getUserBuddies(req, res) {
+async function getUserBuddies1(req, res) {
   try {
     // const { id } = req.params;
     const userId = req.user.userId; // Assuming `id` is part of the token payload
@@ -761,6 +761,52 @@ async function getUserBuddies(req, res) {
   } catch (error) {
     console.log("Error in catch part getUserBuddies api", error);
     return res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+async function getUserBuddies(req, res) {
+  try {
+    
+    const userId = req.user.userId;
+    const [buddies] = await pool.execute(
+      `
+      SELECT 
+        u.id,
+        u.profile_image,
+        u.full_name,
+        u.user_name,
+        EXISTS (
+          SELECT 1 
+          FROM buddies 
+          WHERE user_id = u.id AND buddies_id = ?
+        ) AS is_buddies
+      FROM 
+        buddies b
+      JOIN 
+        users u  
+      ON 
+        b.buddies_id = u.id
+      WHERE 
+        b.user_id = ? 
+        AND EXISTS (
+          SELECT 1 
+          FROM buddies 
+          WHERE user_id = u.id AND buddies_id = ?
+        )
+      `,
+      [userId, userId, userId] // Pass userId for both user-to-buddy and buddy-to-user checks
+    );
+
+    console.log("===buddies data====>", buddies);
+    return res.status(200).json({
+      message: "Data fetched successfully",
+      data: buddies,
+    });
+  } catch (error) {
+    console.error("===error fetching buddies====>", error);
+    return res.status(500).json({
+      error: "An error occurred while fetching data",
+    });
   }
 }
 
@@ -797,17 +843,18 @@ async function getUserBuddies(req, res) {
 
 
 // API to get user followers
-async function getUserFollower(req, res) {
+async function getUserFollower1(req, res) {
   try {
     const userId = req.user.userId; // Assuming `userId` comes from the token payload
 
     // Fetch followers of the user
     const [followers] = await pool.execute(
-      "SELECT * FROM followers WHERE follower_id = ?",
+      "SELECT * FROM followers WHERE followee_id = ?",
       [userId]
     );
 
-    const followingIds = followers.map((user) => user.followee_id);
+    // const followingIds = followers.map((user) => user.followee_id);
+    const followingIds = followers.map((user) => user.follower_id);
 
     if (followingIds.length === 0) {
       return res.status(404).json({ message: "No Follower found" });
@@ -846,7 +893,47 @@ async function getUserFollower(req, res) {
   }
 }
 
-async function toWhomUserFollows(req, res) {
+async function getUserFollower(req , res){
+  
+  try {
+    const userId = req.user.userId;
+    const [followers] = await pool.execute(
+      ` SELECT 
+        u.id,
+        u.user_name,
+        u.full_name,
+        u.profile_image,
+        EXISTS (
+          SELECT 1 
+          FROM followers 
+          WHERE follower_id = ? AND followee_id = u.id
+        ) AS is_mutual
+      FROM 
+        followers f
+      JOIN 
+        users u 
+      ON 
+        f.follower_id = u.id
+      WHERE 
+        f.followee_id = ?
+      ` ,[userId,userId ]
+    )
+
+    return res.status(200).json({
+      message:"followers fetched",
+      data:followers
+    });
+    
+  } catch (error) {
+    console.log("=====followeers====>",error)
+    return res.status(500).json({
+      error:"error followers fetched",
+
+    });
+  }
+}
+
+async function toWhomUserFollows1(req, res) {
   try {
 
     const userId = req.user.userId;
@@ -885,6 +972,47 @@ async function toWhomUserFollows(req, res) {
   }
 }
 
+async function toWhomUserFollows(req , res){
+  
+  try {
+  
+    const userId = req.user.userId;
+    const [followers] = await pool.execute(
+      ` SELECT 
+        u.id,
+        u.user_name,
+        u.full_name,
+        u.profile_image,
+        EXISTS (
+          SELECT 1 
+          FROM followers 
+          WHERE follower_id = ? AND followee_id = u.id
+        ) AS is_mutual
+      FROM 
+        followers f
+      JOIN 
+        users u 
+      ON 
+        f.followee_id = u.id
+      WHERE 
+        f.follower_id = ?
+      ` ,[userId,userId ]
+    )
+
+    return res.status(200).json({
+      message:"followee fetched",
+      data:followers
+    });
+    
+  } catch (error) {
+    console.log("=====followeers====>",error)
+    return res.status(500).json({
+      error:"error followee fetched",
+
+    });
+  }
+}
+
 // function to get user details
 const getUserDetails = async (req, res) => {
   try {
@@ -895,7 +1023,7 @@ const getUserDetails = async (req, res) => {
 
     // Query to fetch user details
     const [rows] = await pool.query(
-      "SELECT id, dob, created_at, user_name, profile_image, cover_image, description, first_name, last_name, city, state, gender, full_name FROM users WHERE id = ?",
+      "SELECT id, dob, email, created_at, user_name, profile_image, cover_image, description, first_name, last_name, city, state, gender, full_name FROM users WHERE id = ?",
       [userId]
     );
 
@@ -1073,7 +1201,8 @@ async function getallUsers(req , res){
       data: allusers
     })
   } catch (error) {
-    console.log(500).json({
+    console.log("==error==getallUsers=>", error)
+    return res.status(500).json({
       error: "Internal Server Error"
     })
   }
@@ -1248,6 +1377,55 @@ async function onlineFriends(req, res) {
   }
 }
 
+async function addBuddies(req, res) {
+  const user_id = req.user.userId; // Extract user ID from token
+
+  const { buddies_id } = req.body;
+
+  try {
+    // Check if the buddy relationship already exists
+    const [existReply] = await pool.execute(
+      `SELECT * FROM buddies WHERE user_id = ? AND buddies_id = ?`,
+      [user_id, buddies_id]
+    );
+
+    if (existReply.length > 0) {
+      return res.status(409).json({
+        message: "Buddy relationship already exists",
+        data: {
+          user_id,
+          buddies_id,
+        },
+      });
+    }
+
+    // Insert the buddy relationship if it doesn't exist
+    await pool.execute(
+      `INSERT INTO buddies (user_id, buddies_id) VALUES (?, ?)`,
+      [user_id, buddies_id]
+    );
+
+    await pool.execute(
+      `INSERT INTO followers (follower_id, followee_id) VALUES (?, ?)`,
+      [user_id, buddies_id]
+    );
+
+    return res.status(200).json({
+      message: "Buddies and followers added successfully",
+      data: {
+        user_id,
+        buddies_id,
+      },
+    });
+  } catch (error) {
+    console.error("Error in addBuddies:", { error, user_id, buddies_id });
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+}
+
+
 module.exports = {
   registerUser,
   sendOTP,
@@ -1273,5 +1451,6 @@ module.exports = {
   logOut,
   addSearch,
   updateFollowSelect,
-  onlineFriends
+  onlineFriends,
+  addBuddies
 };
