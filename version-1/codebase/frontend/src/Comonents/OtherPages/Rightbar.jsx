@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Girl from "../../assets/headerIcon/girl.jpg";
 import Boy1 from "../../assets/headerIcon/boy1.png";
 import Boy2 from "../../assets/headerIcon/boy2.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import dummyUserImage from "../../assets/user_image-removebg-preview.png";
 import { useNavigate } from "react-router-dom";
+import { addBuddy, getUserBuddies, getUserFollowers, toWhomUserIsFollowing } from "../../redux/slices/authSlice";
+import { followUnfollow, followUnfollowOnFollowing } from "../../redux/slices/postSlice";
 
 const Rightbar = () => {
   const navigate = useNavigate();
@@ -12,6 +14,14 @@ const Rightbar = () => {
 
  const { userBuddies, user: userDetails, userPosts, userFollowers, toWhomUserFollows } = useSelector((state) => state.auth);
 
+ useEffect(()=> {
+  if(!toWhomUserFollows) {
+    dispatch(toWhomUserIsFollowing())
+  }
+  if(!userBuddies) {
+    dispatch(getUserBuddies());
+  }
+ },[dispatch]);
 
   const [buddies, setbuddies] = useState([
     {
@@ -156,14 +166,22 @@ const Rightbar = () => {
   // Show only first 9 posts or all posts based on state
   // const visiblePostsbuddies = showAllbuddies ? buddies : buddies.slice(0, 3);
   const visiblePostsbuddies = showAllbuddies ? (userBuddies ? userBuddies : []) : userBuddies ? userBuddies.slice(0, 3) : [];
+  console.log("====userBuddies===", userBuddies);
+  // const visiblePostsfollowes = showAllfollowers
+  //   ? followers
+  //   : followers.slice(0, 3);
 
   const visiblePostsfollowes = showAllfollowers
-    ? followers
-    : followers.slice(0, 3);
+    ? (userFollowers ? userFollowers : [])
+    : ( userFollowers ? userFollowers.slice(0, 3) : []);
+
+  // const visiblePostsfollowing = showAllfollowing
+  //   ? following
+  //   : following.slice(0, 3);
 
   const visiblePostsfollowing = showAllfollowing
-    ? following
-    : following.slice(0, 3);
+    ? (toWhomUserFollows ? toWhomUserFollows : [])
+    : ( toWhomUserFollows ? toWhomUserFollows.slice(0, 3) : []);
 
 
 
@@ -178,6 +196,45 @@ const Rightbar = () => {
     const handleAllFollowing = () =>{
       navigate("/following")
     } 
+
+  // to follow and unfollow a user in follower section
+  const handleFollowUnfollow = async(followeeID) => {
+    try {
+      const followUnfollowResponse = await dispatch(followUnfollow(followeeID)).unwrap();
+      if(followUnfollowResponse) {
+        await dispatch(getUserFollowers());
+        await dispatch(toWhomUserIsFollowing());
+      }
+    } catch (error) {
+      console.log("==error in handleFollowUnfollow==", error);
+    }
+  }
+
+  // to follow unfollow user in following section
+  const handleFollowUnfollowForFollowing = async(followeeID) => {
+    try {
+      const followUnfollowResponse = await dispatch(followUnfollowOnFollowing(followeeID)).unwrap();
+      if(followUnfollowResponse) {
+        await dispatch(getUserFollowers());
+        await dispatch(toWhomUserIsFollowing());
+      }
+    } catch (error) {
+      console.log("==error in handleFollowUnfollowForFollowing==", error);
+    }
+  } 
+
+  // handle add buddy
+const handleAddBuddy = async(buddyId) => {
+  try {
+    const response = await dispatch(addBuddy(buddyId));
+    if(response) {
+      await dispatch(getUserFollowers());
+      await dispatch(getUserBuddies());
+    }
+  } catch (error) {
+    console.log("==error in handleAddBuddy==", error);
+  }
+}
 
   return (
     <>
@@ -219,7 +276,7 @@ const Rightbar = () => {
               {/* Buttons */}
               <div className="flex items-center space-x-2">
                 <button className="w-[76px] h-[36px] text-[14px] text-[#2DC6BE] border border-[#2DC6BE] rounded-[4px] font-medium ">
-                  {buddy.follow}
+                {buddy.is_buddies === 0 ? "Follow" : "Following"}
                 </button>
                 <button className="w-[36px] h-[36px] text-[20px] text-[#2DC6BE] border border-[#2DC6BE] rounded-[4px] font-medium flex items-center justify-center">
                   <svg
@@ -247,7 +304,7 @@ const Rightbar = () => {
       <div className="w-[340px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] p-4 px-4 mb-4">
         <div className="flex justify-between items-center mb-2">
           <h2 className="font-poppins font-semibold text-[20px] text-[#212626]">
-            Followers ({followers.length})
+            Followers ({userFollowers ? userFollowers.length : "0"})
           </h2>
           <p
             onClick={handleAllFollowers}
@@ -258,23 +315,23 @@ const Rightbar = () => {
         </div>
         {/* User List */}
         <div className="mt-4 space-y-4">
-          {visiblePostsfollowes.map((buddy) => (
-            <div key={buddy.id} className="flex items-center justify-between">
+          {visiblePostsfollowes.map((follower) => (
+            <div key={`${follower.id}_follower`} className="flex items-center justify-between">
               {/* User Info */}
               <div className="flex items-center space-x-3">
                 <img
-                  src={buddy.image}
-                  alt={buddy.name}
+                  src={follower.profile_image || dummyUserImage}
+                  alt={'Profile'}
                   className="w-[44px] h-[44px] rounded-full object-cover"
                 />
                 <div>
                   <p className="font-inter font-medium text-[16px] text-[#212626] text-left">
-                    {buddy.name}
+                    {follower.full_name}
                   </p>
                   <p className="font-inter font-medium text-[14px] text-[#667877] text-left">
-                    {buddy.handle.length > 9
-                      ? `${buddy.handle.slice(0, 9)}...`
-                      : buddy.handle}
+                  {follower.user_name ? follower.user_name.length > 9
+                      ? `@${follower.user_name.slice(0, 9)}...`
+                      : `@${follower.user_name}` : ""}
                   </p>
                 </div>
               </div>
@@ -283,19 +340,22 @@ const Rightbar = () => {
               <div className="flex items-center space-x-2">
                 <button
                   className={`w-[76px] h-[36px] text-[14px] border rounded-[4px] font-medium ${
-                    buddy.follow === "Follow"
+                    follower.is_mutual == 0
                       ? "bg-[#2DC6BE] text-white border-[#2DC6BE]"
                       : "text-[#2DC6BE] border-[#2DC6BE]"
                   }`}
+                // onClick={() => handleFollowUnfollow(follower?.id)}
+                onClick={follower.is_mutual === 1 ? () => handleFollowUnfollow(follower?.id) : () =>handleFollowUnfollowForFollowing(follower?.id) }
                 >
-                  {buddy.follow}
+                  {follower.is_mutual !== 0 ? "Following" : "Follow"}
                 </button>
                 <button
                   className={`w-[36px] h-[36px] text-[20px] text-sm border rounded-[4px] font-medium bg-[#2DC6BE] text-white border-[#2DC6BE] flex items-center justify-center ${
-                    buddy.follow === "Follow"
+                    follower.is_mutual !== 0
                       ? "bg-[#2DC6BE] text-white border-[#2DC6BE]"
                       : "text-[#2DC6BE] border-[#2DC6BE]"
                   }`}
+                onClick={() => handleAddBuddy(follower?.id)}
                 >
                   <svg
                     width="14"
@@ -322,7 +382,7 @@ const Rightbar = () => {
       <div className="w-[340px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] p-4 px-4 mb-4">
         <div className="flex justify-between items-center mb-2">
           <h2 className="font-poppins font-semibold text-[20px] text-[#212626]">
-            Following ({following.length})
+            Following ({toWhomUserFollows ? toWhomUserFollows.length : "0"})
           </h2>
           <p
              onClick={handleAllFollowing}
@@ -333,23 +393,23 @@ const Rightbar = () => {
         </div>
         {/* User List */}
         <div className="mt-4 space-y-4">
-          {visiblePostsfollowing.map((buddy) => (
-            <div key={buddy.id} className="flex items-center justify-between">
+          {visiblePostsfollowing.map((userFollowing) => (
+            <div key={`${userFollowing.id}_following`} className="flex items-center justify-between">
               {/* User Info */}
               <div className="flex items-center space-x-3">
                 <img
-                  src={buddy.image}
-                  alt={buddy.name}
+                  src={userFollowing.profile_image || dummyUserImage}
+                  alt={'Profile'}
                   className="w-[44px] h-[44px] rounded-full object-cover"
                 />
                 <div>
                   <p className="font-inter font-medium text-[16px] text-[#212626] text-left">
-                    {buddy.name}
+                    {userFollowing.full_name}
                   </p>
                   <p className="font-inter font-medium text-[14px] text-[#667877] text-left">
-                    {buddy.handle.length > 9
-                      ? `${buddy.handle.slice(0, 9)}...`
-                      : buddy.handle}
+                  {userFollowing.user_name ? userFollowing.user_name.length > 9
+                      ? `@${userFollowing.user_name.slice(0, 9)}...`
+                      : `@${userFollowing.user_name}` : ""}
                   </p>
                 </div>
               </div>
@@ -358,16 +418,17 @@ const Rightbar = () => {
               <div className="flex items-center space-x-2">
                 <button
                   className={`w-[76px] h-[36px] text-[14px] border rounded-[4px] font-medium ${
-                    buddy.follow === "Follow"
+                    userFollowing.is_mutual === 0
                       ? "bg-[#2DC6BE] text-white border-[#2DC6BE]"
                       : "text-[#2DC6BE] border-[#2DC6BE]"
                   }`}
+                  onClick={() => handleFollowUnfollowForFollowing(userFollowing.id)}
                 >
-                  {buddy.follow}
+                  {userFollowing.is_mutual === 0 ? "Follow" : "Following"}
                 </button>
                 <button
                   className={`w-[36px] h-[36px] text-[16px] border rounded-[4px] font-medium bg-[#2DC6BE] text-white border-[#2DC6BE] flex items-center justify-center ${
-                    buddy.follow === "Follow"
+                    userFollowing.follow === 0
                       ? "bg-[#2DC6BE] text-white border-[#2DC6BE]"
                       : "text-[#2DC6BE] border-[#2DC6BE]"
                   }`}

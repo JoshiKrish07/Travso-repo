@@ -623,6 +623,7 @@ const handleCoverUpload = async (e) => {
                 value={formData?.description || ''}
                 onChange={handleInputChange}
                 name="description"
+                maxLength={300}
                 className="rounded-[8px] px-4 py-2 w-full h-[132px] focus:outline-none focus:ring-2 focus:ring-blue-500 bg-[#F0F7F7] placeholder:text-[#869E9D] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]"
               ></textarea>
                 {formDataError.description && <p className="error text-left text-[#ff0000] text-sm">{formDataError.description}</p>}

@@ -3,14 +3,14 @@ import React, { useState, useEffect, useRef } from "react";
 import Girl from "../../../assets/headerIcon/girl.jpg";
 import chevron_down from "../../../assets/chevron-down.png";
 import ImageBoxed from "../../../assets/ImageBoxed.png";
+import image_add_logo from "../../../assets/image_add_logo.png";
 import BadgesIconFirst from "../../../assets/BadgesIconFirst.png";
 import Select from "react-select";
-import "./AllPopupPage.css"
+import "./AllPopupPage.css";
 import { useDispatch, useSelector } from "react-redux";
 import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
 import PostDetailPopup from "./PostDetailPopup";
 import { fetchCities } from "../../../redux/slices/stateCitySlice";
-
 
 const options = [
   { value: "chocolate", label: "Chocolate" },
@@ -18,11 +18,19 @@ const options = [
   { value: "vanilla", label: "Vanilla" },
 ];
 
-const CreateaPostPopup = ({ isOpen, onClose, openPostDetail, postData, setPostData }) => {
+const CreateaPostPopup = ({
+  isOpen,
+  onClose,
+  openPostDetail,
+  postData,
+  setPostData,
+}) => {
   const dispatch = useDispatch();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Select View");
-  const [wordsCount, setWordsCount] = useState(postData?.description.length || 0);
+  const [wordsCount, setWordsCount] = useState(
+    postData?.description.length || 0
+  );
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
   const [showTagBuddySuggestions, setShowBuddyTagSuggestions] = useState(false);
   const [buddyInput, setBuddyInput] = useState("");
@@ -32,24 +40,21 @@ const CreateaPostPopup = ({ isOpen, onClose, openPostDetail, postData, setPostDa
   const [isPostDetailPopup, setIsPostDetailPopup] = useState(false);
   const fileInputRef = useRef(null); // Create a ref for the file input
 
-  const validate = async() => {
+  const validate = async () => {};
 
-  }
-
-  const handlePostUpload = async() => {
+  const handlePostUpload = async () => {
     console.log("running");
-    const isValid = await validate()
+    const isValid = await validate();
     onClose();
     // setIsPostDetailPopup(true);
     openPostDetail();
-  }
+  };
 
-  const handlePostDetailPopup = () =>{
-    setIsPostDetailPopup(false)
+  const handlePostDetailPopup = () => {
+    setIsPostDetailPopup(false);
     isOpen();
-  }
+  };
 
-  
   /* user details from auth slice */
   const { user: userDetails, userBuddies } = useSelector((state) => state.auth);
 
@@ -64,46 +69,42 @@ const CreateaPostPopup = ({ isOpen, onClose, openPostDetail, postData, setPostDa
   //   buddies_id: []
   // });
 
-
   const handleLocationChange = (selectedOption) => {
     console.log("Selected:", selectedOption);
   };
-
 
   /* handle buddy tag */
   const handleBuddyTag = (e) => {
     const { value } = e.target;
     const match = value.match(/@(\w*)$/); // Match word after @
     setBuddyInput(value);
-    if(match) {
-        const query = match[1].toLowerCase();
-        const filtered = userBuddies.filter((person) =>
-            person.full_name.toLowerCase().includes(query)
-        );
-        setFilteredSuggestions(filtered);
-        setShowBuddyTagSuggestions(filtered.length > 0);
+    if (match) {
+      const query = match[1].toLowerCase();
+      const filtered = userBuddies.filter((person) =>
+        person.full_name.toLowerCase().includes(query)
+      );
+      setFilteredSuggestions(filtered);
+      setShowBuddyTagSuggestions(filtered.length > 0);
     } else {
-        setShowBuddyTagSuggestions(false);
+      setShowBuddyTagSuggestions(false);
     }
-  }
+  };
 
   /* handle public and private account choose */
   const handleOption = (option) => {
-
-    if(option === "public") {
-        setPostData((prev) => ({
-            ...prev,
-            "is_public": true
-        }));
-    } 
-    else if(option === "private") {
-        setPostData((prev) => ({
-            ...prev,
-            "is_public": false
-        }));
+    if (option === "public") {
+      setPostData((prev) => ({
+        ...prev,
+        is_public: true,
+      }));
+    } else if (option === "private") {
+      setPostData((prev) => ({
+        ...prev,
+        is_public: false,
+      }));
     }
-    
-    setDropdownOpen(false); 
+
+    setDropdownOpen(false);
   };
 
   // Disable body scroll when popup is open
@@ -118,33 +119,37 @@ const CreateaPostPopup = ({ isOpen, onClose, openPostDetail, postData, setPostDa
     };
   }, [isOpen]);
 
-
   /* handle description change value and show words count*/
   const handleDescriptionChange = (e) => {
     const { value } = e.target;
     setWordsCount(value.length);
 
     setPostData((prev) => ({
-        ...prev,
-        'description': value
+      ...prev,
+      description: value,
     }));
-  }
+  };
 
   const handleSuggestionClick = (person) => {
     // Add selected buddy to postData.buddies
     setPostData((prevData) => {
-      const isAlreadyAdded = prevData.buddies.some((buddy) => buddy.id === person.id);
+      const isAlreadyAdded = prevData.buddies.some(
+        (buddy) => buddy.id === person.id
+      );
       if (isAlreadyAdded) return prevData; // Avoid duplicates
       return {
         ...prevData,
-        buddies: [...prevData.buddies, { id: person.id, name: person.full_name }],
+        buddies: [
+          ...prevData.buddies,
+          { id: person.id, name: person.full_name },
+        ],
         buddies_id: [...prevData.buddies_id, person.id], // Maintain IDs separately
       };
     });
     setBuddyInput("");
     setShowBuddyTagSuggestions(false);
   };
-  
+
   // Remove buddy from tagged list
   const handleRemoveBuddy = (id) => {
     setPostData((prevData) => ({
@@ -162,42 +167,42 @@ const CreateaPostPopup = ({ isOpen, onClose, openPostDetail, postData, setPostDa
     }));
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("form")
-  }
+    console.log("form");
+  };
 
   /* when user hits enter after writing tag */
-  const handleTagEnter = async(e) => {
-    if(postData?.tags.length > 10) {
+  const handleTagEnter = async (e) => {
+    if (postData?.tags.length > 10) {
       alert("Only 10 tags are acceptable");
       return;
     }
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-    if(!tagInput.includes('#')){
+      if (!tagInput.includes("#")) {
         console.log("need keyword #");
         return;
-    }
-    setPostData((prevData) => {
+      }
+      setPostData((prevData) => {
         const isAlreadyAdded = prevData.tags.some((tag) => tag === tagInput);
         if (isAlreadyAdded) return prevData; // Avoid duplicates
         return {
           ...prevData,
-          tags: [...prevData.tags, tagInput]
+          tags: [...prevData.tags, tagInput],
         };
       });
       setTagInput("");
     }
-  }
+  };
 
-  const handleTagInputChange = async(e) => {
-    if(postData?.tags.length > 10) {
+  const handleTagInputChange = async (e) => {
+    if (postData?.tags.length > 10) {
       alert("Only 10 tags are acceptable");
       return;
     }
     setTagInput(e.target.value);
-  }
+  };
 
   /* for image drag */
   const handleDragOver = (e) => {
@@ -248,7 +253,7 @@ const CreateaPostPopup = ({ isOpen, onClose, openPostDetail, postData, setPostDa
     }
   };
 
-/* for setting image in postData */
+  /* for setting image in postData */
   const handleFileSelect = (files) => {
     const file = files[0];
     const reader = new FileReader();
@@ -266,7 +271,7 @@ const CreateaPostPopup = ({ isOpen, onClose, openPostDetail, postData, setPostDa
 
   // Remove image from media_url
   const handleRemoveImage = (index) => {
-    console.log("=====index====>",index);
+    console.log("=====index====>", index);
     setPostData((prevState) => {
       const newMediaUrl = prevState.media_url.filter((_, i) => i !== index);
       return {
@@ -334,7 +339,7 @@ const CreateaPostPopup = ({ isOpen, onClose, openPostDetail, postData, setPostDa
                   className="flex items-center justify-center w-[120px] h-[24px] bg-[#FFFFFF] border border-[#D5D5D5] text-[#6D6D6D] font-normal text-[14px] rounded-full focus:outline-none"
                   onClick={() => setDropdownOpen((prev) => !prev)}
                 >
-                  { postData?.is_public ? 'Public' : 'Private' }
+                  {postData?.is_public ? "Public" : "Private"}
                   <img
                     src={chevron_down}
                     alt="Chevron"
@@ -368,82 +373,240 @@ const CreateaPostPopup = ({ isOpen, onClose, openPostDetail, postData, setPostDa
               {/* Input Fields */}
               <div className="flex flex-col">
                 <div className="flex items-center justify-between">
-                <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">Description</p>
-                <p className="text-left font-inter font-medium text-[12px] text-[#869E9D] mb-3">{wordsCount}/300</p>
+                  <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">
+                    Description
+                  </p>
+                  <p className="text-left font-inter font-medium text-[12px] text-[#869E9D] mb-3">
+                    {wordsCount}/300
+                  </p>
                 </div>
                 <textarea
                   placeholder="Your Story in few words..."
                   className="font-inter font-medium text-[16px] text-[#212626] w-full p-3 h-[132px] bg-[#F0F7F7] rounded-[8px] border-1 border-[#F5F5F5] placeholder:text-[#869E9D] focus:outline-none focus:ring-1 focus:ring-[#5E6F78] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]"
                   maxLength="300"
-                  value={postData?.description || ''}
+                  value={postData?.description || ""}
                   onChange={(e) => handleDescriptionChange(e)}
                 ></textarea>
               </div>
 
               <div className="flex flex-col dataSelect">
-                <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">Add Location ( Only one )</p>
-                 <Select options={options} onChange={handleLocationChange} placeholder="eg: Mysore" className="" />
+                <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">
+                  Add Location ( Only one )
+                </p>
+                <Select
+                  options={options}
+                  onChange={handleLocationChange}
+                  placeholder="eg: Mysore"
+                  className=""
+                />
               </div>
 
-              <div className="flex flex-col">
-                <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">Add Buddies</p>
-                
-                <div className="flex flex-wrap gap-2 mb-2">
-                    {postData.buddies.map((buddy) => (
+              {/* <div className="flex flex-col">
+                <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">
+                  Add Buddies
+                </p>
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="eg: @calvin"
+                    className="font-inter font-medium text-[16px] text-[#212626] w-full p-3 h-[48px] bg-[#F0F7F7] rounded-[8px] border border-[#F5F5F5] placeholder:text-[#869E9D] focus:outline-none focus:ring-1 focus:ring-[#5E6F78]"
+                    value={buddyInput}
+                    onChange={(e) => handleBuddyTag(e)}
+                  />
+
+                  {postData.buddies.map((buddy) => (
                     <span
-                        key={buddy.id}
-                        className="inline-flex items-center gap-2 bg-[#E8F5F5] text-[#2DC6BE] px-3 py-1 rounded-full text-sm"
+                      key={buddy.id}
+                      className="absolute left-2 top-2 inline-flex items-center gap-2 bg-[#E8F5F5] text-[#2DC6BE] px-3 py-1 rounded-full text-sm"
                     >
-                        {buddy.name}
-                        <button
-                          onClick={() => handleRemoveBuddy(buddy.id)}
-                          className="text-[#2DC6BE] font-bold"
-                        >
+                      {buddy.name}
+                      <button
+                        onClick={() => handleRemoveBuddy(buddy.id)}
+                        className="text-[#2DC6BE] font-bold"
+                      >
                         &times;
-                        </button>
+                      </button>
                     </span>
-                    ))}
+                  ))}
+
+                  {showTagBuddySuggestions &&
+                    filteredSuggestions.length > 0 && (
+                      <div className="absolute bg-white border border-gray-200 rounded shadow-lg mt-1 w-full z-10">
+                        <ul className="max-h-40 overflow-y-auto">
+                          {filteredSuggestions.map((person) => (
+                            <li
+                              key={person.id}
+                              onClick={() => handleSuggestionClick(person)}
+                              className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                            >
+                              {person.full_name}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                 </div>
+
                 
-                {showTagBuddySuggestions && (
-                    <ul >
+              </div> */}
+
+              {/* Prashant Code Start */}
+              <div className="flex flex-col">
+                <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">
+                  Add Buddies
+                </p>
+
+                <div className="relative flex flex-wrap items-center gap-2 p-2 bg-[#F0F7F7] rounded-[8px] border border-[#F5F5F5]">
+                  {/* Tag Show inside input */}
+                  {postData.buddies.map((buddy) => (
+                    <span
+                      key={buddy.id}
+                      className="inline-flex items-center justify-center gap-2 bg-[#09857E] text-white w-[108px] h-[24px] rounded-[4px] text-[12px] font-inter font-medium "
+                    >
+                      {buddy.name}
+                      <button
+                        onClick={() => handleRemoveBuddy(buddy.id)}
+                        className="text-[#2DC6BE] font-bold"
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M12 4L4 12M4 4L12 12"
+                            stroke="white"
+                            strokeWidth="1.33333"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </button>
+                    </span>
+                  ))}
+
+                  {/* Input Field */}
+                  <input
+                    type="text"
+                    placeholder={
+                      postData.buddies.length === 0 ? "eg: @calvin" : ""
+                    }
+                    className="flex-grow font-inter font-medium text-[16px] text-[#212626] h-[30px] bg-transparent outline-none placeholder:text-[#869E9D] placeholder:font-medium"
+                    value={buddyInput}
+                    onChange={(e) => handleBuddyTag(e)}
+                  />
+                </div>
+
+                {/* Search show dropdown */}
+                {showTagBuddySuggestions && filteredSuggestions.length > 0 && (
+                  <div className="absolute top-[335px] bg-white border border-gray-200 rounded shadow-lg w-[656px] z-10">
+                    <ul className="max-h-40 overflow-y-auto">
                       {filteredSuggestions.map((person) => (
-                        <li key={person.id} onClick={() => handleSuggestionClick(person)}>
+                        <li
+                          key={person.id}
+                          onClick={() => handleSuggestionClick(person)}
+                          className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                        >
                           {person.full_name}
                         </li>
                       ))}
                     </ul>
+                  </div>
                 )}
-                
-                <input
-                  type="text"
-                  placeholder="eg: @calvin"
-                  className="font-inter font-medium text-[16px] text-[#212626] w-full p-3 h-[48px] bg-[#F0F7F7] rounded-[8px] border-1 border-[#F5F5F5] placeholder:text-[#869E9D] focus:outline-none focus:ring-1 focus:ring-[#5E6F78] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]"
-                  value={buddyInput}
-                  onChange={(e) =>  handleBuddyTag(e)}
-                />
               </div>
 
               <div className="flex flex-col">
-                <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">Add Tags (Up to 10)</p>
-                
-                <div className="flex flex-wrap gap-2 mb-2">
-                    {postData.tags.map((tag) => (
+                <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">
+                  Add Tags (Up to 10)
+                </p>
+
+                <div className="relative flex flex-wrap items-center gap-2 p-2 bg-[#F0F7F7] rounded-[8px] border border-[#F5F5F5]">
+                  {/* Tag Show inside input */}
+                  {postData.tags.map((tag) => (
                     <span
-                        key={tag}
-                        className="inline-flex items-center gap-2 bg-[#E8F5F5] text-[#2DC6BE] px-3 py-1 rounded-full text-sm"
+                      key={tag}
+                      className="absolute left-2 inline-flex items-center justify-center gap-2 bg-[#09857E] text-white w-[108px] h-[24px] rounded-[4px] text-[12px] font-inter font-medium "
                     >
-                        {tag}
-                        <button
-                          onClick={() => handleRemoveTag(tag)}
-                          className="text-[#2DC6BE] font-bold"
+                      {tag}
+                      <button
+                        onClick={() => handleRemoveTag(tag)}
+                        className="text-[#2DC6BE] font-bold"
+                      >
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
                         >
-                        &times;
-                        </button>
+                          <path
+                            d="M12 4L4 12M4 4L12 12"
+                            stroke="white"
+                            strokeWidth="1.33333"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </button>
                     </span>
-                    ))}
+                  ))}
+
+                  <input
+                    type="text"
+                    onKeyDown={(e) => handleTagEnter(e)}
+                    onChange={(e) => handleTagInputChange(e)}
+                    placeholder={
+                      postData.tags.length === 0 ? "eg: #travel" : ""
+                    }
+                    value={tagInput}
+                    className="flex-grow font-inter font-medium text-[16px] text-[#212626] w-full p-3 h-[48px] bg-[#F0F7F7] rounded-[8px] border-1 border-[#F5F5F5] placeholder:text-[#869E9D] focus:outline-none focus:ring-1 focus:ring-[#5E6F78] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]"
+                  />
                 </div>
-                
+
+                {/* Search show dropdown */}
+                {showTagBuddySuggestions && filteredSuggestions.length > 0 && (
+                  <div className="absolute top-[335px] bg-white border border-gray-200 rounded shadow-lg w-[656px] z-10">
+                    <ul className="max-h-40 overflow-y-auto">
+                      {filteredSuggestions.map((person) => (
+                        <li
+                          key={person.id}
+                          onClick={() => handleSuggestionClick(person)}
+                          className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                        >
+                          {person.full_name}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+              {/* Prashant Code End */}
+
+              {/* <div className="flex flex-col">
+                <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">
+                  Add Tags (Up to 10)
+                </p>
+
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {postData.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-2 bg-[#E8F5F5] text-[#2DC6BE] px-3 py-1 rounded-full text-sm"
+                    >
+                      {tag}
+                      <button
+                        onClick={() => handleRemoveTag(tag)}
+                        className="text-[#2DC6BE] font-bold"
+                      >
+                        &times;
+                      </button>
+                    </span>
+                  ))}
+                </div>
+
                 <input
                   type="text"
                   onKeyDown={(e) => handleTagEnter(e)}
@@ -452,7 +615,7 @@ const CreateaPostPopup = ({ isOpen, onClose, openPostDetail, postData, setPostDa
                   value={tagInput}
                   className="font-inter font-medium text-[16px] text-[#212626] w-full p-3 h-[48px] bg-[#F0F7F7] rounded-[8px] border-1 border-[#F5F5F5] placeholder:text-[#869E9D] focus:outline-none focus:ring-1 focus:ring-[#5E6F78] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]"
                 />
-              </div>
+              </div> */}
 
               {/* <div className="font-inter font-medium text-[16px] text-[#869E9D] w-full p-3 h-[133px] bg-[#F0F7F7] rounded-[8px] border-1 border-[#F5F5F5] placeholder:text-[#869E9D] focus:outline-none focus:ring-1 focus:ring-[#5E6F78] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]">
                 <div className="flex flex-col items-center justify-center gap-2">
@@ -470,71 +633,105 @@ const CreateaPostPopup = ({ isOpen, onClose, openPostDetail, postData, setPostDa
                 </div>
               </div> */}
 
-      <div
-        className="font-inter font-medium text-[16px] text-[#869E9D] w-full p-3 h-[133px] bg-[#F0F7F7] rounded-[8px] border-1 border-[#F5F5F5] placeholder:text-[#869E9D] focus:outline-none focus:ring-1 focus:ring-[#5E6F78] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]"
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-      >
-      <div className="flex flex-col items-center justify-center gap-2">
-        <div className="cursor-pointer">
-          {postData.media_url.length > 0 ? (
-            <div className="flex gap-2">
-              {postData.media_url.map((url, index) => (
-                <div key={index} className="relative inline-block">
-                 <img key={index} src={url} alt={`Uploaded ${index}`} className="w-[32px] h-[32px]" />
-                 {/* Cancel button */}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveImage(index)}
-                    className="absolute top-0 right-0 text-red-500 p-1"
-                  >
-                    cancel
-                  </button>
+              <div
+                className="font-inter font-medium text-[16px] text-[#869E9D] w-full p-3 h-[133px] bg-[#F0F7F7] rounded-[8px] border-1 border-[#F5F5F5] placeholder:text-[#869E9D] focus:outline-none focus:ring-1 focus:ring-[#5E6F78] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]"
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+              >
+                <div className={`flex flex-col ${postData.media_url.length > 0 ? "items-start": "items-center" } justify-center gap-2`}>
+                  <div className="cursor-pointer flex flex-col items-center">
+                    {postData.media_url.length > 0 ? (
+                      <div className="flex gap-2">
+                        {postData.media_url.map((url, index) => (
+                          <div
+                            key={index}
+                            className="relative inline-block items-start"
+                          >
+                            <img
+                              key={index}
+                              src={url}
+                              alt={`Uploaded ${index}`}
+                              className="w-[100px] h-[110px] object-cover"
+                            />
+                            {/* Cancel button */}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(index)}
+                              className="absolute top-0 right-0 bg-[#2dc6be] p-1 rounded-l-[8px] rounded-t-[0px]"
+                            >
+                              <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M12 4L4 12M4 4L12 12"
+                                  stroke="white"
+                                  strokeWidth="1.33333"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={handleClick}
+                          className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[100px] h-[112px]"
+                        >
+                          <img
+                            src={image_add_logo}
+                            alt="image_add_logo"
+                            className=""
+                            />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <img
+                          src={ImageBoxed}
+                          alt=""
+                          className="w-[32px] h-[32px]"
+                        />
+                        <div className="flex flex-col items-center justify-center gap-3">
+                          <h2 className="font-inter font-medium text-[14px] text-[#212626]">
+                            Drag and drop Images or,
+                          </h2>
+                          <button
+                            type="button"
+                            onClick={handleClick}
+                            className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[82px] h-[36px]"
+                          >
+                            Browse
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
-              ))}
-              <button
-                  type="button"
-                  onClick={handleClick}
-                  className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[82px] h-[36px]"
-                >
-                  Add
-                </button>
-            </div>
-          ) : (
-            <>
-                <img src={ImageBoxed} alt="" className="w-[32px] h-[32px]" />
-                <div className="flex flex-col items-center justify-center gap-3">
-                <h2 className="font-inter font-medium text-[14px] text-[#212626]">
-                  Drag and drop Images or,
-                </h2>
+
+                {/* Hidden file input */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                  accept="image/*"
+                  multiple // Allows multiple file selection
+                />
+              </div>
+
+              <div className="mt-4 flex justify-end">
                 <button
                   type="button"
-                  onClick={handleClick}
                   className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[82px] h-[36px]"
+                  onClick={() => handlePostUpload()}
                 >
-                  Browse
+                  Next
                 </button>
-                </div>
-            </>
-          )}
-        </div>
-        
-      </div>
-
-      {/* Hidden file input */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        className="hidden"
-        accept="image/*"
-        multiple // Allows multiple file selection
-      />
-    </div>
-
-              <div className="mt-4 flex justify-end" >
-                <button type="button" className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[82px] h-[36px]" onClick={() => handlePostUpload()}>Next</button>
-                
               </div>
               {/* {
                 isPostDetailPopup && (

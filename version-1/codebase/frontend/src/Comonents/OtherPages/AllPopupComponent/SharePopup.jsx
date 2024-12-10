@@ -4,9 +4,19 @@ import Boy1 from "../../../assets/headerIcon/boy1.png";
 import Girl from "../../../assets/headerIcon/girl.jpg";
 import SearchIcon from "@mui/icons-material/Search";
 import "../Header.css";
+import { useDispatch, useSelector } from "react-redux";
+import { SharePostWithFriends } from "../../../redux/slices/postSlice";
+import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
 
-const SharePopup = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
+
+const SharePopup = ({ isOpen, onClose, postId }) => {
+
+  const dispatch = useDispatch();
+  const { userBuddies } = useSelector((state) => state.auth);
+  const [shareIds, setShareIds] = useState([]);
+  const [thought, setThought] = useState("");
+  const [buddieList, setBuddieList] = useState(userBuddies);
+  // console.log("====userBuddies on sharepopup====>", userBuddies);
 
   const data = [
     { id: 1, src: Boy1, label: "Arjun Kumar" },
@@ -31,6 +41,69 @@ const SharePopup = ({ isOpen, onClose }) => {
     { id: 20, src: Girl, label: "Pooja Iyer" },
   ];
 
+  // select the people to share post with
+  const handleSelect = (id) => {
+    
+    setShareIds((prevShareIds) => {
+      if (prevShareIds.includes(id)) {
+        // Remove the id if it already exists
+        return prevShareIds.filter((shareId) => shareId !== id);
+      } else {
+        // Add the id if it doesn't exist
+        return [...prevShareIds, id];
+      }
+    });
+  };
+
+  // to set thoughts
+  const handleInputChange = (e) => {
+    setThought(e.target.value);
+  };
+
+  // to share post with friends
+  const handleShare = async() => {
+    try {
+      const shareData = {
+        'post_id': postId,
+        'shared_to_id': shareIds,
+        'thoughts': thought
+      }
+
+      const response = await dispatch(SharePostWithFriends(shareData)).unwrap();
+      if(response) onClose();
+
+    } catch (error) {
+      console.log("===error in handleShare==>", error);
+    }
+  }
+
+  // for seacrhing buddies
+  const handleBuddiesData = (e) => {
+    const {value} = e.target;
+    if(value.trim()) {
+      const searchResult = userBuddies ? userBuddies.filter((buddy) => buddy.full_name.toLowerCase().includes(value.toLowerCase())) : [];
+      setBuddieList(searchResult);
+    } else {
+      setBuddieList(userBuddies);
+    }
+  }
+
+  // to copy link to clipboard
+  const copyLinkToClipBoard = async() => {
+    const text = "hello world";
+
+    await navigator.clipboard.writeText(text)
+        .then(() => {
+            console.log('Text successfully copied to clipboard');
+        })
+        .catch((err) => {
+            console.error('Failed to copy text: ', err);
+        });
+
+  }
+
+  if (!isOpen) return null;
+
   return (
     <div className="fixed top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.15)] flex items-center justify-center z-50">
       <div className="bg-white rounded-[16px] shadow-lg w-[696px] px-5 py-5 md:w-[696px] h-[660px] flex flex-col overflow-hidden">
@@ -54,21 +127,52 @@ const SharePopup = ({ isOpen, onClose }) => {
               type="text"
               placeholder="Search..."
               className="w-full h-[48px] pl-12 pr-4 py-2 rounded-full bg-gray-100 border-gray-300 focus:ring-2 focus:ring-[#FFFFFF] outline-none placeholder:text-sm"
+              onChange={(e) => handleBuddiesData(e)}
             />
             <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
               <SearchIcon />
             </span>
           </div>
           <div className="grid grid-cols-5 gap-4">
-            {data.map((item) => (
-              <div key={item.id} className="flex flex-col items-center">
+            {buddieList && buddieList.map((item) => (
+              <div
+                key={item.id}
+                className="relative flex flex-col items-center"
+                onClick={() => handleSelect(item.id)}
+              >
+                 {shareIds.includes(item.id) && (
+                <div className="absolute top-4 right-4 flex items-center gap-[8px]">
+                  <div
+                    className={`relative h-6 w-6 rounded-full border-2 cursor-pointer flex items-center justify-center ${
+                      shareIds.includes(item.id)
+                        ? "bg-[#2DC6BE] border-[#2DC6BE]"
+                        : "bg-white border-gray-300"
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent triggering the parent onClick
+                      handleSelect(item.id); // Handle checkbox selection
+                    }}
+                  >
+                    {shareIds.includes(item.id) && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="white"
+                        className="h-5 w-5"
+                      >
+                        <path d="M9 16.17l-3.59-3.58L4 14l5 5 10-10-1.41-1.42L9 16.17z" />
+                      </svg>
+                    )}
+                  </div>
+                </div>
+                )}
                 <img
-                  src={item.src}
-                  alt={item.label}
+                  src={item.profile_image || dummyUserImage}
+                  alt={'Profile'}
                   className="w-[96px] h-[96px] rounded-full border-2 border-gray-300 object-cover"
                 />
                 <p className="font-inter font-medium text-[14px] mt-2 text-[#212626]">
-                  {item.label}
+                  {item.full_name}
                 </p>
               </div>
             ))}
@@ -80,14 +184,15 @@ const SharePopup = ({ isOpen, onClose }) => {
             type="text"
             placeholder="Add your thoughts..."
             className="w-full h-[48px] pl-5 pr-4 py-2 rounded-[8px] bg-gray-100 border-gray-300 focus:ring-2 focus:ring-[#FFFFFF] outline-none placeholder:text-[16px] placeholder:font-inter placeholder:font-medium"
+            onChange={(e) => handleInputChange(e)}
           />
 
           <div className="flex items-center justify-between gap-10">
-            <button className="rounded-[8px] border border-[#F0F7F7] bg-[#F0F7F7] p-[12px] w-full font-inter font-medium text-[16px] text-[#2DC6BE] hover:bg-teal-400 hover:text-white">
+            <button className="rounded-[8px] border border-[#F0F7F7] bg-[#F0F7F7] p-[12px] w-full font-inter font-medium text-[16px] text-[#2DC6BE] hover:bg-teal-400 hover:text-white" onClick={() => copyLinkToClipBoard()}>
               Copy link
             </button>
-            <button className="rounded-[8px] border border-[#F0F7F7] bg-[#F0F7F7] p-[12px] w-full font-inter font-medium text-[16px] text-[#2DC6BE] hover:bg-teal-400 hover:text-white">
-            Share
+            <button className="rounded-[8px] border border-[#F0F7F7] bg-[#F0F7F7] p-[12px] w-full font-inter font-medium text-[16px] text-[#2DC6BE] hover:bg-teal-400 hover:text-white" onClick={() => handleShare()}>
+              Share
             </button>
           </div>
         </div>

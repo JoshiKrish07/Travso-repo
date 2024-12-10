@@ -337,7 +337,67 @@ export const likeUnlikeAnyReply = createAsyncThunk(
   }
 );
 
+// Thunk for SharePostWithFriends details
+export const SharePostWithFriends = createAsyncThunk(
+  'post/SharePostWithFriends',
+  async (shareData,{ rejectWithValue }) => {
+    try {
+  
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/share-post`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(shareData)
+      });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in SharePostWithFriends===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in SharePostWithFriends call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Thunk for followUnfollowOnFollowing details
+export const followUnfollowOnFollowing = createAsyncThunk(
+  'post/followUnfollowOnFollowing',
+  async (followeeId,{ rejectWithValue }) => {
+    try {
+      
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/follow-unfollow-following`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 'follwee_id': followeeId})
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in followUnfollowOnFollowing===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in followUnfollowOnFollowing call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 
 const postSlice = createSlice({
@@ -476,6 +536,30 @@ const postSlice = createSlice({
         state.loading = false;
       })
       .addCase(followUnfollow.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle followUnfollow
+      .addCase(followUnfollowOnFollowing.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(followUnfollowOnFollowing.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(followUnfollowOnFollowing.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle SharePostWithFriends
+      .addCase(SharePostWithFriends.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(SharePostWithFriends.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(SharePostWithFriends.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

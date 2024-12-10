@@ -775,6 +775,38 @@ export const updateSelectFollow =  createAsyncThunk(
   }
 );
 
+// Thunk for addBuddy details
+export const addBuddy = createAsyncThunk(
+  'auth/addBuddy',
+  async (buddyId,{ rejectWithValue }) => {
+    try {
+      
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/auth/add-buddy`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 'buddies_id': buddyId})
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in addBuddy===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in addBuddy call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
 
 const authSlice = createSlice({
   name: 'auth',
@@ -1124,6 +1156,18 @@ const authSlice = createSlice({
         state.suggestionList = action.payload.data;
       })
       .addCase(getSuggestionList.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle addBuddy
+      .addCase(addBuddy.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addBuddy.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(addBuddy.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

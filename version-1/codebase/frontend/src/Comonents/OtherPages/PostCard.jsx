@@ -76,7 +76,7 @@ const PostCard = () => {
   };
 
   const handleLikeUnlike = async (postId) => {
-    console.log("====postId====>", postId);
+   
     try {
       const likeUnlikeResult = await dispatch(
         LikeUnlikePost({ post_id: postId })
@@ -230,6 +230,42 @@ const PostCard = () => {
     }
   }
 
+  // to close share popup
+  const handleSharePopupClose = () => {
+    setIsSharePopup(false);
+    setActivePostId(null);
+    dispatch(getUserPosts());
+  }
+
+  // to open share popup
+  const handleOpenSharePopup = (postId) => {
+    setActivePostId(postId);
+    setIsSharePopup(true);
+  }
+
+  // to close bucket saved popup
+  const handleBucketSavedPopupClose = () => {
+    setIsCommentWithSavedPopup(false);
+    setActivePostId(null)
+  }
+
+  // to open share popup
+  const handleOpenBucketSavedPopup = (postId) => {
+    setActivePostId(postId);
+    setIsCommentWithSavedPopup(true);
+  }
+
+  // to open comment popup
+  const handleOpenCommentPopup = (postId) => {
+    setActivePostId(postId);
+    setIsCommentPopup(true);
+  }
+
+  // to close comment popup
+  const handleCloseCommentPopup = () => {
+    setIsCommentPopup(false);
+    setActivePostId(null)
+  }
 
   return (
     <>
@@ -511,7 +547,8 @@ const PostCard = () => {
                   <button
                     aria-label="Edit Info"
                     className="flex items-center justify-center w-[144px] h-[36px] bg-[#F0F7F7] text-[#434C50] hover:text-gray-800 py-1 px-2 rounded-full "
-                    onClick={() => setActivePostId(post?.id)}
+                    // onClick={() => setActivePostId(post?.id)}
+                    onClick={() => handleOpenCommentPopup(post?.id)}
                   >
                     <img
                       src={Dialog}
@@ -526,6 +563,8 @@ const PostCard = () => {
                   <button
                     aria-label="Edit Info"
                     className="flex items-center justify-center w-[144px] h-[36px] bg-[#F0F7F7] text-[#434C50] hover:text-gray-800 py-1 px-2 rounded-full relative"
+                    // onClick={() => setIsCommentWithSavedPopup(true)}
+                    onClick={() => handleOpenBucketSavedPopup(post?.id)}
                   >
                     <img
                       src={entypo_bucket}
@@ -540,6 +579,8 @@ const PostCard = () => {
                   <button
                     aria-label="Edit Info"
                     className="flex items-center justify-center w-[144px] h-[36px] bg-[#F0F7F7] text-[#434C50] hover:text-gray-800 py-1 px-2 rounded-full "
+                    // onClick={() => setIsSharePopup(true)}
+                    onClick={() => handleOpenSharePopup(post?.id)}
                   >
                     <img
                       src={send}
@@ -551,13 +592,34 @@ const PostCard = () => {
                     </span>
                   </button>
 
-                  {activePostId === post?.id && (
+                  {activePostId === post?.id && isCommentPopup && (
                     <CommentPopup
-                      isOpen={true}
-                      onClose={() => setActivePostId(null)}
+                      isOpen={isCommentPopup}
+                      onClose={() => handleCloseCommentPopup()}
                       postId={post?.id}
                     />
                   )}
+
+                  {
+                    activePostId === post?.id && isSharePopup && (
+                      <SharePopup
+                        isOpen={isSharePopup}
+                        // onClose={() => setIsSharePopup(false)}
+                        onClose={() => handleSharePopupClose()}
+                        postId={activePostId}
+                      />
+                    )
+                  }
+
+                  {
+                    activePostId === post?.id && isCommentWithSavedPopup && (
+                      <SavedPopup
+                        isOpen={isCommentWithSavedPopup}
+                        // onClose={() => setIsCommentWithSavedPopup(false)}
+                        onClose={() => handleBucketSavedPopupClose()}
+                      />
+                    )
+                  }
                 </div>
                 {/* Bottom Fixed Section */}
               </div>
