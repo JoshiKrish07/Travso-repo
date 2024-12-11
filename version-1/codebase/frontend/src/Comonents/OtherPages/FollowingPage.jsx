@@ -3,8 +3,15 @@ import Header from "./Header";
 import ProfilePageHeaderData from "./ProfilePageHeaderData";
 import FollowingSidebar from "./FollowingSidebar";
 import FollowingPostCard from "./FollowingPostCard";
+import Rightbar from "./Rightbar";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const FollowingPage = () => {
+ const navigate = useNavigate();
+ const { toWhomUserFollows } = useSelector((state) => state.auth);
+
+
   return (
     <>
       <Header />
@@ -17,6 +24,7 @@ const FollowingPage = () => {
             viewBox="0 0 36 36"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            onClick={() => navigate("/profile")}
           >
             <path
               d="M22.5 27L13.5 18L22.5 9"
@@ -26,7 +34,7 @@ const FollowingPage = () => {
               strokeLinejoin="round"
             />
           </svg>
-          Following (32)
+          Following ({toWhomUserFollows ? toWhomUserFollows.length : "0"})
         </p>
         <div className="container mx-auto flex gap-5">
           {/* Main Content */}
@@ -35,7 +43,8 @@ const FollowingPage = () => {
           </div>
           <div className="flex flex-col">
             {/* Sidebar */}
-            <FollowingSidebar />
+            {/* <FollowingSidebar /> */}
+            <Rightbar />
           </div>
         </div>
       </div>

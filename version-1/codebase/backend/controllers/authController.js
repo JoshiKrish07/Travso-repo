@@ -775,11 +775,24 @@ async function getUserBuddies(req, res) {
         u.profile_image,
         u.full_name,
         u.user_name,
+        u.cover_image,
+        u.is_influencer,
+        u.description,
         EXISTS (
           SELECT 1 
           FROM buddies 
           WHERE user_id = u.id AND buddies_id = ?
-        ) AS is_buddies
+        ) AS is_buddies,
+         EXISTS (
+          SELECT 1 
+          FROM followers f1
+          WHERE f1.follower_id = ? AND f1.followee_id = u.id
+        ) 
+        AND EXISTS (
+          SELECT 1
+          FROM followers f2
+          WHERE f2.follower_id = u.id AND f2.followee_id = ?
+        ) AS is_followers
       FROM 
         buddies b
       JOIN 
@@ -794,7 +807,7 @@ async function getUserBuddies(req, res) {
           WHERE user_id = u.id AND buddies_id = ?
         )
       `,
-      [userId, userId, userId] // Pass userId for both user-to-buddy and buddy-to-user checks
+      [userId, userId, userId, userId, userId] // Pass userId for both user-to-buddy and buddy-to-user checks
     );
 
     console.log("===buddies data====>", buddies);
@@ -903,11 +916,23 @@ async function getUserFollower(req , res){
         u.user_name,
         u.full_name,
         u.profile_image,
+        u.cover_image,
+        u.description,
+        u.is_influencer,
         EXISTS (
           SELECT 1 
           FROM followers 
           WHERE follower_id = ? AND followee_id = u.id
-        ) AS is_mutual
+        ) AS is_mutual,
+         EXISTS(
+         SELECT 1
+         FROM buddies b1
+         WHERE b1.user_id = ? AND b1.buddies_id = u.id 
+        ) AND EXISTS(
+          SELECT 1
+          FROM buddies b2
+          WHERE b2.user_id = u.id AND buddies_id = ?
+         ) AS is_buddies
       FROM 
         followers f
       JOIN 
@@ -916,7 +941,7 @@ async function getUserFollower(req , res){
         f.follower_id = u.id
       WHERE 
         f.followee_id = ?
-      ` ,[userId,userId ]
+      ` ,[userId,userId,userId,userId ]
     )
 
     return res.status(200).json({
@@ -983,11 +1008,22 @@ async function toWhomUserFollows(req , res){
         u.user_name,
         u.full_name,
         u.profile_image,
+        u.cover_image,
+        u.is_influencer,
         EXISTS (
           SELECT 1 
           FROM followers 
           WHERE follower_id = ? AND followee_id = u.id
-        ) AS is_mutual
+        ) AS is_mutual,
+         EXISTS(
+         SELECT 1
+         FROM buddies b1
+         WHERE b1.user_id = ? AND b1.buddies_id = u.id 
+        ) AND EXISTS(
+          SELECT 1
+          FROM buddies b2
+          WHERE b2.user_id = u.id AND buddies_id = ?
+         ) AS is_buddies
       FROM 
         followers f
       JOIN 
@@ -996,7 +1032,7 @@ async function toWhomUserFollows(req , res){
         f.followee_id = u.id
       WHERE 
         f.follower_id = ?
-      ` ,[userId,userId ]
+      ` ,[userId,userId, userId,userId ]
     )
 
     return res.status(200).json({
@@ -1399,6 +1435,28 @@ async function addBuddies(req, res) {
       });
     }
 
+    // Check if the follower relationship already exists
+    const [followerExistReply] = await pool.execute(
+      `SELECT * FROM followers WHERE follower_id = ? AND followee_id = ?`,
+      [user_id, buddies_id]
+    );
+
+    if (followerExistReply.length > 0) {
+      // If followers relationship exists, only insert into the buddies table
+      await pool.execute(
+        `INSERT INTO buddies (user_id, buddies_id) VALUES (?, ?)`,
+        [user_id, buddies_id]
+      );
+
+      return res.status(200).json({
+        message: "Buddy relationship added successfully",
+        data: {
+          user_id,
+          buddies_id,
+        },
+      });
+    }
+
     // Insert the buddy relationship if it doesn't exist
     await pool.execute(
       `INSERT INTO buddies (user_id, buddies_id) VALUES (?, ?)`,
@@ -1419,6 +1477,54 @@ async function addBuddies(req, res) {
     });
   } catch (error) {
     console.error("Error in addBuddies:", { error, user_id, buddies_id });
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+}
+
+async function removeBuddy(req, res) {
+  const user_id = req.user.userId; // Extract user ID from token
+  const { buddies_id } = req.params;
+
+  try {
+    // Check if the buddy relationship exists
+    const [existReply] = await pool.execute(
+      `SELECT * FROM buddies WHERE user_id = ? AND buddies_id = ?`,
+      [user_id, buddies_id]
+    );
+
+    if (existReply.length === 0) {
+      return res.status(404).json({
+        message: "Buddy relationship does not exist",
+        data: {
+          user_id,
+          buddies_id,
+        },
+      });
+    }
+
+    // Remove the buddy relationship
+    await pool.execute(
+      `DELETE FROM buddies WHERE user_id = ? AND buddies_id = ?`,
+      [user_id, buddies_id]
+    );
+
+    // Remove the follower relationship
+    await pool.execute(
+      `DELETE FROM followers WHERE follower_id = ? AND followee_id = ?`,
+      [user_id, buddies_id]
+    );
+
+    return res.status(200).json({
+      message: "Buddy and follower relationship removed successfully",
+      data: {
+        user_id,
+        buddies_id,
+      },
+    });
+  } catch (error) {
+    console.error("Error in removeBuddy:", { error, user_id, buddies_id });
     return res.status(500).json({
       message: "Internal Server Error",
     });
@@ -1452,5 +1558,6 @@ module.exports = {
   addSearch,
   updateFollowSelect,
   onlineFriends,
-  addBuddies
+  addBuddies,
+  removeBuddy
 };

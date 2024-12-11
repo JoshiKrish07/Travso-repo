@@ -234,3 +234,40 @@ File destination :- src/Components/OtherPages/SharePopUp.jsx
 -> handleBuddiesData() function :- If user wants to search any particular buddy, then it shows buddy data according to it.
 
 =============================================================================================================================
+
+Right and Left Sidebar of Profile page(components) :-
+
+-> When user clicks on see more posts a new page showing all posts data is shown(which have images only) :-
+  Component Used :- PostDataDetailPage
+  file destination :- src/Components/OtherPages/PostDataDetailPage.jsx (data is shown using userPosts slice)
+
+-> When user clicks on see more buddies :-
+   Component Used :- BuddiesPage.jsx, BuddiesPostCard.jsx
+   file destination :- src/Components/OtherPages/BuddiesPage.jsx
+   file destination :- src/Components/OtherPages/BuddiesPostCard.jsx
+
+   In BuddiesPostCard.jsx :- 
+   handleAddBuddy() function :- It is used to add user as buddy.
+   handleBuddyRemove() function :- It is used to remove user as buddy.
+
+-> When user clicks on see more followers :-
+   Component Used :- FollowersPage.jsx, FollowersPostCard.jsx
+   file destination :- src/Components/OtherPages/FollowersPage.jsx
+   file destination :- src/Components/OtherPages/FollowersPostCard.jsx
+
+   In FollowersPostCard :-
+   handleAddBuddy() function :- It is used to add user as buddy.
+   handleBuddyRemove() function :- It is used to remove user as buddy.
+   handleFollowUnfollow() function :- It is used to follow a user.
+   handleFollowUnfollowForFollowing() :- When user removes a following from its list, That data is not deleted from DB and shows on
+                                          follower list.It is called to follow again.
+
+-> When user clicks on see more followers :-
+   Component Used :- FollowingPage.jsx, FollowingPostCard.jsx
+   file destination :- src/Components/OtherPages/FollowingPage.jsx
+   file destination :- src/Components/OtherPages/FollowingPostCard.jsx
+
+   In FollowingPostCard :-
+   handleAddBuddy() function :- It is used to add user as buddy.
+   handleBuddyRemove() function :- It is used to remove user as buddy.
+   handleFollowUnfollowForFollowing() function :- It is used to follow a user.

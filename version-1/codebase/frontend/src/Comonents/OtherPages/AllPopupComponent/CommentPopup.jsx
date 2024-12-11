@@ -32,7 +32,7 @@ import Send from "../../../assets/Send.png";
 import trash from "../../../assets/trash.png";
 import alert from "../../../assets/alert.png";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserBuddies, getUserDetails, getUserPosts } from "../../../redux/slices/authSlice";
+import { blockAccount, getUserBuddies, getUserDetails, getUserPosts } from "../../../redux/slices/authSlice";
 import {
   commentOnPost,
   commentOnReply,
@@ -543,7 +543,6 @@ const sendReplyComment = async (commentId, postId) => {
 };
 
 const handleCommentImageUpload = async (e) => {
-  console.log("file handleCommentImageUpload===>");
   const file = e.target.files[0];
   console.log("===file===>", file);
   if (file) {
@@ -587,6 +586,21 @@ const handleCommentImageUpload = async (e) => {
     setIsSharePopup(false);
     setActivePostId(null);
     dispatch(getUserPosts());
+  }
+
+  const blockTheUser = async(blockId) => {
+    setOpenDropdownReplyId(null);
+  return;
+    // try {
+    //   console.log("=====blockId===>", blockId);
+    //   const response = await dispatch(blockAccount(blockId)).unwrap();
+    //   console.log("===response===>", response);
+    //   if(response) {
+    //     setOpenDropdownReplyId(null);
+    //   }
+    // } catch (error) {
+    //   console.log("===error in blocktheuser===>", error);
+    // }
   }
 
   if (!isOpen) return null;
@@ -913,6 +927,14 @@ const handleCommentImageUpload = async (e) => {
                                         className="w-[20px] h-[20px] cursor-pointer mr-2"
                                       />{" "}
                                       Delete comment
+                                    </li>
+                                    <li className="px-4 py-2 flex items-center cursor-pointer hover:bg-[#f0f0f0]" onClick={() => blockTheUser(userPosts?.id)}>
+                                      <img
+                                        src={trash}
+                                        alt="alert"
+                                        className="w-[20px] h-[20px] cursor-pointer mr-2"
+                                      />{" "}
+                                      Block Account
                                     </li>
                                   </ul>
                                 </div>

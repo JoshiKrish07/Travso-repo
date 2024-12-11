@@ -5,8 +5,14 @@ import BuddiesSidebar from "./BuddiesSidebar";
 import BuddiesPostCard from "./BuddiesPostCard";
 import FollowersPostCard from "./FollowersPostCard";
 import FollowersSidebar from "./FollowersSidebar";
+import Rightbar from "./Rightbar";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const FollowersPage = () => {
+  const navigate = useNavigate();
+  const { userFollowers } = useSelector((state) => state.auth);
+
   return (
     <>
       <Header />
@@ -19,6 +25,7 @@ const FollowersPage = () => {
             viewBox="0 0 36 36"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            onClick={() => navigate("/profile")}
           >
             <path
               d="M22.5 27L13.5 18L22.5 9"
@@ -28,7 +35,7 @@ const FollowersPage = () => {
               strokeLinejoin="round"
             />
           </svg>
-          Followers (32)
+          Followers ({userFollowers ? userFollowers.length : "0"})
         </p>
         <div className="container mx-auto flex gap-5">
           {/* Main Content */}
@@ -37,7 +44,8 @@ const FollowersPage = () => {
           </div>
           <div className="flex flex-col">
             {/* Sidebar */}
-            <FollowersSidebar />
+            {/* <FollowersSidebar /> */}
+            <Rightbar />
           </div>
         </div>
       </div>
