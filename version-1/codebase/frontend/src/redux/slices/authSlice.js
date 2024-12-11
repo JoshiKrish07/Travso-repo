@@ -775,7 +775,7 @@ export const updateSelectFollow =  createAsyncThunk(
   }
 );
 
-// Thunk for addBuddy details
+// Thunk for addBuddy 
 export const addBuddy = createAsyncThunk(
   'auth/addBuddy',
   async (buddyId,{ rejectWithValue }) => {
@@ -805,6 +805,68 @@ export const addBuddy = createAsyncThunk(
     }
   }
 );
+
+// Thunk for removeBuddy 
+export const removeBuddy = createAsyncThunk(
+  'auth/removeBuddy',
+  async (buddyId,{ rejectWithValue }) => {
+    try {
+      
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/auth/remove-buddy/${buddyId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in removeBuddy===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in removeBuddy call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
+// Thunk for blockAccount 
+export const blockAccount = createAsyncThunk(
+  'auth/BlockAccount',
+  async (blockId,{ rejectWithValue }) => {
+    try {
+      
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/auth/block-account/${blockId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in BlockAccount===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in BlockAccount call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 
 
 
@@ -1168,6 +1230,30 @@ const authSlice = createSlice({
         state.loading = false;
       })
       .addCase(addBuddy.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle removeBuddy
+      .addCase(removeBuddy.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeBuddy.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(removeBuddy.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle blockAccount
+      .addCase(blockAccount.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(blockAccount.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(blockAccount.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

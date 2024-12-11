@@ -36,7 +36,7 @@ function App() {
         <Route path="/community" element={<CommunityPage />} />
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/bucketlist" element={<BucketList />} />
-        <Route path="/buddiesPage" element={<BuddiesPage />} />
+        <Route path="/buddiespage" element={<BuddiesPage />} />
         <Route path="/followers" element={<FollowersPage />} />
         <Route path="/following" element={<FollowingPage />} />
         <Route path="/PostData" element={<PostDataDetailPage />} />
