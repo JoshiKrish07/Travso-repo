@@ -654,6 +654,7 @@ async function getPostComments(req, res) {
                 cr.content AS reply_content,
                 u.full_name AS reply_user_full_name,
                 u.user_name AS reply_user_user_name,
+                u.user_id AS reply_user_id,
                 u.profile_image AS reply_user_profile_image,
                 cr.created_at AS reply_created_at,
                  (SELECT COUNT(*) FROM reply_like crl WHERE crl.reply_id = cr.id) AS total_likes_on_reply,

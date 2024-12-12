@@ -152,14 +152,12 @@ const PostCard = () => {
   };
 
   const goToPrevious = (imgArrLength) => {
-    console.log("=====imgArrLength====goToPrevious===>", imgArrLength);
     setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? imgArrLength - 1 : prevIndex - 1
     );
   };
 
   const goToNext = (imgArrLength) => {
-    console.log("=====imgArrLength====goToNext===>", imgArrLength);
     setCurrentIndex((prevIndex) =>
       prevIndex === imgArrLength - 1 ? 0 : prevIndex + 1
     );
@@ -205,12 +203,10 @@ const PostCard = () => {
 
   const handlePostUpload = async() => {
     try {
-      console.log("postData", postData)
       const commentResult = await dispatch(
         commitPost(postData)
       ).unwrap();
       if (commentResult) {
-        console.log("=====commentResult===>", commentResult.message);
         // await dispatch(getAllPosts());
         await dispatch(getUserPosts());
         setPostData({
@@ -257,6 +253,7 @@ const PostCard = () => {
 
   // to open comment popup
   const handleOpenCommentPopup = (postId) => {
+    // console.log("===postId===>", postId);
     setActivePostId(postId);
     setIsCommentPopup(true);
   }

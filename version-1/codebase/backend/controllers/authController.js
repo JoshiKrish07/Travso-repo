@@ -406,7 +406,7 @@ async function finalSignUp(req, res) {
   }
 }
 
-async function getFollowersCount(req, res) {
+async function getFollowersCount1(req, res) {
   try {
     const { smlink1, mobileNumber, email } = req.body;
     // console.log("====smlink1====>", smlink1);
@@ -486,6 +486,43 @@ async function getFollowersCount(req, res) {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
+
+async function getFollowersCount(req, res) {
+  try {
+    const { smlink1, smlink2, mobileNumber, email } = req.body;
+    // console.log("====smlink1====>", smlink1);
+
+      const [user] = await pool.execute(
+        "SELECT * FROM users WHERE email = ? OR mobile_number = ?",
+        [email, mobileNumber]
+      );
+  
+      // update user type to influencer
+      const [updateResult] = await pool.execute(
+        "UPDATE users SET is_influencer = ?, user_type = ?, smlink1 = ?, smlink2 = ?, WHERE id = ? AND email = ? AND mobile_number = ?",
+        [1, 'influencer', smlink1, smlink2 ,user[0].id, email, mobileNumber]
+      );
+
+      if (updateResult.affectedRows === 0) {
+        return res.status(404).json({ message: "User not found" });
+      }
+    
+      return res.status(200).json({ setInfluencer: true });
+
+
+    // Send extracted data as response
+    // res.status(200).json({
+    //     success: true,
+    //     data: {
+    //         instaFollowers: followersCount,  // Add the followers count to the response
+    //     },
+    // });
+  } catch (err) {
+    console.error("Error in catch part final update", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
 
 async function loginUser(req, res) {
   try {
@@ -792,7 +829,17 @@ async function getUserBuddies(req, res) {
           SELECT 1
           FROM followers f2
           WHERE f2.follower_id = u.id AND f2.followee_id = ?
-        ) AS is_followers
+        ) AS is_followers,
+        (
+          SELECT COUNT(*)
+          FROM followers
+          WHERE followee_id = u.id
+        ) AS followers_count,
+          (
+          SELECT COUNT(*)
+          FROM buddies
+          WHERE user_id = u.id
+        ) AS buddies_count
       FROM 
         buddies b
       JOIN 
@@ -1059,7 +1106,7 @@ const getUserDetails = async (req, res) => {
 
     // Query to fetch user details
     const [rows] = await pool.query(
-      "SELECT id, dob, email, created_at, user_name, profile_image, cover_image, description, first_name, last_name, city, state, gender, full_name FROM users WHERE id = ?",
+      "SELECT id, dob, email, created_at, user_name, profile_image, cover_image, description, first_name, last_name, city, state, gender, full_name, badge FROM users WHERE id = ?",
       [userId]
     );
 
@@ -1077,12 +1124,13 @@ const getUserDetails = async (req, res) => {
 const updateUser = async(req, res) => {
   try {
     const userId = req.user.userId; // Assuming `id` is part of the token payload
-    const { firstName, lastName, gender, city, description } = req.body;
+    const { firstName, lastName, gender, city, description, badge } = req.body;
+  
     const fullName = `${firstName} ${lastName}`;
     // Update user in the database using email and mobile number
     const [updateResult] = await pool.execute(
       `UPDATE users 
-             SET first_name = ?, last_name = ?, full_name = ?, city = ?, description = ?, gender = ?
+             SET first_name = ?, last_name = ?, full_name = ?, city = ?, description = ?, gender = ?, badge = ?
              WHERE id = ?`,
       [
         firstName,
@@ -1091,6 +1139,7 @@ const updateUser = async(req, res) => {
         city,
         description,
         gender,
+        badge,
         userId,
       ]
     );
@@ -1531,6 +1580,45 @@ async function removeBuddy(req, res) {
   }
 }
 
+async function blockAccount(req , res){
+  try {
+
+    const userId = req.user.userId; // Extract user ID from token
+    const { block_id } = req.params;
+
+    const [ data ] = await pool.execute(
+      `INSERT INTO block_user (user_id, blocked_id) VALUES (?, ?)`,[userId, block_id]
+    );
+
+    await pool.execute(
+      `
+      DELETE FROM followers 
+      WHERE (follower_id = ? AND followee_id = ?)
+         OR (follower_id = ? AND followee_id = ?)
+      `,
+      [userId, block_id, block_id, userId]
+    );
+
+    // Delete relationships from buddies table
+    await pool.execute(
+      `
+      DELETE FROM buddies 
+      WHERE (user_id = ? AND buddies_id = ?)
+         OR (user_id = ? AND buddies_id = ?)
+      `,
+      [userId, block_id, block_id, userId]
+    );
+    return res.status(200).json({
+      message:"Account Blocked  Successfully"
+    });
+  } catch (error) {
+    console.log("=======error block account====",error);
+    return res.status(500).json({
+      error:"Error Blocking Account"
+    });
+  }
+}
+
 
 module.exports = {
   registerUser,
@@ -1559,5 +1647,6 @@ module.exports = {
   updateFollowSelect,
   onlineFriends,
   addBuddies,
-  removeBuddy
+  removeBuddy,
+  blockAccount
 };

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { registerUser, sendOTP, verifyOTP, finalSignUp, resendOTP, getFollowersCount, loginUser, sendEmailOTP, sendOTPForgotPassword, forgotPassVerify, updatePassword, getUserBuddies, getUserFollower, getUserDetails, updateUser, toWhomUserFollows, insertProfileImage, removeProfileImage, getallUsers, removeCoverImage, uploadCoverImage, logOut, addSearch, updateFollowSelect, onlineFriends, addBuddies, removeBuddy } = require('../controllers/authController');
+const { registerUser, sendOTP, verifyOTP, finalSignUp, resendOTP, getFollowersCount, loginUser, sendEmailOTP, sendOTPForgotPassword, forgotPassVerify, updatePassword, getUserBuddies, getUserFollower, getUserDetails, updateUser, toWhomUserFollows, insertProfileImage, removeProfileImage, getallUsers, removeCoverImage, uploadCoverImage, logOut, addSearch, updateFollowSelect, onlineFriends, addBuddies, removeBuddy, blockAccount } = require('../controllers/authController');
 const verifyToken = require("../utils/verifyToken");
 
 router.post('/signup', registerUser);
@@ -32,6 +32,6 @@ router.post("/update-follow-select",verifyToken, updateFollowSelect);
 router.get("/online-friends",verifyToken, onlineFriends);
 router.post("/add-buddy",verifyToken, addBuddies);
 router.post("/remove-buddy/:buddies_id",verifyToken, removeBuddy);
-router.post("/block-account/:buddies_id",verifyToken, removeBuddy);
+router.post("/block-account/:block_id",verifyToken, blockAccount);
 
 module.exports = router;

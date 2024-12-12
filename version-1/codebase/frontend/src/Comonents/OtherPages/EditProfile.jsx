@@ -4,7 +4,14 @@ import Select from "react-select";
 import EditHeader from "./EditHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getUserDetails, removeCoverImage, removeProfileImage, updateUserDetails, uploadCoverImage, uploadProfileImage } from "../../redux/slices/authSlice";
+import {
+  getUserDetails,
+  removeCoverImage,
+  removeProfileImage,
+  updateUserDetails,
+  uploadCoverImage,
+  uploadProfileImage,
+} from "../../redux/slices/authSlice";
 import { fetchCities } from "../../redux/slices/stateCitySlice";
 import SuccessError from "./SuccessError";
 import "./EditProfile.css";
@@ -62,9 +69,9 @@ const EditProfile = () => {
   const navigate = useNavigate();
 
   const [genderData, setGenderData] = useState({
-    'male': 'Male',
-    'female': 'Female',
-    'other': 'Other'
+    male: "Male",
+    female: "Female",
+    other: "Other",
   });
 
   // for user details
@@ -77,27 +84,27 @@ const EditProfile = () => {
     city: "",
     userName: "",
     description: "",
+    badge: ""
   });
   const [formDataError, setFormDataError] = useState({});
-  const [flashMessage, setFlashMessage] = useState('');
-  const [flashMsgType, setFlashMsgType] = useState('');
+  const [flashMessage, setFlashMessage] = useState("");
+  const [flashMsgType, setFlashMsgType] = useState("");
 
   const { user: userDetails } = useSelector((state) => state.auth);
   const { cities, states } = useSelector((state) => state.stateCity);
   // console.log("===userDetails====>", userDetails)
 
   useEffect(() => {
-
-    if(!userDetails) {
+    if (!userDetails) {
       dispatch(getUserDetails());
     }
 
-    if(cities.length === 0 && userDetails) {
-      console.log("running")
+    if (cities.length === 0 && userDetails) {
+      console.log("running");
       dispatch(fetchCities({ state: userDetails?.state, country: "India" }));
     }
 
-    if(userDetails && !formData.fullName) {
+    if (userDetails && !formData.fullName) {
       setFormData({
         fullName: userDetails?.full_name,
         firstName: userDetails?.first_name,
@@ -107,44 +114,48 @@ const EditProfile = () => {
         city: userDetails?.city,
         userName: userDetails?.user_name,
         description: userDetails?.description || "",
-      })
-      console.log("yes working")
+        badge: userDetails?.badge || ""
+      });
+      console.log("yes working");
     }
-  }, [dispatch, userDetails,cities]);
-
+  }, [dispatch, userDetails, cities]);
 
   // check for input validations
   const validate = () => {
     let formErrors = {};
     // console.log("===formData===>", formData);
-      // First Name validation
-      if (!formData.fullName.trim()) {
-        formErrors.fullName = "*Full name is required";
-      }
+    // First Name validation
+    if (!formData.fullName.trim()) {
+      formErrors.fullName = "*Full name is required";
+    }
 
-      // Last Name validation
-      if (!formData.userName.trim()) {
-        formErrors.userName = "*Unique Id is required";
-      }
+    // Last Name validation
+    if (!formData.userName.trim()) {
+      formErrors.userName = "*Unique Id is required";
+    }
 
-      // City validation
-      if (!formData.city.trim()) {
-        formErrors.city = "*City is required";
-      }
+    // City validation
+    if (!formData.city.trim()) {
+      formErrors.city = "*City is required";
+    }
 
-      // Gender validation
-      if (!formData.gender.trim()) {
-        formErrors.gender = "*Gender is required";
-      }
+    // City validation
+    if (!formData.badge.trim()) {
+      formErrors.badge = "*Badge is required";
+    }
 
-      // description validation
-      if (!formData.description || !formData.description.trim()) {
-        formErrors.description = "*Description is required";
-      }
+    // Gender validation
+    if (!formData.gender.trim()) {
+      formErrors.gender = "*Gender is required";
+    }
 
-      setFormDataError(formErrors);
-      return Object.keys(formErrors).length === 0;
+    // description validation
+    if (!formData.description || !formData.description.trim()) {
+      formErrors.description = "*Description is required";
+    }
 
+    setFormDataError(formErrors);
+    return Object.keys(formErrors).length === 0;
   };
 
   const handleImageUpload = async (e) => {
@@ -158,16 +169,15 @@ const EditProfile = () => {
           const uploadImageResult = await dispatch(
             uploadProfileImage({ image: reader.result })
           ).unwrap();
-          if(uploadImageResult) {
+          if (uploadImageResult) {
             await dispatch(getUserDetails());
           }
           console.log("Image upload successful:", uploadImageResult);
         } catch (error) {
           console.error("Image upload failed:", error);
-        }
-         finally {
+        } finally {
           e.target.value = null;
-         }
+        }
       };
     }
   };
@@ -175,27 +185,50 @@ const EditProfile = () => {
   // to show gender option on select box
   const genderOption = Object.keys(genderData).map((genderName) => ({
     value: genderName,
-    label: genderName.charAt(0).toUpperCase() + genderName.slice(1)
+    label: genderName.charAt(0).toUpperCase() + genderName.slice(1),
   }));
 
   // to show city options on select box
-  const cityOptions = 
-  // userDetails ? 
-  cities
-        .map((cityName) => ({
-          value: cityName,
-          label: cityName,
-        }))
-        .sort((a, b) => a.label.localeCompare(b.label))
-    // : [];
+  const cityOptions =
+    // userDetails ?
+    cities
+      .map((cityName) => ({
+        value: cityName,
+        label: cityName,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  // : [];
 
   const handleRemovePhoto = () => {
     setCoverPhoto(null); // Remove the cover photo
   };
 
-  // handle change on city and state select
-  const handleSelectChange = async(selectedOption, name) => {
+  // handle badge select
+  const handleBadgeSelect = (e) => {
+    const { name, value } = e.target;
+    // Update the form data
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  
+    // Validate the selection
+    setFormDataError((prevErrors) => {
+      let updatedErrors = { ...prevErrors };
+  
+      // Ensure the badge is selected
+      if (value === "") {
+        updatedErrors[name] = "Please select a badge.";
+      } else {
+        delete updatedErrors[name];
+      }
+  
+      return updatedErrors;
+    });
+  };
 
+  // handle change on city and state select
+  const handleSelectChange = async (selectedOption, name) => {
     setFormData((prevData) => ({
       ...prevData,
       [name]: selectedOption ? selectedOption.value : "",
@@ -222,17 +255,13 @@ const EditProfile = () => {
   // handle input change with dob validation
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    // console.table({
-    //   name: name,
-    //   value: value,
-    // });
-  
+
     // Update the form data
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
-  
+
     // Validate the input
     setFormDataError((prevErrors) => {
       let updatedErrors = { ...prevErrors };
@@ -240,7 +269,7 @@ const EditProfile = () => {
       if (value !== "" && updatedErrors[name]) {
         delete updatedErrors[name];
       }
-  
+
       return updatedErrors;
     });
   };
@@ -253,90 +282,89 @@ const EditProfile = () => {
       setFlashMessage("");
       setFlashMsgType("");
     }, 3000); // Hide the message after 3 seconds
-  }
+  };
 
-  const handleSave = async() => {
-
+  const handleSave = async () => {
     const isValid = await validate();
     console.log("=====formData====>", formData);
 
-    if(isValid) {
+    if (isValid) {
       try {
-        const token = localStorage.getItem('token');
-        if(!token) {
-          navigate('/login');
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
           return;
         }
 
-        const updateResult = await dispatch(updateUserDetails(formData)).unwrap();
+        const updateResult = await dispatch(
+          updateUserDetails(formData)
+        ).unwrap();
         console.log("updateResult", updateResult);
-        if(updateResult) {
-          navigate('/suggestion');
+        if (updateResult) {
+          navigate("/suggestion");
         }
-        
       } catch (error) {
         console.log("error in catch part of handle save", error);
       }
     } else {
       console.log("all fields are required");
       // alert("all fields are required")
-  }
-}
-
-const handleImageRemove = async() => {
-  // setImageSrc(null); // Reset the uploaded image
-  try {
-    const removePic = await dispatch(removeProfileImage()).unwrap();
-    if(removePic) {
-      handleFlashMessage(removePic.message, 'success');
-      await dispatch(getUserDetails());
     }
-  } catch (error) {
-    console.log("error in removing profile image", error);
-    const errorMessage = error.error || 'Unexpected error occured';
-    handleFlashMessage(errorMessage, 'error');
-  }
-};
+  };
 
-const removeCoverPic = async() => {
-  //  console.log("yes")
-  try {
+  const handleImageRemove = async () => {
+    // setImageSrc(null); // Reset the uploaded image
+    try {
+      const removePic = await dispatch(removeProfileImage()).unwrap();
+      if (removePic) {
+        handleFlashMessage(removePic.message, "success");
+        await dispatch(getUserDetails());
+      }
+    } catch (error) {
+      console.log("error in removing profile image", error);
+      const errorMessage = error.error || "Unexpected error occured";
+      handleFlashMessage(errorMessage, "error");
+    }
+  };
+
+  const removeCoverPic = async () => {
+    //  console.log("yes")
+    try {
       const removeCoverImgResult = await dispatch(removeCoverImage()).unwrap();
-      if(removeCoverImgResult) {
+      if (removeCoverImgResult) {
         await dispatch(getUserDetails());
       }
       console.log("====removeCoverImgResult====>", removeCoverImgResult);
-  } catch (error) {
-    console.log("error in cover image profilepage", error);
-  }
-}
+    } catch (error) {
+      console.log("error in cover image profilepage", error);
+    }
+  };
 
-// upload cover image
-const handleCoverUpload = async (e) => {
-  const file = e.target.files[0];
-  console.log("===file====>", file);
-  if (file) {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
+  // upload cover image
+  const handleCoverUpload = async (e) => {
+    const file = e.target.files[0];
+    console.log("===file====>", file);
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
 
-    reader.onloadend = async () => {
-      try {
-        const uploadImageResult = await dispatch(
-          uploadCoverImage({ image: reader.result })
-        ).unwrap();
-        if(uploadImageResult) {
-          await dispatch(getUserDetails());
+      reader.onloadend = async () => {
+        try {
+          const uploadImageResult = await dispatch(
+            uploadCoverImage({ image: reader.result })
+          ).unwrap();
+          if (uploadImageResult) {
+            await dispatch(getUserDetails());
+          }
+          console.log("Image upload successful:", uploadImageResult);
+        } catch (error) {
+          console.error("Image upload failed:", error);
+        } finally {
+          e.target.value = null;
         }
-        console.log("Image upload successful:", uploadImageResult);
-      } catch (error) {
-        console.error("Image upload failed:", error);
-      }
-       finally {
-        e.target.value = null;
-       }
-    };
-  }
-};
+      };
+    }
+  };
 
   const handleProfilePhotoUpload = (e) => {
     const file = e.target.files[0];
@@ -353,11 +381,14 @@ const handleCoverUpload = async (e) => {
     setProfilePhoto(null); // Remove the profile photo
   };
 
+
   return (
     <>
       {/* Header Section */}
       <EditHeader />
-      {flashMessage && <SuccessError message={flashMessage} messageType={flashMsgType}/>}
+      {flashMessage && (
+        <SuccessError message={flashMessage} messageType={flashMsgType} />
+      )}
       <div className="bg-[#F0F7F7] flex justify-center items-center min-h-screen">
         <div className="w-full mt-12 rounded-[16px] mb-5 max-w-[1024px] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] overflow-hidden p-[24px]">
           {/* Title and Subtitle */}
@@ -376,46 +407,51 @@ const handleCoverUpload = async (e) => {
             <div className="relative border-dashed border-2 border-[#F0F7F7] rounded-[10px] h-[320px] flex items-center justify-center bg-[#F0F7F7] mb-6 overflow-hidden group">
               {userDetails?.cover_image ? (
                 <>
-                <img
-                  src={userDetails?.cover_image}
-                  alt="Cover"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                
-                {/* Buttons on hover */}
-              <label
-                htmlFor="cover-upload"
-                className="bg-[#2DC6BE] text-white py-2 px-4 rounded-lg cursor-pointer"
-                onClick={() =>
-                  document.getElementById("cover-upload-1").click()
-              }
-              >
-                Upload
-              </label>
-              <button
-                type="button"
-                onClick={removeCoverPic}
-                className="bg-red-500 text-white py-2 px-4 rounded-lg"
-              >
-                Remove
-              </button>
-              <input
-                type="file"
-                id="cover-upload-1"
-                className="hidden"
-                accept="image/*"
-                onChange={handleCoverUpload}
-              />
-            </div>
-            </>
+                  <img
+                    src={userDetails?.cover_image}
+                    alt="Cover"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {/* Buttons on hover */}
+                    <label
+                      htmlFor="cover-upload"
+                      className="bg-[#2DC6BE] text-white py-2 px-4 rounded-lg cursor-pointer"
+                      onClick={() =>
+                        document.getElementById("cover-upload-1").click()
+                      }
+                    >
+                      Upload
+                    </label>
+                    <button
+                      type="button"
+                      onClick={removeCoverPic}
+                      className="bg-red-500 text-white py-2 px-4 rounded-lg"
+                    >
+                      Remove
+                    </button>
+                    <input
+                      type="file"
+                      id="cover-upload-1"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleCoverUpload}
+                    />
+                  </div>
+                </>
               ) : (
-                <div className="flex flex-col items-center" >
+                <div className="flex flex-col items-center">
                   <img src={Icon} alt="Placeholder" className="w-8 h-8 mb-2" />
                   <span className="font-inter font-medium text-[16px] text-[#869E9D]">
-                    <label htmlFor="cover-upload" className="cursor-pointer" onClick={() =>
-                  document.getElementById("cover-upload-2").click()
-                }>Upload Cover Photo (optional)</label>
+                    <label
+                      htmlFor="cover-upload"
+                      className="cursor-pointer"
+                      onClick={() =>
+                        document.getElementById("cover-upload-2").click()
+                      }
+                    >
+                      Upload Cover Photo (optional)
+                    </label>
                   </span>
                   <input
                     type="file"
@@ -424,9 +460,8 @@ const handleCoverUpload = async (e) => {
                     accept="image/*"
                     onChange={handleCoverUpload}
                   />
-                </div>        
+                </div>
               )}
-              
             </div>
 
             {/* Profile Photo and Badge */}
@@ -434,38 +469,38 @@ const handleCoverUpload = async (e) => {
               {/* Profile Photo Section */}
               <div className="relative w-[220px] h-[220px] left-[64px] -top-[130px] rounded-full overflow-hidden border-[14px] border-[#FFFFFF] bg-[#F0F7F7] flex flex-col items-center justify-center group">
                 {userDetails?.profile_image ? (
-                  <>  
+                  <>
                     <img
                       src={userDetails?.profile_image}
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />
                     {/* Buttons on hover */}
-                      <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <label
-                          htmlFor="profile-upload"
-                          className="bg-[#2DC6BE] text-white py-2 px-4 rounded-lg cursor-pointer"
-                          onClick={() =>
-                            document.getElementById("profile-upload").click()
-                          }
-                        >
-                          Upload
-                        </label>
-                        <button
-                          type="button"
-                          onClick={handleImageRemove}
-                          className="bg-red-500 text-white py-2 px-4 rounded-lg"
-                        >
-                          Remove
-                        </button>
-                        <input
-                          type="file"
-                          id="profile-upload"
-                          className="hidden"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                        />
-                      </div>
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <label
+                        htmlFor="profile-upload"
+                        className="bg-[#2DC6BE] text-white py-2 px-4 rounded-lg cursor-pointer"
+                        onClick={() =>
+                          document.getElementById("profile-upload").click()
+                        }
+                      >
+                        Upload
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleImageRemove}
+                        className="bg-red-500 text-white py-2 px-4 rounded-lg"
+                      >
+                        Remove
+                      </button>
+                      <input
+                        type="file"
+                        id="profile-upload"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                      />
+                    </div>
                   </>
                 ) : (
                   <div className="flex flex-col items-center">
@@ -474,9 +509,13 @@ const handleCoverUpload = async (e) => {
                       alt="Placeholder"
                       className="w-8 h-8 mb-2"
                     />
-                    <button type="button" className="font-inter font-medium text-[16px] text-[#869E9D] cursor-pointer" onClick={() =>
-                            document.getElementById("profile-upload-1").click()
-                          }>
+                    <button
+                      type="button"
+                      className="font-inter font-medium text-[16px] text-[#869E9D] cursor-pointer"
+                      onClick={() =>
+                        document.getElementById("profile-upload-1").click()
+                      }
+                    >
                       Upload Profile Photo
                     </button>
                     <input
@@ -488,25 +527,54 @@ const handleCoverUpload = async (e) => {
                     />
                   </div>
                 )}
-                
               </div>
 
               {/* Badge Selector */}
               <div className="flex justify-center items-center">
                 <div className="relative right-[40px] -top-[130px] rounded-full border-[14px] border-[#FFFFFF] bg-[#F0F7F7] px-10 py-4 shadow-sm flex items-center">
                   {/* Dropdown Select */}
-                  <select className="appearance-none bg-transparent text-[#667877] font-medium text-center w-full focus:outline-none cursor-pointer pr-4">
-                    <option className="font-inter font-medium text-[16px] text-[#869E9D]" value="">
+                  <select 
+                    className="appearance-none bg-transparent text-[#667877] font-medium text-center w-full focus:outline-none cursor-pointer pr-4" 
+                    onChange={(e) => handleBadgeSelect(e)}
+                    name="badge"
+                    value={formData?.badge || ""}
+                  >
+                    <option
+                      className="font-inter font-medium text-[16px] text-[#869E9D]"
+                      disabled
+                      value=""
+                    >
                       Select your Badge
                     </option>
-                    <option className="font-inter font-medium text-[16px] text-[#869E9D]" value="Adventure">
-                      Adventure
+                    <option
+                      className="font-inter font-medium text-[16px] text-[#869E9D]"
+                      value="Explorer"
+                    >
+                      Explorer
                     </option>
-                    <option className="font-inter font-medium text-[16px] text-[#869E9D]" value="Foodie">
+                    <option
+                      className="font-inter font-medium text-[16px] text-[#869E9D]"
+                      value="Adventurer"
+                    >
+                      Adventurer
+                    </option>
+                    <option
+                      className="font-inter font-medium text-[16px] text-[#869E9D]"
+                      value="Foodie"
+                    >
                       Foodie
                     </option>
-                    <option className="font-inter font-medium text-[16px] text-[#869E9D]" value="Traveller">
-                      Traveller
+                    <option
+                      className="font-inter font-medium text-[16px] text-[#869E9D]"
+                      value="Solo Traveler"
+                    >
+                      Solo Traveler
+                    </option>
+                    <option
+                      className="font-inter font-medium text-[16px] text-[#869E9D]"
+                      value="Luxury Traveler"
+                    >
+                      Luxury Traveler
                     </option>
                   </select>
 
@@ -528,6 +596,11 @@ const handleCoverUpload = async (e) => {
                     />
                   </svg>
                 </div>
+                  {formDataError.badge && (
+                      <p className="error text-left text-[#ff0000] text-sm">
+                        {formDataError.badge}
+                      </p>
+                  )}
               </div>
             </div>
 
@@ -540,14 +613,18 @@ const handleCoverUpload = async (e) => {
                 </label>
                 <input
                   type="text"
-                  name='fullName'
+                  name="fullName"
                   onChange={handleInputChange}
-                  value={formData?.fullName || ''}
+                  value={formData?.fullName || ""}
                   placeholder="Your FullName Name"
                   className="rounded-[8px] px-4 py-2 w-full h-[48px] focus:outline-none focus:ring-2 focus:ring-blue-500 bg-[#F0F7F7] placeholder:text-[#869E9D] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]"
                   disabled
                 />
-                {formDataError.fullName && <p className="error text-left text-[#ff0000] text-sm">{formDataError.fullName}</p>}
+                {formDataError.fullName && (
+                  <p className="error text-left text-[#ff0000] text-sm">
+                    {formDataError.fullName}
+                  </p>
+                )}
               </div>
 
               {/* Unique ID */}
@@ -557,14 +634,18 @@ const handleCoverUpload = async (e) => {
                 </label>
                 <input
                   type="text"
-                  value={formData?.userName || ''}
+                  value={formData?.userName || ""}
                   onChange={handleInputChange}
-                  name='userName'
+                  name="userName"
                   placeholder="Your userName Name"
                   className="rounded-[8px] px-4 py-2 w-full h-[48px] focus:outline-none focus:ring-2 focus:ring-blue-500 bg-[#F0F7F7] placeholder:text-[#869E9D] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]"
                   disabled
                 />
-                {formDataError.userName && <p className="error text-left text-[#ff0000] text-sm">{formDataError.userName}</p>}
+                {formDataError.userName && (
+                  <p className="error text-left text-[#ff0000] text-sm">
+                    {formDataError.userName}
+                  </p>
+                )}
               </div>
 
               {/* Gender */}
@@ -586,7 +667,11 @@ const handleCoverUpload = async (e) => {
                   classNamePrefix="custom"
                   isSearchable
                 />
-                {formDataError.gender && <p className="error text-left text-[#ff0000] text-sm">{formDataError.gender}</p>}
+                {formDataError.gender && (
+                  <p className="error text-left text-[#ff0000] text-sm">
+                    {formDataError.gender}
+                  </p>
+                )}
               </div>
 
               {/* City */}
@@ -609,7 +694,11 @@ const handleCoverUpload = async (e) => {
                   onChange={(option) => handleSelectChange(option, "city")}
                   isSearchable
                 />
-                {formDataError.city && <p className="error text-left text-[#ff0000] text-sm">{formDataError.city}</p>}
+                {formDataError.city && (
+                  <p className="error text-left text-[#ff0000] text-sm">
+                    {formDataError.city}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -620,13 +709,17 @@ const handleCoverUpload = async (e) => {
               </label>
               <textarea
                 placeholder="Your Story in 50 words..."
-                value={formData?.description || ''}
+                value={formData?.description || ""}
                 onChange={handleInputChange}
                 name="description"
                 maxLength={300}
                 className="rounded-[8px] px-4 py-2 w-full h-[132px] focus:outline-none focus:ring-2 focus:ring-blue-500 bg-[#F0F7F7] placeholder:text-[#869E9D] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]"
               ></textarea>
-                {formDataError.description && <p className="error text-left text-[#ff0000] text-sm">{formDataError.description}</p>}
+              {formDataError.description && (
+                <p className="error text-left text-[#ff0000] text-sm">
+                  {formDataError.description}
+                </p>
+              )}
             </div>
 
             {/* Submit Button */}

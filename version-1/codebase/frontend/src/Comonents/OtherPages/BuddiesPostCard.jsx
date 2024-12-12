@@ -3,6 +3,7 @@ import starBadges from "../../assets/starBadges.png";
 import { useDispatch, useSelector } from "react-redux";
 import dummyUserImage from "../../assets/user_image-removebg-preview.png";
 import { addBuddy, getUserBuddies, getUserFollowers, removeBuddy, toWhomUserIsFollowing } from "../../redux/slices/authSlice";
+import { followUnfollow, followUnfollowOnFollowing } from "../../redux/slices/postSlice";
 
 const BuddiesPostCard = () => {
   const dispatch = useDispatch();
@@ -68,6 +69,20 @@ const handleBuddyRemove = async(buddyId) => {
     }
   } catch (error) {
     console.log("==error in handleBuddyRemove ===>", error);
+  }
+}
+
+const handleFollowUnfollow = async(followeeID) => {
+  try {
+    // const followUnfollowResponse = await dispatch(followUnfollow(followeeID)).unwrap();
+    const followUnfollowResponse = await dispatch(followUnfollowOnFollowing(followeeID)).unwrap();
+    if(followUnfollowResponse) {
+      await dispatch(getUserFollowers());
+      await dispatch(toWhomUserIsFollowing());
+      await dispatch(getUserBuddies());
+    }
+  } catch (error) {
+    console.log("==error in handleFollowUnfollow==", error);
   }
 }
 
@@ -144,12 +159,13 @@ const handleBuddyRemove = async(buddyId) => {
                   {profile?.is_buddies === 1 ? "Added" : "Add as Buddy"}
                 </button>
                 <button
-                  onClick={() => handleFollowBuddyClick(index)}
+                  // onClick={() => handleFollowBuddyClick(index)}
                   className={`w-full font-inter font-medium text-[14px] h-[36px] rounded-[4px] ${
                     profile?.is_followers === 0
                       ? "bg-[#1DB2AA] text-white"
                       : "bg-[#F0F7F7] text-[#667877]"
                   }`}
+                  onClick={() => handleFollowUnfollow(profile?.id)}
                 >
                   {profile?.is_followers === 1 ? "Following" : "Follow"}
                 </button>
@@ -169,12 +185,13 @@ const handleBuddyRemove = async(buddyId) => {
                   {profile?.is_buddies === 1 ? "Added" : "Add as Buddy"}
                 </button>
                 <button
-                  onClick={() => handleIsInfluencerFollowBuddyClick(index)}
+                  // onClick={() => handleIsInfluencerFollowBuddyClick(index)}
                   className={`w-full font-inter font-medium text-[14px] h-[36px] rounded-[4px] ${
                     profile?.is_followers === 0
                       ? "bg-gradient-to-r from-[#1DB2AA] to-[#bae53dcc] text-white"
                       : "bg-gradient-to-r from-[#1db2aae0] to-[#bae53d6b] text-[#667877]"
                   }`}
+                  onClick={() => handleFollowUnfollow(profile?.id)}
                 >
                   {profile?.is_followers === 1 ? "Following" : "Follow"}
                 </button>

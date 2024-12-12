@@ -269,6 +269,41 @@ const Sidebar = () => {
       </div>
 
       <div className="w-[340px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] p-4 px-4 mb-4">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="font-poppins font-semibold text-[20px] text-[#212626]">
+            Posts ({userPosts ? userPosts?.length : "0"})
+          </h2>
+          <p
+            onClick={handleAllPost}
+            className="font-inter font-medium text-[14px] text-[#2DC6BE] cursor-pointer hover:underline"
+          >
+            See All
+          </p>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {/* Dynamically render images and titles */}
+          {visiblePosts.map((post) => (
+            <div key={post.id}>
+              {/* <img
+                src={post.imageUrl}
+                alt={post.title}
+                className="w-full h-[92px] rounded-[8px] object-cover"
+              /> */}
+              {
+                  (post.media_url).length > 0 && (
+                    <img
+                      src={post.media_url[0]}
+                      alt={post.description}
+                      className="w-full h-[130px] rounded-sm object-cover"
+                    />
+                  )
+                }
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="w-[340px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] p-4 px-4 mb-4">
         <div className="flex justify-between items-center -mb-4">
           <h2 className="font-poppins font-semibold text-[20px] text-[#212626]">
             Bucket List
@@ -310,40 +345,7 @@ const Sidebar = () => {
       ))}
       </div>
 
-      <div className="w-[340px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] p-4 px-4 mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="font-poppins font-semibold text-[20px] text-[#212626]">
-            Posts ({userPosts ? userPosts?.length : "0"})
-          </h2>
-          <p
-            onClick={handleAllPost}
-            className="font-inter font-medium text-[14px] text-[#2DC6BE] cursor-pointer hover:underline"
-          >
-            See All
-          </p>
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          {/* Dynamically render images and titles */}
-          {visiblePosts.map((post) => (
-            <div key={post.id}>
-              {/* <img
-                src={post.imageUrl}
-                alt={post.title}
-                className="w-full h-[92px] rounded-[8px] object-cover"
-              /> */}
-              {
-                  (post.media_url).length > 0 && (
-                    <img
-                      src={post.media_url[0]}
-                      alt={post.description}
-                      className="w-full h-[130px] rounded-sm object-cover"
-                    />
-                  )
-                }
-            </div>
-          ))}
-        </div>
-      </div>
+
     </>
   );
 };

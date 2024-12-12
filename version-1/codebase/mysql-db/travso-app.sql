@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 03, 2024 at 12:10 PM
+-- Generation Time: Dec 12, 2024 at 05:19 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -35,6 +35,28 @@ CREATE TABLE `bkt_lists` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `block_user`
+--
+
+CREATE TABLE `block_user` (
+  `id` int(11) NOT NULL,
+  `user_id` int(10) NOT NULL,
+  `blocked_id` int(10) NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `block_user`
+--
+
+INSERT INTO `block_user` (`id`, `user_id`, `blocked_id`, `created_at`, `updated_at`) VALUES
+(1, 1, 2, '2024-12-12 10:48:26', '2024-12-12 10:48:26'),
+(2, 27, 13, '2024-12-12 11:58:08', '2024-12-12 11:58:08');
 
 -- --------------------------------------------------------
 
@@ -76,7 +98,8 @@ CREATE TABLE `buddies` (
 
 INSERT INTO `buddies` (`id`, `user_id`, `buddies_id`, `created_at`) VALUES
 (1, 27, 19, '2024-11-25 10:58:02'),
-(2, 27, 23, '2024-11-25 10:58:02');
+(2, 27, 23, '2024-11-25 10:58:02'),
+(3, 27, 11, '2024-12-10 11:27:40');
 
 -- --------------------------------------------------------
 
@@ -100,15 +123,8 @@ INSERT INTO `comments` (`id`, `post_id`, `user_id`, `content`, `created_at`) VAL
 (1, 1, 13, 'Nice.', '2024-11-25 07:27:15'),
 (2, 1, 26, 'Wounderfull', '2024-11-25 07:27:15'),
 (4, 4, 11, 'Where are you?', '2024-11-26 07:46:22'),
-(5, 1, 27, 'hello my first comment', '2024-11-27 11:32:14'),
-(6, 1, 27, 'hello my 2nd comment', '2024-11-27 11:33:57'),
-(7, 1, 27, 'hello comment', '2024-11-27 11:36:00'),
 (8, 4, 27, 'dsdhjh', '2024-11-27 11:37:35'),
-(9, 1, 27, 'new comment', '2024-11-27 11:41:33'),
-(10, 1, 27, 'new comment 2', '2024-11-27 11:42:35'),
-(11, 1, 27, 'nikhil bhai ki comment', '2024-11-27 11:43:53'),
 (12, 1, 27, 'dhsdjhjhj', '2024-11-27 12:12:14'),
-(13, 1, 27, 'chhdw', '2024-11-27 12:39:54'),
 (14, 1, 27, 'hello', '2024-11-28 10:58:59'),
 (15, 4, 27, 'hello', '2024-11-28 12:17:09'),
 (16, 4, 27, 'second time hello', '2024-11-28 12:18:49'),
@@ -134,7 +150,27 @@ INSERT INTO `comments` (`id`, `post_id`, `user_id`, `content`, `created_at`) VAL
 (36, 1, 27, 'without button', '2024-12-02 17:59:43'),
 (37, 1, 27, '😀', '2024-12-02 18:55:48'),
 (38, 1, 27, 'k22', '2024-12-03 08:35:54'),
-(39, 1, 27, 'test comment 3', '2024-12-03 10:34:27');
+(39, 1, 27, 'test comment 3', '2024-12-03 10:34:27'),
+(40, 9, 27, 'hello', '2024-12-03 13:52:54'),
+(41, 8, 27, 'hello', '2024-12-03 17:24:31'),
+(42, 8, 27, 'how are you', '2024-12-03 17:24:40'),
+(43, 1, 27, '😁', '2024-12-04 05:38:52'),
+(44, 1, 27, 'hii', '2024-12-04 06:00:01'),
+(45, 1, 13, 'Hii buddy', '2024-12-04 06:04:12'),
+(46, 1, 27, 'Hello buddy', '2024-12-04 06:59:42'),
+(47, 1, 27, 'hello buddy 2', '2024-12-04 07:01:19'),
+(48, 8, 27, '🙋', '2024-12-04 10:42:30'),
+(49, 9, 27, '🤪', '2024-12-04 11:54:54'),
+(50, 4, 27, 'hii', '2024-12-04 12:01:37'),
+(52, 9, 27, 'hello bhai', '2024-12-05 12:43:13'),
+(53, 9, 27, 'hello bbai 2', '2024-12-05 12:44:17'),
+(54, 9, 27, 'hello bhai 3', '2024-12-05 12:44:44'),
+(58, 9, 27, 'hello', '2024-12-07 12:05:27'),
+(61, 14, 27, 'hello', '2024-12-09 12:40:04'),
+(62, 14, 27, 'Hello 5', '2024-12-10 06:13:39'),
+(63, 14, 27, '@krishna hello', '2024-12-10 08:47:28'),
+(64, 14, 27, '@Nikhil hello bhai', '2024-12-10 08:50:30'),
+(66, 14, 27, 'nikhil bhai hello', '2024-12-10 09:55:55');
 
 -- --------------------------------------------------------
 
@@ -157,7 +193,10 @@ INSERT INTO `comments_like` (`id`, `comment_id`, `user_id`, `created_at`) VALUES
 (5, 1, 44, '2024-12-02 12:28:06'),
 (8, 1, 27, '2024-12-02 17:41:24'),
 (13, 2, 27, '2024-12-03 10:26:48'),
-(18, 5, 27, '2024-12-03 10:33:13');
+(23, 45, 27, '2024-12-04 07:00:58'),
+(24, 5, 27, '2024-12-05 06:04:05'),
+(30, 61, 27, '2024-12-10 06:11:47'),
+(31, 62, 27, '2024-12-10 06:13:42');
 
 -- --------------------------------------------------------
 
@@ -178,15 +217,23 @@ CREATE TABLE `comment_reply` (
 --
 
 INSERT INTO `comment_reply` (`id`, `comment_id`, `user_id`, `content`, `created_at`) VALUES
-(1, 1, 43, 'Accha batau teko nice.', '2024-12-02 11:44:15'),
-(2, 1, 44, 'Ha Bhai.', '2024-12-02 12:34:04'),
-(4, 2, 27, 'nikhil ko reply', '2024-12-03 08:17:44'),
-(5, 2, 27, 'nikhil ko reply second time', '2024-12-03 08:21:09'),
-(6, 1, 27, '1st time reply', '2024-12-03 08:22:01'),
-(7, 1, 27, 'second comment', '2024-12-03 08:23:18'),
-(8, 1, 27, 'third reply', '2024-12-03 08:27:37'),
-(9, 1, 27, 'test', '2024-12-03 08:27:59'),
-(10, 5, 27, 'test comment', '2024-12-03 10:34:12');
+(14, 45, 27, 'hello rishabh', '2024-12-04 06:07:44'),
+(15, 42, 27, '😆', '2024-12-04 10:53:35'),
+(16, 42, 27, '😄', '2024-12-04 11:17:00'),
+(19, 40, 27, '🦍', '2024-12-04 11:43:59'),
+(20, 40, 27, '🥲', '2024-12-04 11:57:03'),
+(24, 42, 27, 'first reply', '2024-12-05 11:48:44'),
+(25, 1, 27, 'hello rishbh 1', '2024-12-05 11:49:48'),
+(26, 1, 27, 'hello rishabh 2', '2024-12-05 11:49:55'),
+(27, 1, 27, 'hello rishabh 3', '2024-12-05 11:50:01'),
+(28, 1, 27, 'hello rishabh 4', '2024-12-05 11:50:11'),
+(30, 49, 27, 'hello', '2024-12-09 10:02:49'),
+(31, 40, 27, '😄', '2024-12-09 12:23:39'),
+(32, 61, 27, 'hello2', '2024-12-09 12:40:12'),
+(33, 61, 27, '😆', '2024-12-09 12:40:43'),
+(34, 61, 27, 'hello 3', '2024-12-10 06:12:49'),
+(35, 61, 27, '@Nikhil replied', '2024-12-10 08:51:14'),
+(36, 61, 27, 'hii', '2024-12-10 08:53:33');
 
 -- --------------------------------------------------------
 
@@ -200,16 +247,6 @@ CREATE TABLE `followers` (
   `followee_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `followers`
---
-
-INSERT INTO `followers` (`id`, `follower_id`, `followee_id`, `created_at`) VALUES
-(1, 27, 11, '2024-11-25 06:57:18'),
-(2, 11, 27, '2024-11-25 06:57:18'),
-(3, 13, 27, '2024-11-25 07:03:42'),
-(4, 27, 19, '2024-11-25 07:03:42');
 
 -- --------------------------------------------------------
 
@@ -235,7 +272,11 @@ INSERT INTO `likes` (`id`, `post_id`, `user_id`, `created_at`) VALUES
 (5, 4, 28, '2024-11-26 05:15:51'),
 (43, 4, 27, '2024-12-02 13:52:51'),
 (44, 5, 27, '2024-12-02 17:26:13'),
-(54, 1, 27, '2024-12-03 07:13:04');
+(69, 1, 27, '2024-12-05 10:00:08'),
+(77, 12, 27, '2024-12-09 09:39:16'),
+(84, 11, 27, '2024-12-09 09:56:17'),
+(86, 9, 27, '2024-12-09 12:22:25'),
+(94, 14, 27, '2024-12-12 08:18:51');
 
 -- --------------------------------------------------------
 
@@ -276,11 +317,20 @@ CREATE TABLE `posts` (
 --
 
 INSERT INTO `posts` (`id`, `user_id`, `is_public`, `description`, `buddies_id`, `tag_id`, `location_id`, `media_url`, `status`, `block_post`, `created_at`, `updated_at`) VALUES
-(1, 27, 1, 'Post description 1', '2', '2', 1, '[\"https://images.unsplash.com/photo-1521575107034-e0fa0b594529?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fHBvc3R8ZW58MHx8MHx8fDA%3D\",\"https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"]', 'active', 0, '2024-11-25 06:29:48', '2024-12-02 11:41:10'),
-(2, 27, 0, 'Post description 2', '1', '3', 2, '[\"https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"]', 'inactive', 0, '2024-11-25 06:29:48', '2024-12-02 11:14:02'),
-(3, 27, 1, 'Post description 3', '1', '1', 3, '[\"https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg\"]', 'deleted', 1, '2024-11-25 06:29:48', '2024-12-02 11:14:31'),
-(4, 27, 1, 'Post description 4', '3', '2', 1, '[\"https://image-processor-storage.s3.us-west-2.amazonaws.com/images/866759932dc5358cee86f6552d1250f2/inside-bubble-spheres.jpg\"]', 'active', 1, '2024-11-25 06:29:48', '2024-12-02 17:23:57'),
-(5, 27, 0, 'Post description 5', '1', '4', 2, '[\"https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg\"]', 'active', 0, '2024-11-25 06:29:48', '2024-12-02 17:24:06');
+(1, 27, 1, 'An application designed and developed to serve the purpose of traveling, like planning, booking, and managing is a travel app. An application has various other features, such as saving all the travel-related information and managing travel apps.', '2', '[\"#posttag\",\"#testtag\"]', 1, '[\"https://images.unsplash.com/photo-1521575107034-e0fa0b594529?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fHBvc3R8ZW58MHx8MHx8fDA%3D\",\"https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"]', 'active', 0, '2024-11-25 06:29:48', '2024-12-09 09:09:14'),
+(2, 27, 0, 'Post description 2', '1', '[]', 2, '[\"https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"]', 'inactive', 0, '2024-11-25 06:29:48', '2024-12-09 09:09:20'),
+(3, 27, 1, 'Post description 3', '1', '[]', 3, '[\"https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg\"]', 'deleted', 1, '2024-11-25 06:29:48', '2024-12-09 09:09:26'),
+(4, 27, 1, 'Post description 4', '3', '[]', 1, '[\"https://image-processor-storage.s3.us-west-2.amazonaws.com/images/866759932dc5358cee86f6552d1250f2/inside-bubble-spheres.jpg\"]', 'active', 1, '2024-11-25 06:29:48', '2024-12-09 09:09:32'),
+(5, 27, 0, 'Post description 5', '1', '[]', 2, '[\"https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg\"]', 'active', 0, '2024-11-25 06:29:48', '2024-12-09 09:09:38'),
+(6, 27, 1, 'My First Post', NULL, NULL, NULL, '[]', 'active', 0, '2024-12-03 13:19:58', '2024-12-03 13:19:58'),
+(7, 27, 1, 'Second Post😀', NULL, NULL, NULL, '[]', 'active', 0, '2024-12-03 13:28:55', '2024-12-03 13:28:55'),
+(8, 27, 1, 'Third Post', NULL, NULL, NULL, '[]', 'active', 0, '2024-12-03 13:40:10', '2024-12-03 13:40:10'),
+(9, 27, 1, 'Fourth Post', NULL, NULL, NULL, '[]', 'active', 0, '2024-12-03 13:41:14', '2024-12-03 13:41:14'),
+(10, 27, 1, 'This is first test comment', '[19,23]', '[\"#travel\",\"#posttag\"]', NULL, '[]', 'active', 0, '2024-12-07 11:04:26', '2024-12-07 11:05:21'),
+(11, 27, 1, 'Test Post for images', '[]', '[]', NULL, '[\"http://localhost:3000/uploads/post_img/post_1733721996316.webp\"]', 'active', 0, '2024-12-09 05:26:36', '2024-12-09 05:26:36'),
+(12, 27, 1, 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.', '[19]', '[]', NULL, '[\"http://localhost:3000/uploads/post_img/post_1733722360997.webp\",\"http://localhost:3000/uploads/post_img/post_1733722361000.jpeg\"]', 'active', 0, '2024-12-09 05:32:41', '2024-12-09 08:50:42'),
+(13, 27, 1, 'Uploading Post from Profile Section', '[23]', '[\"#travelprofile\"]', NULL, '[\"http://localhost:3000/uploads/post_img/post_1733746079858.webp\",\"http://localhost:3000/uploads/post_img/post_1733746079870.webp\"]', 'active', 0, '2024-12-09 12:07:59', '2024-12-09 12:07:59'),
+(14, 27, 1, 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.', '[19]', '[\"#traveltest\"]', NULL, '[\"http://localhost:3000/uploads/post_img/post_1733747951307.jpeg\",\"http://localhost:3000/uploads/post_img/post_1733747951309.jpeg\"]', 'active', 0, '2024-12-09 12:39:11', '2024-12-09 12:39:11');
 
 -- --------------------------------------------------------
 
@@ -306,6 +356,50 @@ INSERT INTO `recent_search` (`id`, `user_id`, `searched_id`, `created_at`, `upda
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `reply_comment`
+--
+
+CREATE TABLE `reply_comment` (
+  `id` int(11) NOT NULL,
+  `reply_id` int(10) NOT NULL,
+  `user_id` int(10) NOT NULL,
+  `content` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `reply_comment`
+--
+
+INSERT INTO `reply_comment` (`id`, `reply_id`, `user_id`, `content`) VALUES
+(1, 19, 13, 'reply of reply- kuch nahi'),
+(4, 19, 23, 'This is my reply'),
+(5, 6, 3, 'This is my replyss'),
+(7, 6, 3, 'This is my 3 reply'),
+(8, 7, 3, 'Reply ka reply');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reply_like`
+--
+
+CREATE TABLE `reply_like` (
+  `id` int(11) NOT NULL,
+  `reply_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `reply_like`
+--
+
+INSERT INTO `reply_like` (`id`, `reply_id`, `user_id`, `created_at`) VALUES
+(1, 6, 3, '2024-12-06 09:47:29');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `shared_post`
 --
 
@@ -313,6 +407,8 @@ CREATE TABLE `shared_post` (
   `id` int(11) NOT NULL,
   `post_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `shared_to_id` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`shared_to_id`)),
+  `thoughts` varchar(255) DEFAULT NULL,
   `shared_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -320,10 +416,16 @@ CREATE TABLE `shared_post` (
 -- Dumping data for table `shared_post`
 --
 
-INSERT INTO `shared_post` (`id`, `post_id`, `user_id`, `shared_at`) VALUES
-(1, 1, 26, '2024-11-26 06:23:29'),
-(2, 1, 13, '2024-11-26 06:24:46'),
-(3, 4, 28, '2024-11-26 06:24:46');
+INSERT INTO `shared_post` (`id`, `post_id`, `user_id`, `shared_to_id`, `thoughts`, `shared_at`) VALUES
+(1, 1, 26, '', NULL, '2024-11-26 06:23:29'),
+(2, 1, 13, '', NULL, '2024-11-26 06:24:46'),
+(3, 4, 28, '', NULL, '2024-11-26 06:24:46'),
+(4, 14, 27, '[1,2,3,6,7,8]', '', '2024-12-10 08:01:20'),
+(5, 14, 27, '[19,23]', 'hello first thought with nikhil and krishna', '2024-12-10 08:13:06'),
+(6, 14, 27, '[19,23]', 'Second thought', '2024-12-10 08:14:58'),
+(7, 14, 27, '[23]', 'share with nikhil', '2024-12-10 08:26:21'),
+(8, 14, 27, '[23]', 'hello from comment section', '2024-12-10 09:54:33'),
+(9, 14, 27, '[19,23]', 'share from comment section 2', '2024-12-10 09:55:13');
 
 -- --------------------------------------------------------
 
@@ -371,38 +473,45 @@ CREATE TABLE `users` (
   `password` varchar(255) DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT NULL,
   `user_type` varchar(255) DEFAULT NULL,
-  `smlink1` varchar(255) DEFAULT NULL,
+  `smlink1` longtext DEFAULT NULL,
+  `smlink2` longtext DEFAULT NULL,
   `profile_image` varchar(255) DEFAULT NULL,
   `cover_image` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `is_logged_in` tinyint(1) NOT NULL DEFAULT 0,
-  `is_follow_selected` tinyint(1) NOT NULL DEFAULT 0
+  `is_follow_selected` tinyint(1) NOT NULL DEFAULT 0,
+  `is_online` tinyint(1) NOT NULL DEFAULT 1,
+  `badge` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `full_name`, `first_name`, `last_name`, `gender`, `dob`, `state`, `city`, `email`, `mobile_number`, `otp`, `isOtpVerified`, `is_influencer`, `user_name`, `description`, `password`, `is_active`, `user_type`, `smlink1`, `profile_image`, `cover_image`, `created_at`, `is_logged_in`, `is_follow_selected`) VALUES
-(9, 'krishna', NULL, NULL, 'male', '1990-11-15', 'Madhya Pradesh', 'Indore', 'kk14@kk.com', '1234567892', '7619', 1, 0, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0),
-(11, 'Krishna', NULL, NULL, 'male', '2024-11-01', 'Madhya Pradesh', 'Indore', 'krishnakant0795@gmail.com', '9977195275', '8884', 0, 0, 'Krishna002', 'Test Account Description', '$2b$10$OW4ZCAzq3XiY2n/Yb1TSBu1zY1EOyO.yiUIHkMzpu.xC3b0LLhqiC', 1, 'traveler', 'https://www.instagram.com/krishnakant7947/profilecard/?igsh=MXhieDRyZjhmdHhpZQ==', NULL, NULL, '2024-11-26 11:37:50', 0, 0),
-(13, 'Rishabh', NULL, NULL, 'male', '2024-11-01', 'Madhya Pradesh', 'Indore', 'rishabh@rishabh.com', '8720096457', '3198', 0, 0, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0),
-(19, 'krishna', NULL, NULL, 'male', '1995-03-07', 'Madhya Pradesh', 'Indore', 'kk19@kk.com', '9977194285', '1466', 0, 0, 'Krish003', NULL, NULL, 1, 'traveler', NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0),
-(23, 'Krishna005', NULL, NULL, 'male', '2007-02-25', 'Madhya Pradesh', 'Indore', 'kktest@kk.com', '1212121212', '3725', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0),
-(26, 'Nikhil Sir', NULL, NULL, 'male', '2006-02-26', 'Madhya Pradesh', 'Indore', 'nikhil02.1998@gmail.com', '7415872603', '0640', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0),
-(27, 'Krishna Kant Malviya', 'Krishna Kant', 'Malviya', 'male', '2006-02-08', 'Madhya Pradesh', 'Indore', 'learncoding299@gmail.com', '9755895314', '0325', 0, 0, 'Krishna005', 'Test Description 004', '$2b$10$OW4ZCAzq3XiY2n/Yb1TSBu1zY1EOyO.yiUIHkMzpu.xC3b0LLhqiC', 1, 'traveler', NULL, 'http://localhost:3000/uploads/profile_img/profile_1733134156676.webp', 'http://localhost:3000/uploads/cover_img/profile_1733136257342.webp', '2024-11-26 11:37:50', 0, 1),
-(30, 'Test', NULL, NULL, 'male', '2007-02-27', 'Madhya Pradesh', 'Indore', 'test@test.com', '1212121211', '5133', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, '2024-11-27 01:54:23', 0, 0),
-(31, 'bdh', NULL, NULL, 'female', '2004-02-28', 'Andhra Pradesh', 'Ādoni', 'emai@email.com', '9340169945', '1929', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, '2024-11-27 12:19:35', 0, 0),
-(32, 'Prashant', NULL, NULL, 'male', '2003-01-28', 'Madhya Pradesh', 'Indore', 'prashant@prashant.com', '9340169981', '7723', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, '2024-11-28 13:52:29', 0, 0),
-(33, 'hhh', NULL, NULL, 'male', '2005-01-29', 'Madhya Pradesh', 'Indore', 'ss@ss.com', '1212121213', '9578', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, '2024-11-29 10:23:17', 0, 0),
-(34, 'sd', NULL, NULL, 'male', '1998-02-28', 'Andhra Pradesh', 'Ādoni', 'dsd@sd.com', '1234567890', '7315', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, '2024-11-29 12:22:56', 0, 0),
-(35, 'sd', NULL, NULL, 'male', '2008-01-29', 'Andhra Pradesh', 'Ādoni', 'kk@ll.com', '1234567898', '7639', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, '2024-11-29 13:05:44', 0, 0),
-(36, 'sd', NULL, NULL, 'male', '2007-03-29', 'Andhra Pradesh', 'Addanki', 'kk@kk.com', '1212454572', '4903', 0, 0, 'test001', 'Test description', '$2b$10$RO2fWhAGEnZX49Cq6pR1.uJjrLsZm.wYD0Ftvfe/RfYPgeTt8BHGe', NULL, 'traveler', NULL, NULL, NULL, '2024-11-29 13:09:12', 0, 0),
-(41, 'Test Account1', 'Test', 'Account1', 'male', '2008-02-29', 'Madhya Pradesh', 'Harda', 'test1@test.com', '1233211231', '4918', 0, 0, 'test1', 'Test Description  Test 1', '$2b$10$3G1LH/D8IwgmJKsI4SWWWuFaksMjm3Bpl4ZMVY7LkgPXwkz2vA5KK', NULL, 'traveler', NULL, 'http://localhost:3000/uploads/profile_img/profile_1732948983049.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1732951028576.jpeg', '2024-11-30 06:28:10', 0, 0),
-(42, 'Test Account2', 'Test', 'Account2', 'male', '2008-02-29', 'Madhya Pradesh', 'Indore', 'test2@test.com', '1234563215', '6859', 0, 0, 'test2', 'Test Description new', '$2b$10$CJXPEs91RUyfX9f3D5LCk.idHaJM1tVKw8OEf4vqXEemxSkz.5GQe', NULL, 'traveler', NULL, 'http://localhost:3000/uploads/profile_img/profile_1732969808487.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1732969898721.webp', '2024-11-30 09:29:51', 0, 0),
-(43, 'test003 ', 'test003', '', 'male', '2006-02-01', 'Madhya Pradesh', 'Indore', 'test3@test.com', '1254125412', '8966', 0, 0, 'test003', 'test description 003', '$2b$10$noJ70se3/3w2yGB1MzItMeCF3O6G2PVi9wMt.2I2tPPHxpIyE4mHe', NULL, 'traveler', NULL, 'http://localhost:3000/uploads/profile_img/profile_1733057594306.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733057585165.webp', '2024-12-01 12:52:02', 0, 0),
-(44, 'test4 ', 'test4', '', 'male', '2008-02-02', 'Madhya Pradesh', 'Indore', 'test4@test.com', '1237894561', '1720', 0, 0, 'test004', 'Test Description 004', '$2b$10$RHUAXhLqKFfFvIXMz7CC8.sVPWcUwAd0GdJcwTFWQYsR7VKyWl2wm', NULL, 'traveler', NULL, 'http://localhost:3000/uploads/profile_img/profile_1733116560982.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733116543861.webp', '2024-12-02 05:13:56', 0, 1),
-(45, 'Arti Kushwaha', 'Arti', 'Kushwaha', 'female', '1998-11-03', 'Madhya Pradesh', 'Bhopal', 'aktest@gmail.com', '7000085170', '4926', 0, 0, 'arti07', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.', '$2b$10$GqrpGoigu6uRrbYMLe1aRupkFR4Y1LGxRoQowBFj200g7b6BylN.a', NULL, 'traveler', NULL, 'http://localhost:3000/uploads/profile_img/profile_1733222590612.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733222582167.jpeg', '2024-12-03 10:41:50', 0, 1);
+INSERT INTO `users` (`id`, `full_name`, `first_name`, `last_name`, `gender`, `dob`, `state`, `city`, `email`, `mobile_number`, `otp`, `isOtpVerified`, `is_influencer`, `user_name`, `description`, `password`, `is_active`, `user_type`, `smlink1`, `smlink2`, `profile_image`, `cover_image`, `created_at`, `is_logged_in`, `is_follow_selected`, `is_online`, `badge`) VALUES
+(9, 'krishna', NULL, NULL, 'male', '1990-11-15', 'Madhya Pradesh', 'Indore', 'kk14@kk.com', '1234567892', '7619', 1, 0, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0, 1, NULL),
+(11, 'Krishna', NULL, NULL, 'male', '2024-11-01', 'Madhya Pradesh', 'Indore', 'krishnakant0795@gmail.com', '9977195275', '8884', 0, 0, 'Krishna002', 'Test Account Description', '$2b$10$OW4ZCAzq3XiY2n/Yb1TSBu1zY1EOyO.yiUIHkMzpu.xC3b0LLhqiC', 1, 'traveler', 'https://www.instagram.com/krishnakant7947/profilecard/?igsh=MXhieDRyZjhmdHhpZQ==', NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0, 1, NULL),
+(13, 'Rishabh', NULL, NULL, 'male', '2024-11-01', 'Madhya Pradesh', 'Indore', 'rishabh@rishabh.com', '8720096457', '3198', 0, 0, 'rishabh-07', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ', NULL, 1, NULL, NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1732948983049.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733745929342.webp', '2024-11-26 11:37:50', 0, 0, 1, NULL),
+(19, 'krishna', NULL, NULL, 'male', '1995-03-07', 'Madhya Pradesh', 'Indore', 'kk19@kk.com', '9977194285', '1466', 0, 0, 'Krish003', NULL, NULL, 1, 'traveler', NULL, NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0, 1, NULL),
+(23, 'Nikhil', NULL, NULL, 'male', '2007-02-25', 'Madhya Pradesh', 'Indore', 'kktest@kk.com', '1212121212', '3725', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0, 1, NULL),
+(26, 'Nikhil Sir', NULL, NULL, 'male', '2006-02-26', 'Madhya Pradesh', 'Indore', 'nikhil02.1998@gmail.com', '7415872603', '0640', 0, 0, 'nikhil-02', NULL, NULL, 1, 'traveler', NULL, NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0, 1, NULL),
+(27, 'Krishna Kant Malviya', 'Krishna Kant', 'Malviya', 'male', '2006-02-08', 'Madhya Pradesh', 'Indore', 'learncoding299@gmail.com', '9755895314', '0325', 0, 0, 'Krishna005', 'Test Description 004', '$2b$10$OW4ZCAzq3XiY2n/Yb1TSBu1zY1EOyO.yiUIHkMzpu.xC3b0LLhqiC', 1, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1733739127944.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733745929342.webp', '2024-11-26 11:37:50', 0, 1, 1, 'Adventurer'),
+(30, 'Test', NULL, NULL, 'male', '2007-02-27', 'Madhya Pradesh', 'Indore', 'test@test.com', '1212121211', '5133', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, NULL, '2024-11-27 01:54:23', 0, 0, 1, NULL),
+(31, 'bdh', NULL, NULL, 'female', '2004-02-28', 'Andhra Pradesh', 'Ādoni', 'emai@email.com', '9340169945', '1929', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, NULL, '2024-11-27 12:19:35', 0, 0, 1, NULL),
+(32, 'Prashant', NULL, NULL, 'male', '2003-01-28', 'Madhya Pradesh', 'Indore', 'prashant@prashant.com', '9340169981', '7723', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, NULL, '2024-11-28 13:52:29', 0, 0, 1, NULL),
+(33, 'hhh', NULL, NULL, 'male', '2005-01-29', 'Madhya Pradesh', 'Indore', 'ss@ss.com', '1212121213', '9578', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, NULL, '2024-11-29 10:23:17', 0, 0, 1, NULL),
+(34, 'sd', NULL, NULL, 'male', '1998-02-28', 'Andhra Pradesh', 'Ādoni', 'dsd@sd.com', '1234567890', '7315', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, NULL, '2024-11-29 12:22:56', 0, 0, 1, NULL),
+(35, 'sd', NULL, NULL, 'male', '2008-01-29', 'Andhra Pradesh', 'Ādoni', 'kk@ll.com', '1234567898', '7639', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, NULL, '2024-11-29 13:05:44', 0, 0, 1, NULL),
+(36, 'sd', NULL, NULL, 'male', '2007-03-29', 'Andhra Pradesh', 'Addanki', 'kk@kk.com', '1212454572', '4903', 0, 0, 'test001', 'Test description', '$2b$10$RO2fWhAGEnZX49Cq6pR1.uJjrLsZm.wYD0Ftvfe/RfYPgeTt8BHGe', NULL, 'traveler', NULL, NULL, NULL, NULL, '2024-11-29 13:09:12', 0, 0, 1, NULL),
+(41, 'Test Account1', 'Test', 'Account1', 'male', '2008-02-29', 'Madhya Pradesh', 'Harda', 'test1@test.com', '1233211231', '4918', 0, 0, 'test1', 'Test Description  Test 1', '$2b$10$3G1LH/D8IwgmJKsI4SWWWuFaksMjm3Bpl4ZMVY7LkgPXwkz2vA5KK', NULL, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1732948983049.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1732951028576.jpeg', '2024-11-30 06:28:10', 0, 0, 1, NULL),
+(42, 'Test Account2', 'Test', 'Account2', 'male', '2008-02-29', 'Madhya Pradesh', 'Indore', 'test2@test.com', '1234563215', '6859', 0, 0, 'test2', 'Test Description new', '$2b$10$CJXPEs91RUyfX9f3D5LCk.idHaJM1tVKw8OEf4vqXEemxSkz.5GQe', NULL, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1732969808487.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1732969898721.webp', '2024-11-30 09:29:51', 0, 0, 1, NULL),
+(43, 'test003 ', 'test003', '', 'male', '2006-02-01', 'Madhya Pradesh', 'Indore', 'test3@test.com', '1254125412', '8966', 0, 0, 'test003', 'test description 003', '$2b$10$noJ70se3/3w2yGB1MzItMeCF3O6G2PVi9wMt.2I2tPPHxpIyE4mHe', NULL, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1733057594306.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733057585165.webp', '2024-12-01 12:52:02', 0, 0, 1, NULL),
+(44, 'test4 ', 'test4', '', 'male', '2008-02-02', 'Madhya Pradesh', 'Indore', 'test4@test.com', '1237894561', '1720', 0, 0, 'test004', 'Test Description 004', '$2b$10$RHUAXhLqKFfFvIXMz7CC8.sVPWcUwAd0GdJcwTFWQYsR7VKyWl2wm', NULL, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1733116560982.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733116543861.webp', '2024-12-02 05:13:56', 0, 1, 1, NULL),
+(45, 'Arti Kushwaha', 'Arti', 'Kushwaha', 'female', '1998-11-03', 'Madhya Pradesh', 'Bhopal', 'aktest@gmail.com', '7000085170', '4926', 0, 0, 'arti07', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.', '$2b$10$GqrpGoigu6uRrbYMLe1aRupkFR4Y1LGxRoQowBFj200g7b6BylN.a', NULL, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1733222590612.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733222582167.jpeg', '2024-12-03 10:41:50', 0, 1, 1, NULL),
+(46, 'Prashant ', 'Prashant', '', 'male', '2006-02-03', 'Maharashtra', 'Pune', 'gg@gg.com', '9977720000', '2331', 0, 0, 'pr-003', 'An application designed and developed to serve the purpose of traveling, like planning, booking, and managing is a travel app. An application has various other features, such as saving all the travel-related information and managing travel apps.', '$2b$10$eWLLqhNxhhbkg7WLclilwe8A6vf2GF1aWy8oz92YPIbjEEE/1GAq2', NULL, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1733291489028.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733291479478.webp', '2024-12-04 05:43:28', 0, 1, 1, NULL),
+(47, 'Madhulika ', 'Madhulika', '', 'female', '2008-02-06', 'Maharashtra', 'Pune', 'dhd@gmail.com', '9870516399', '8178', 0, 0, 'Madhu-07', 'An application designed and developed to serve the purpose of traveling, like planning, booking, and managing is a travel app. An application has various other features, such as saving all the travel-related information and managing travel apps.', '$2b$10$XG8n4eQsD9VcPafOJkzeVuBHbrqS3u96GLbQJjxx8qIXywDYie5.y', NULL, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1733294749187.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733294709972.webp', '2024-12-04 06:39:16', 0, 1, 1, NULL),
+(48, 'Narendra ', 'Narendra', '', 'male', '2006-02-09', 'Madhya Pradesh', 'Indore', 'narendra@narendra.com', '1478523691', '0610', 0, 0, 'narendra-001', 'It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum', '$2b$10$fxBKONzVqEQoKtbScGpxZeZ9dAvFiva3/puvAoMR6B9F0alHHMRyO', NULL, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1733747571578.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733747584889.webp', '2024-12-09 12:30:04', 0, 1, 1, NULL),
+(49, 'Anima ', 'Anima', '', 'male', '2007-02-10', 'Madhya Pradesh', 'Indore', 'anima@anima.com', '7897897896', '6492', 0, 0, 'Anima02', 'A profile description is a brief summary of your skills, experiences, and interests that you can use on social media or professional networking sites.', '$2b$10$1D7OGKV1BiJdSSsKWB2AL.DERR8IpvxCkRuHoW5zCN/QLFk3d5APG', NULL, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1733810295840.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733810288168.webp', '2024-12-10 05:56:43', 0, 1, 1, NULL);
 
 --
 -- Indexes for dumped tables
@@ -414,6 +523,12 @@ INSERT INTO `users` (`id`, `full_name`, `first_name`, `last_name`, `gender`, `do
 ALTER TABLE `bkt_lists`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `block_user`
+--
+ALTER TABLE `block_user`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `bucket_list`
@@ -491,6 +606,19 @@ ALTER TABLE `recent_search`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `reply_comment`
+--
+ALTER TABLE `reply_comment`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `reply_id` (`reply_id`);
+
+--
+-- Indexes for table `reply_like`
+--
+ALTER TABLE `reply_like`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `shared_post`
 --
 ALTER TABLE `shared_post`
@@ -522,6 +650,12 @@ ALTER TABLE `bkt_lists`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `block_user`
+--
+ALTER TABLE `block_user`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `bucket_list`
 --
 ALTER TABLE `bucket_list`
@@ -531,37 +665,37 @@ ALTER TABLE `bucket_list`
 -- AUTO_INCREMENT for table `buddies`
 --
 ALTER TABLE `buddies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
 
 --
 -- AUTO_INCREMENT for table `comments_like`
 --
 ALTER TABLE `comments_like`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `comment_reply`
 --
 ALTER TABLE `comment_reply`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `followers`
 --
 ALTER TABLE `followers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=624;
 
 --
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
 
 --
 -- AUTO_INCREMENT for table `list_posts`
@@ -573,7 +707,7 @@ ALTER TABLE `list_posts`
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `recent_search`
@@ -582,10 +716,22 @@ ALTER TABLE `recent_search`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `reply_comment`
+--
+ALTER TABLE `reply_comment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `reply_like`
+--
+ALTER TABLE `reply_like`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
 -- AUTO_INCREMENT for table `shared_post`
 --
 ALTER TABLE `shared_post`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `tags`
@@ -597,7 +743,7 @@ ALTER TABLE `tags`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- Constraints for dumped tables
