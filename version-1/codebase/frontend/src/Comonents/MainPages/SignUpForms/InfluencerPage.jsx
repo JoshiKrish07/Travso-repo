@@ -31,7 +31,7 @@ const InfluencerPage = ({
         try {
           const isInfluencerResponse = await dispatch(setInfluencerType({ smlink1: formData.smlink1, email: formData.email, mobileNumber: formData.mobileNumber })).unwrap();
         } catch (error) {
-          console.log("Error during socail media link verification:", error);
+          console.log("Error during social media link verification:", error);
         }
         
       }
@@ -119,14 +119,14 @@ const InfluencerPage = ({
                 onChange={handleInputChange}
                 className="w-full p-2 border border-[#2DC6BE] rounded-[12px] focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder:font-poppins placeholder:text-customBlack mt-3"
               />
-              {/* <input
+              <input
                 type="text"
                 name="smlink2"
                 value={formData?.smlink2 || ""}
                 placeholder="Social Media Link 2"
                 onChange={handleInputChange}
                 className="w-full p-2 border border-[#2DC6BE] rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder:font-poppins placeholder:text-customBlack mt-3"
-              /> */}
+              />
               {formDataError.smLinkError && (
                 <p className="error text-left text-[#ff0000] text-sm">
                   {formDataError.smLinkError}

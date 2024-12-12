@@ -246,6 +246,7 @@ const Rightbar = () => {
       if(followUnfollowResponse) {
         await dispatch(getUserFollowers());
         await dispatch(toWhomUserIsFollowing());
+        await dispatch(getUserBuddies());
       }
     } catch (error) {
       console.log("==error in handleFollowUnfollowForFollowing==", error);
@@ -268,7 +269,7 @@ const handleAddBuddy = async(buddyId) => {
 
 // handle remove buddy
 const handleBuddyRemove = async(buddyId) => {
-  console.log("===buddyId===>", buddyId)
+  
   try {
     const response = await dispatch(removeBuddy(buddyId));
     if(response) {
@@ -322,9 +323,16 @@ const handleBuddyRemove = async(buddyId) => {
 
                 {/* Buttons */}
                 <div className="flex items-center space-x-2">
-                  {/* <button className="w-[76px] h-[36px] text-[14px] text-[#2DC6BE] border border-[#2DC6BE] rounded-[4px] font-medium ">
-                  {buddy.is_buddies === 0 ? "Follow" : "Following"}
-                  </button> */}
+                  <button 
+                    className={`w-[76px] h-[36px] text-[14px] border rounded-[4px] font-medium ${
+                      buddy.is_followers == 0
+                        ? "bg-[#2DC6BE] text-white border-[#2DC6BE]"
+                        : "text-[#2DC6BE] border-[#2DC6BE]"
+                    }`}
+                    onClick={() => handleFollowUnfollowForFollowing(buddy?.id)}  
+                  >
+                  {buddy.is_followers === 0 ? "Follow" : "Following"}
+                  </button>
                   <button 
                     className="w-[36px] h-[36px] text-[20px] text-[#2DC6BE] border border-[#2DC6BE] rounded-[4px] font-medium flex items-center justify-center"
                     onClick={() => handleBuddyRemove(buddy?.id)}

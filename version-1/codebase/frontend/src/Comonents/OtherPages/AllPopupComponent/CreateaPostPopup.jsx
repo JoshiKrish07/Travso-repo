@@ -130,6 +130,15 @@ const CreateaPostPopup = ({
     }));
   };
 
+  /* handle location set */
+  const handleLocationInputChange = async(e) => {
+    const { value } = e.target;
+    setPostData((prev) => ({
+      ...prev,
+      location: value,
+    }));
+  }
+
   const handleSuggestionClick = (person) => {
     // Add selected buddy to postData.buddies
     setPostData((prevData) => {
@@ -141,7 +150,16 @@ const CreateaPostPopup = ({
         ...prevData,
         buddies: [
           ...prevData.buddies,
-          { id: person.id, name: person.full_name },
+          {
+             id: person.id,
+             name: person.full_name, 
+             profile_image: person.profile_image,
+             followers_count: person.followers_count || 0,
+             buddies_count: person.buddies_count || 0,
+             trips_count: person.trips_count || 0,
+             role: person.user_role,
+             user_name: person.user_name
+          },
         ],
         buddies_id: [...prevData.buddies_id, person.id], // Maintain IDs separately
       };
@@ -393,12 +411,19 @@ const CreateaPostPopup = ({
                 <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">
                   Add Location ( Only one )
                 </p>
-                <Select
+                {/* <Select
                   options={options}
                   onChange={handleLocationChange}
                   placeholder="eg: Mysore"
                   className=""
-                />
+                /> */}
+                <input
+                    type="text"
+                    onChange={(e) => handleLocationInputChange(e)}
+                    placeholder= "eg: Mysore"
+                    value={postData?.location || ""}
+                    className="flex-grow font-inter font-medium text-[16px] text-[#212626] w-full p-3 h-[48px] bg-[#F0F7F7] rounded-[8px] border-1 border-[#F5F5F5] placeholder:text-[#869E9D] focus:outline-none focus:ring-1 focus:ring-[#5E6F78] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]"
+                  />
               </div>
 
               {/* <div className="flex flex-col">

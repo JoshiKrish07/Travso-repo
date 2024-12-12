@@ -32,7 +32,12 @@ import Send from "../../../assets/Send.png";
 import trash from "../../../assets/trash.png";
 import alert from "../../../assets/alert.png";
 import { useDispatch, useSelector } from "react-redux";
-import { blockAccount, getUserBuddies, getUserDetails, getUserPosts } from "../../../redux/slices/authSlice";
+import {
+  blockAccount,
+  getUserBuddies,
+  getUserDetails,
+  getUserPosts,
+} from "../../../redux/slices/authSlice";
 import {
   commentOnPost,
   commentOnReply,
@@ -68,8 +73,10 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
   const [flashMessage, setFlashMessage] = useState("");
   const [flashMsgType, setFlashMsgType] = useState("");
   const [visibleReplies, setVisibleReplies] = useState({}); // Object to track visible replies for each comment
-  const [showTagSuggestionsForReply, setShowTagSuggestionsForReply] = useState(false);
-  const [filteredSuggestionsForReply, setFilteredSuggestionsForReply] = useState([]);
+  const [showTagSuggestionsForReply, setShowTagSuggestionsForReply] =
+    useState(false);
+  const [filteredSuggestionsForReply, setFilteredSuggestionsForReply] =
+    useState([]);
 
   // to show share popup
   const [activePostId, setActivePostId] = useState(null);
@@ -81,11 +88,11 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
   const [taggedUsers, setTaggedUsers] = useState([]); // To store tagged user IDs/names
   const people = [
-    { id: 1, name: 'John Doe' },
-    { id: 2, name: 'Jane Smith' },
-    { id: 3, name: 'Michael Johnson' },
-    { id: 4, name: 'Kevin Brooks' },
-    { id: 5, name: 'Kate Wilson' },
+    { id: 1, name: "John Doe" },
+    { id: 2, name: "Jane Smith" },
+    { id: 3, name: "Michael Johnson" },
+    { id: 4, name: "Kevin Brooks" },
+    { id: 5, name: "Kate Wilson" },
   ];
 
   const handleSuggestionClick = (person) => {
@@ -115,14 +122,13 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
     }));
   };
 
-// Handle showing fewer replies (View Less)
-const handleViewLessReplies = (commentId) => {
-  setVisibleReplies((prev) => ({
-    ...prev,
-    [commentId]: 2, // Reset to initial state (show only 2 replies)
-  }));
-};
-
+  // Handle showing fewer replies (View Less)
+  const handleViewLessReplies = (commentId) => {
+    setVisibleReplies((prev) => ({
+      ...prev,
+      [commentId]: 2, // Reset to initial state (show only 2 replies)
+    }));
+  };
 
   /* handle reply to comment click */
   const handleReplyClick = (commentId) => {
@@ -132,7 +138,7 @@ const handleViewLessReplies = (commentId) => {
 
   /* handle reply on reply click */
   const handleReplyToReplyClick = (replyId) => {
-    console.log("====replyId===>", replyId)
+    console.log("====replyId===>", replyId);
     setReplyToReplyId(replyToReplyId === replyId ? null : replyId);
   };
 
@@ -146,7 +152,11 @@ const handleViewLessReplies = (commentId) => {
   };
 
   const { postComment } = useSelector((state) => state.postSlice);
-  const { userPosts, user: userDetails, userBuddies } = useSelector((state) => state.auth);
+  const {
+    userPosts,
+    user: userDetails,
+    userBuddies,
+  } = useSelector((state) => state.auth);
 
   /* emoji functionality starts */
   const [showEmojiPicker, setShowEmojiPicker] = useState(false); // working on reply on comment
@@ -181,9 +191,9 @@ const handleViewLessReplies = (commentId) => {
       dispatch(getUserPosts());
     }
 
-    if (!postComment) {
-      dispatch(getCommentOnPost(postId));
-    }
+    // if (!postComment) {
+    dispatch(getCommentOnPost(postId));
+    // }
 
     if (!userDetails) {
       dispatch(getUserDetails());
@@ -194,7 +204,7 @@ const handleViewLessReplies = (commentId) => {
     }
 
     const foundPost = userPosts.find((post) => post.id === postId);
-    
+
     if (foundPost) {
       setAllPosts([foundPost]); // Place the found post at the 0 index
     }
@@ -217,7 +227,6 @@ const handleViewLessReplies = (commentId) => {
       // handleFlashMessage(errorMessage, 'error')
     }
   };
-
 
   // handle flash messages show
   const handleFlashMessage = (errorMessage, msgType) => {
@@ -254,7 +263,6 @@ const handleViewLessReplies = (commentId) => {
         const errorMessage = error.error || "Unexpected Error Occured";
         // handleFlashMessage(errorMessage, 'error')
       }
-      
     }
   };
 
@@ -318,7 +326,7 @@ const handleViewLessReplies = (commentId) => {
     if (hoursDifference >= 1) {
       return `${hoursDifference}h`;
     }
-  
+
     return `${minutesDifference}m`;
   }
 
@@ -355,39 +363,40 @@ const handleViewLessReplies = (commentId) => {
   };
 
   // for deleting comment on user post only
-  const deleteThisComment = async(commentId) => {
-      try {
-        const deleteResponse = await dispatch(deleteCommentByPostOwner(commentId)).unwrap();
-        if(deleteResponse) {
-          setOpenDropdownId(null);
-          await dispatch(getCommentOnPost(postId));
-          await dispatch(getUserPosts());
-          handleFlashMessage(deleteResponse.message, 'success');
-        }
-      } catch (error) {
-        console.log("=======error====in deleteThisComment==>", error);
-        handleFlashMessage(error.error || "Unexpected Error", 'error');
-
-      }
-  }
-
-  // for deleting reply on user post only
-  const deleteThisReply = async(replyId) => {
-
+  const deleteThisComment = async (commentId) => {
     try {
-      const deleteResponse = await dispatch(deleteReplyByPostOwner(replyId)).unwrap();
-      if(deleteResponse) {
-        setOpenDropdownReplyId(null);
+      const deleteResponse = await dispatch(
+        deleteCommentByPostOwner(commentId)
+      ).unwrap();
+      if (deleteResponse) {
+        setOpenDropdownId(null);
         await dispatch(getCommentOnPost(postId));
         await dispatch(getUserPosts());
-        handleFlashMessage(deleteResponse.message, 'success');
+        handleFlashMessage(deleteResponse.message, "success");
       }
     } catch (error) {
       console.log("=======error====in deleteThisComment==>", error);
-      handleFlashMessage(error.error || "Unexpected Error", 'error');
-
+      handleFlashMessage(error.error || "Unexpected Error", "error");
     }
-}
+  };
+
+  // for deleting reply on user post only
+  const deleteThisReply = async (replyId) => {
+    try {
+      const deleteResponse = await dispatch(
+        deleteReplyByPostOwner(replyId)
+      ).unwrap();
+      if (deleteResponse) {
+        setOpenDropdownReplyId(null);
+        await dispatch(getCommentOnPost(postId));
+        await dispatch(getUserPosts());
+        handleFlashMessage(deleteResponse.message, "success");
+      }
+    } catch (error) {
+      console.log("=======error====in deleteThisComment==>", error);
+      handleFlashMessage(error.error || "Unexpected Error", "error");
+    }
+  };
 
   const handleCommentLikeUnlike = async (commentId, postId) => {
     try {
@@ -401,33 +410,29 @@ const handleViewLessReplies = (commentId) => {
     }
   };
 
-  
-  const handleCommentLikeUnlikeOnReply = async(replyId) => {
+  const handleCommentLikeUnlikeOnReply = async (replyId) => {
     try {
       const response = await dispatch(likeUnlikeAnyReply(replyId)).unwrap();
       if (response) {
         await dispatch(getCommentOnPost(postId));
       }
       // console.log("=====response=====>", response);
-      
     } catch (error) {
       console.log("error in handleCommentLikeUnlikeOnReply", error);
     }
-  }
+  };
 
   // to show post images
   // const mediaArray =
   //   allPosts && allPosts[0].media_url.replace(/^\[\"|\"?\]$/g, "").split('","'); // Split the string into individual URLs
 
-   // to show post images
-   const mediaArray =
-   allPosts && allPosts[0].media_url;
-
+  // to show post images
+  const mediaArray = allPosts && allPosts[0].media_url;
 
   // handle input change on comment input
   const handleCommentInputChange = (e) => {
     const { value } = e.target;
-    
+
     setCommentInputVal(value);
     const match = value.match(/@(\w*)$/); // Match word after @
     if (match) {
@@ -440,7 +445,7 @@ const handleViewLessReplies = (commentId) => {
     } else {
       setShowTagSuggestions(false);
     }
-  }
+  };
 
   // to detect tag if user deleted any character
   const detectRemovedTag = (text) => {
@@ -459,7 +464,7 @@ const handleViewLessReplies = (commentId) => {
     setCommentReplyInputVal((prev) => ({
       ...prev,
       [commentId]: value,
-    }))
+    }));
 
     const match = value.match(/@(\w*)$/); // Match word after @
     if (match) {
@@ -472,19 +477,19 @@ const handleViewLessReplies = (commentId) => {
     } else {
       setShowTagSuggestionsForReply(false);
     }
-  }
+  };
 
   const handleSuggestionClickForReply = (person, commentId) => {
     // Replace the @mention in input with the selected person's name
     // Replace the @mention in input with the selected person's name
-      const currentText = commentReplyInputVal[commentId] || ""; // Retrieve the current value for the commentId
-      const newText = currentText.replace(/@\w*$/, `@${person.full_name} `);
+    const currentText = commentReplyInputVal[commentId] || ""; // Retrieve the current value for the commentId
+    const newText = currentText.replace(/@\w*$/, `@${person.full_name} `);
 
-      // Update the input value for the specific commentId
-      setCommentReplyInputVal((prev) => ({
-        ...prev,
-        [commentId]: newText,
-      }));
+    // Update the input value for the specific commentId
+    setCommentReplyInputVal((prev) => ({
+      ...prev,
+      [commentId]: newText,
+    }));
 
     // Add the tagged user's ID to the taggedUsers array
     setTaggedUsers((prev) => [...prev, person.id]);
@@ -523,85 +528,83 @@ const handleViewLessReplies = (commentId) => {
     }
   };
 
-const sendReplyComment = async (commentId, postId) => {
-  try {
-    const replyResponse = await dispatch(
-      commentOnReply({
-        comment_id: commentId,
-        content: commentReplyInputVal[commentId],
-      })
-    ).unwrap();
-    console.log("====replyResponse===>", replyResponse);
-    if (replyResponse) {
-      await dispatch(getCommentOnPost(postId));
-      await dispatch(getUserPosts());
-      setCommentReplyInputVal({});
-    }
-  } catch (error) {
-    console.log("error in sendReplyComment commentpopup page", error);
-  }
-};
-
-const handleCommentImageUpload = async (e) => {
-  const file = e.target.files[0];
-  console.log("===file===>", file);
-  if (file) {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = async () => {
-      try {
-        setImagePreview(reader.result);
-        setImagePreview(reader.result); // Set the image preview
-
-        // Append the image preview as part of the comment (you can also append it to a markdown or HTML format)
-        setCommentInputVal(
-          (prevComment) =>
-            prevComment + `<img src="${reader.result}" alt="comment-image" />`
-        );
-        console.log("Image uploaded successfully");
-      } catch (error) {
-        console.error("Image upload failed handleCommentImageUpload:", error);
-      } finally {
-        e.target.value = null;
+  const sendReplyComment = async (commentId, postId) => {
+    try {
+      const replyResponse = await dispatch(
+        commentOnReply({
+          comment_id: commentId,
+          content: commentReplyInputVal[commentId],
+        })
+      ).unwrap();
+      console.log("====replyResponse===>", replyResponse);
+      if (replyResponse) {
+        await dispatch(getCommentOnPost(postId));
+        await dispatch(getUserPosts());
+        setCommentReplyInputVal({});
       }
-    };
-  }
-};
+    } catch (error) {
+      console.log("error in sendReplyComment commentpopup page", error);
+    }
+  };
+
+  const handleCommentImageUpload = async (e) => {
+    const file = e.target.files[0];
+    console.log("===file===>", file);
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = async () => {
+        try {
+          setImagePreview(reader.result);
+          setImagePreview(reader.result); // Set the image preview
+
+          // Append the image preview as part of the comment (you can also append it to a markdown or HTML format)
+          setCommentInputVal(
+            (prevComment) =>
+              prevComment + `<img src="${reader.result}" alt="comment-image" />`
+          );
+          console.log("Image uploaded successfully");
+        } catch (error) {
+          console.error("Image upload failed handleCommentImageUpload:", error);
+        } finally {
+          e.target.value = null;
+        }
+      };
+    }
+  };
 
   // console.log("======allPosts[0].description.length====>", allPosts[0].description.length);
 
-  const handleReplyToReply = async(replyId) => {
+  const handleReplyToReply = async (replyId) => {
     setReplyToReplyId(replyId);
-  }
-
+  };
 
   // to open share popup
   const handleOpenSharePopup = (postId) => {
     setActivePostId(postId);
     setIsSharePopup(true);
-  }
+  };
 
   // to close share popup
   const handleSharePopupClose = () => {
     setIsSharePopup(false);
     setActivePostId(null);
     dispatch(getUserPosts());
-  }
+  };
 
-  const blockTheUser = async(blockId) => {
-    setOpenDropdownReplyId(null);
-  return;
-    // try {
-    //   console.log("=====blockId===>", blockId);
-    //   const response = await dispatch(blockAccount(blockId)).unwrap();
-    //   console.log("===response===>", response);
-    //   if(response) {
-    //     setOpenDropdownReplyId(null);
-    //   }
-    // } catch (error) {
-    //   console.log("===error in blocktheuser===>", error);
-    // }
-  }
+  const blockTheUser = async (blockId) => {
+
+    try {
+      console.log("=====blockId===>", blockId);
+      const response = await dispatch(blockAccount(blockId)).unwrap();
+      console.log("===response===>", response);
+      if(response) {
+        setOpenDropdownId(null);
+      }
+    } catch (error) {
+      console.log("===error in blocktheuser===>", error);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -659,69 +662,75 @@ const handleCommentImageUpload = async (e) => {
 
             {/*---------- Scrollable Part ---------*/}
             <div className="flex-1 overflow-y-auto scrollbar-hidden">
-            { mediaArray && mediaArray.length === 1 && (
-                  <div className="relative w-full max-w-4xl mx-auto"> 
-                    <div className="overflow-hidden relative">
-                      <div>
-                        <img
-                          // src={images[currentIndex]}
-                          src={mediaArray && mediaArray.length > 0 && mediaArray[currentIndex]}
-                          alt={`Slide ${currentIndex}`}
-                          className="rounded-lg w-full h-[344px] object-cover transition duration-500"
-                        />
-                      </div>
+              {mediaArray && mediaArray.length === 1 && (
+                <div className="relative w-full max-w-4xl mx-auto">
+                  <div className="overflow-hidden relative">
+                    <div>
+                      <img
+                        // src={images[currentIndex]}
+                        src={
+                          mediaArray &&
+                          mediaArray.length > 0 &&
+                          mediaArray[currentIndex]
+                        }
+                        alt={`Slide ${currentIndex}`}
+                        className="rounded-lg w-full h-[344px] object-cover transition duration-500"
+                      />
                     </div>
                   </div>
-              )}
-                {/* Slider */}
-                { mediaArray && mediaArray.length > 1 && (
-                  <div className="relative w-full max-w-4xl mx-auto">
-                
-                    <div className="overflow-hidden relative">
-                      <div>
-                        <img
-                          // src={images[currentIndex]}
-                          src={mediaArray && mediaArray.length > 0 && mediaArray[currentIndex]}
-                          alt={`Slide ${currentIndex}`}
-                          className="rounded-lg w-full h-[344px] object-cover transition duration-500"
-                        />
-                      </div>
-                    </div>
-                 
-                
-
-                {/* Left Button */}
-                <button
-                  onClick={goToPrevious}
-                  className="absolute top-1/2 left-4 w-9 h-9 transform -translate-y-1/2 bg-[#EEF0F299] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center"
-                >
-                  <img src={leftIcon} alt="leftIcon" className="" />
-                </button>
-
-                {/* Right Button */}
-                <button
-                  onClick={goToNext}
-                  className="absolute top-1/2 right-4 w-9 h-9 transform -translate-y-1/2 bg-[#EEF0F299] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center rotate-180"
-                >
-                  <img src={leftIcon} alt="leftIcon" className="" />
-                </button>
-
-                {/* Dots */}
-                <div className="flex justify-center mt-1">
-                  {mediaArray && mediaArray.length > 0 &&
-                    mediaArray?.map((_, index) => (
-                      <div
-                        key={index}
-                        onClick={() => goToSlide(index)}
-                        className={`w-2 h-2 mx-1 rounded-full ${
-                          index === currentIndex
-                            ? "bg-[#2DC6BE]"
-                            : "bg-[#364045] hover:bg-[#2DC6BE]"
-                        } cursor-pointer`}
-                      ></div>
-                    ))}
                 </div>
-              </div>
+              )}
+              {/* Slider */}
+              {mediaArray && mediaArray.length > 1 && (
+                <div className="relative w-full max-w-4xl mx-auto">
+                  <div className="overflow-hidden relative">
+                    <div>
+                      <img
+                        // src={images[currentIndex]}
+                        src={
+                          mediaArray &&
+                          mediaArray.length > 0 &&
+                          mediaArray[currentIndex]
+                        }
+                        alt={`Slide ${currentIndex}`}
+                        className="rounded-lg w-full h-[344px] object-cover transition duration-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Left Button */}
+                  <button
+                    onClick={goToPrevious}
+                    className="absolute top-1/2 left-4 w-9 h-9 transform -translate-y-1/2 bg-[#EEF0F299] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center"
+                  >
+                    <img src={leftIcon} alt="leftIcon" className="" />
+                  </button>
+
+                  {/* Right Button */}
+                  <button
+                    onClick={goToNext}
+                    className="absolute top-1/2 right-4 w-9 h-9 transform -translate-y-1/2 bg-[#EEF0F299] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center rotate-180"
+                  >
+                    <img src={leftIcon} alt="leftIcon" className="" />
+                  </button>
+
+                  {/* Dots */}
+                  <div className="flex justify-center mt-1">
+                    {mediaArray &&
+                      mediaArray.length > 0 &&
+                      mediaArray?.map((_, index) => (
+                        <div
+                          key={index}
+                          onClick={() => goToSlide(index)}
+                          className={`w-2 h-2 mx-1 rounded-full ${
+                            index === currentIndex
+                              ? "bg-[#2DC6BE]"
+                              : "bg-[#364045] hover:bg-[#2DC6BE]"
+                          } cursor-pointer`}
+                        ></div>
+                      ))}
+                  </div>
+                </div>
               )}
               {/* Post Description */}
               <p className="font-inter font-medium text-[14px] text-[#212626] text-left text-justify mb-1">
@@ -732,7 +741,11 @@ const handleCommentImageUpload = async (e) => {
                   onClick={toggleFullText}
                   className="text-[#2DC6BE] cursor-pointer"
                 >
-                  {allPosts && allPosts[0].description.length < 100 ? "" : isFullTextVisible ? " Show less" : " See more"}
+                  {allPosts && allPosts[0].description.length < 100
+                    ? ""
+                    : isFullTextVisible
+                    ? " Show less"
+                    : " See more"}
                 </span>
               </p>
 
@@ -775,12 +788,18 @@ const handleCommentImageUpload = async (e) => {
             <div className="flex items-center justify-between mt-3">
               <button
                 aria-label="Edit Info"
-                className={`flex items-center justify-center w-[130px] h-[36px] py-1 px-2 rounded-full ${allPosts && allPosts[0].user_liked_post == 0 ? "bg-[#cdd0d499] text-[#434C50]" : "bg-[#2DC6BE] text-white" }`}
+                className={`flex items-center justify-center w-[130px] h-[36px] py-1 px-2 rounded-full ${
+                  allPosts && allPosts[0].user_liked_post == 0
+                    ? "bg-[#cdd0d499] text-[#434C50]"
+                    : "bg-[#2DC6BE] text-white"
+                }`}
                 onClick={() => handleLikeUnlike(allPosts[0].id)}
               >
                 <img src={like} alt="like" className="mr-2 w-[20px] h-[20px]" />
                 <span className="font-inter font-medium text-[14px] text-[#212626]">
-                  {allPosts && allPosts[0].user_liked_post == 0 ? "Like" : "Liked"}
+                  {allPosts && allPosts[0].user_liked_post == 0
+                    ? "Like"
+                    : "Liked"}
                 </span>
               </button>
 
@@ -836,16 +855,14 @@ const handleCommentImageUpload = async (e) => {
             </div>
             {/* Top Fixed Section */}
 
-            {
-                    activePostId === postId && isSharePopup && (
-                      <SharePopup
-                        isOpen={isSharePopup}
-                        // onClose={() => setIsSharePopup(false)}
-                        onClose={() => handleSharePopupClose()}
-                        postId={activePostId}
-                      />
-                    )
-                  }
+            {activePostId === postId && isSharePopup && (
+              <SharePopup
+                isOpen={isSharePopup}
+                // onClose={() => setIsSharePopup(false)}
+                onClose={() => handleSharePopupClose()}
+                postId={activePostId}
+              />
+            )}
 
             {/*---------- Scrollable Part ---------*/}
             <div className="flex-1 overflow-y-auto scrollbar-thin space-y-4">
@@ -853,166 +870,190 @@ const handleCommentImageUpload = async (e) => {
               {postComment &&
                 postComment.map((userPosts, index) => {
                   return (
-                    <>
-                    <div className="mt-6" key={index}>
-                      {/* Parent Comment Reaction */}
-                      <div className="flex items-start space-x-3 rounded-md">
-                        {/* Profile Image */}
-                        <img
-                          src={userPosts?.profile_image || dummyUserImage}
-                          alt="User"
-                          className="w-8 h-8 rounded-full"
-                        />
+                    <div key={userPosts?.id}>
+                      <div className="mt-6" key={index}>
+                        {/* Parent Comment Reaction */}
+                        <div className="flex items-start space-x-3 rounded-md">
+                          {/* Profile Image */}
+                          <img
+                            src={userPosts?.profile_image || dummyUserImage}
+                            alt="User"
+                            className="w-8 h-8 rounded-full"
+                          />
 
-                        {/* Content Section */}
-                        <div className="w-full flex flex-col space-y-2">
-                          {/* Comment Content */}
-                          <div className="flex flex-col bg-[#EEF0F29C] p-2 rounded-[12px] w-full">
-                            <div className="flex items-center justify-between">
-                              <p className="flex items-center font-inter font-medium text-[#212626] text-[16px] text-left">
-                                {userPosts?.user_name || userPosts?.full_name}{" "}
-                                &nbsp;{" "}
-                                <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>{" "}
-                                &nbsp;{" "}
-                                {/* <span className="font-inter font-medium text-[16px] text-[#667877]">
+                          {/* Content Section */}
+                          <div className="w-full flex flex-col space-y-2">
+                            {/* Comment Content */}
+                            <div className="flex flex-col bg-[#EEF0F29C] p-2 rounded-[12px] w-full">
+                              <div className="flex items-center justify-between">
+                                <p className="flex items-center font-inter font-medium text-[#212626] text-[16px] text-left">
+                                  {userPosts?.user_name || userPosts?.full_name}{" "}
+                                  &nbsp;{" "}
+                                  <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>{" "}
+                                  &nbsp;{" "}
+                                  {/* <span className="font-inter font-medium text-[16px] text-[#667877]">
                                   {getTimeDifferenceFromNow(
                                     userPosts?.created_at
                                   )}{" "}
                                   ago
                                 </span> */}
-                                <span className="font-inter font-medium text-[16px] text-[#667877]">
-                                  {getTimeDifferenceFromNow(userPosts?.created_at) == '0m' ? 'just now' : `${getTimeDifferenceFromNow(userPosts?.created_at)} ago`}{" "}
-                                </span>
-                              </p>
-                              <img
-                                src={dots_vertical}
-                                alt="dots_vertical"
-                                className="w-[24px] h-[24px] cursor-pointer"
-                                // onClick={toggleSetting}
-                                onClick={() => setOpenDropdownId(userPosts.id)}
-                              />
-                              {/* DropdownSetting Menu */}
-                              {openDropdownId === userPosts?.id && (
-                                <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border border-[#ddd] rounded-md rounded-[16px] shadow-md w-[200px]">
-                                  <div className="flex items-center justify-between p-2 px-4 ">
-                                    <h6 className="font-poppins font-semibold text-[16px] text-[#212626]">
-                                      More Options
-                                    </h6>
+                                  <span className="font-inter font-medium text-[16px] text-[#667877]">
+                                    {getTimeDifferenceFromNow(
+                                      userPosts?.created_at
+                                    ) == "0m"
+                                      ? "just now"
+                                      : `${getTimeDifferenceFromNow(
+                                          userPosts?.created_at
+                                        )} ago`}{" "}
+                                  </span>
+                                </p>
+                                <img
+                                  src={dots_vertical}
+                                  alt="dots_vertical"
+                                  className="w-[24px] h-[24px] cursor-pointer"
+                                  // onClick={toggleSetting}
+                                  onClick={() =>
+                                    setOpenDropdownId(userPosts.id)
+                                  }
+                                />
+                                {/* DropdownSetting Menu */}
+                                {openDropdownId === userPosts?.id && (
+                                  <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border border-[#ddd] rounded-md rounded-[16px] shadow-md w-[200px]">
+                                    <div className="flex items-center justify-between p-2 px-4 ">
+                                      <h6 className="font-poppins font-semibold text-[16px] text-[#212626]">
+                                        More Options
+                                      </h6>
 
-                                    {/* Close Button (X) */}
-                                    <button
-                                      className="hover:text-[#2DC6BE] font-poppins font-semibold text-[16px] text-[#212626]"
-                                      // onClick={() =>
-                                      //   setDropdownOpenSetting(false)
-                                      // }
-                                      onClick={() => setOpenDropdownId(null)}
-                                      aria-label="Close"
-                                    >
-                                      &#x2715;
-                                    </button>
-                                  </div>
-                                  <ul>
-                                    <li className="font-inter font-medium text-[16px] text-[#212626] px-4 py-2 flex items-center cursor-pointer hover:bg-[#f0f0f0]">
+                                      {/* Close Button (X) */}
+                                      <button
+                                        className="hover:text-[#2DC6BE] font-poppins font-semibold text-[16px] text-[#212626]"
+                                        // onClick={() =>
+                                        //   setDropdownOpenSetting(false)
+                                        // }
+                                        onClick={() => setOpenDropdownId(null)}
+                                        aria-label="Close"
+                                      >
+                                        &#x2715;
+                                      </button>
+                                    </div>
+                                    <ul>
+                                      {/* <li className="font-inter font-medium text-[16px] text-[#212626] px-4 py-2 flex items-center cursor-pointer hover:bg-[#f0f0f0]">
                                       <img
                                         src={alert}
                                         alt="alert"
                                         className="w-[20px] h-[20px] cursor-pointer mr-2"
                                       />{" "}
                                       Report comment
-                                    </li>
-                                    <li className="px-4 py-2 flex items-center cursor-pointer hover:bg-[#f0f0f0]" onClick={() => deleteThisComment(userPosts?.id)}>
-                                      <img
-                                        src={trash}
-                                        alt="alert"
-                                        className="w-[20px] h-[20px] cursor-pointer mr-2"
-                                      />{" "}
-                                      Delete comment
-                                    </li>
-                                    <li className="px-4 py-2 flex items-center cursor-pointer hover:bg-[#f0f0f0]" onClick={() => blockTheUser(userPosts?.id)}>
-                                      <img
-                                        src={trash}
-                                        alt="alert"
-                                        className="w-[20px] h-[20px] cursor-pointer mr-2"
-                                      />{" "}
-                                      Block Account
-                                    </li>
-                                  </ul>
-                                </div>
-                              )}
+                                    </li> */}
+                                      <li
+                                        className="px-4 py-2 flex items-center cursor-pointer hover:bg-[#f0f0f0]"
+                                        onClick={() =>
+                                          deleteThisComment(userPosts?.id)
+                                        }
+                                      >
+                                        <img
+                                          src={trash}
+                                          alt="alert"
+                                          className="w-[20px] h-[20px] cursor-pointer mr-2"
+                                        />{" "}
+                                        Delete comment
+                                      </li>
+                                      {userPosts?.user_id !==
+                                        allPosts[0]?.user_id && (
+                                        <li
+                                          className="px-4 py-2 flex items-center cursor-pointer hover:bg-[#f0f0f0]"
+                                          onClick={() =>
+                                            blockTheUser(userPosts?.user_id)
+                                          }
+                                        >
+                                          <img
+                                            src={trash}
+                                            alt="alert"
+                                            className="w-[20px] h-[20px] cursor-pointer mr-2"
+                                          />{" "}
+                                          Block Account
+                                        </li>
+                                      )}
+                                    </ul>
+                                  </div>
+                                )}
+                              </div>
+
+                              <p className="font-inter font-normal text-[14px] text-[#212626] text-left">
+                                {userPosts?.content}
+                              </p>
                             </div>
 
-                            <p className="font-inter font-normal text-[14px] text-[#212626] text-left">
-                              {userPosts?.content}
-                            </p>
-                          </div>
-
-                          {/* Interaction Section */}
-                          <div className="flex flex-col">
-                            <div className="-mt-1 flex items-center gap-4">
-                              <div
-                                className="flex items-center cursor-pointer"
-                                onClick={() =>
-                                  handleCommentLikeUnlike(
-                                    userPosts.id,
-                                    allPosts[0]?.id
-                                  )
-                                }
-                              >
-                                <div className="flex items-center">
-                                  <img
-                                    src={noto_fire}
-                                    alt="noto_fire"
-                                    className="w-4 h-4"
-                                  />
+                            {/* Interaction Section */}
+                            <div className="flex flex-col">
+                              <div className="-mt-1 flex items-center gap-4">
+                                <div
+                                  className="flex items-center cursor-pointer"
+                                  onClick={() =>
+                                    handleCommentLikeUnlike(
+                                      userPosts.id,
+                                      allPosts[0]?.id
+                                    )
+                                  }
+                                >
+                                  <div className="flex items-center">
+                                    <img
+                                      src={noto_fire}
+                                      alt="noto_fire"
+                                      className="w-4 h-4"
+                                    />
+                                  </div>
+                                  <div className="flex items-center">
+                                    <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
+                                      {userPosts?.total_likes_on_comment || ""}{" "}
+                                      {userPosts?.total_likes_on_comment > 1
+                                        ? "likes"
+                                        : "like"}{" "}
+                                    </p>
+                                  </div>
                                 </div>
-                                <div className="flex items-center">
-                                  <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
-                                    {userPosts?.total_likes_on_comment || ""}{" "}
-                                    {userPosts?.total_likes_on_comment > 1
-                                      ? "likes"
-                                      : "like"}{" "}
-                                  </p>
+                                <div
+                                  className="flex items-center"
+                                  onClick={() =>
+                                    handleReplyClick(userPosts?.id)
+                                  }
+                                >
+                                  <div className="flex items-center">
+                                    <img
+                                      src={Dialog}
+                                      alt="Dialog"
+                                      className="w-4 h-4"
+                                    />
+                                  </div>
+                                  <div className="flex items-center cursor-pointer">
+                                    <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
+                                      {userPosts?.total_reply_on_comment || ""}{" "}
+                                      {userPosts?.total_reply_on_comment > 1
+                                        ? "replies"
+                                        : "reply"}{" "}
+                                    </p>
+                                  </div>
                                 </div>
-                              </div>
-                              <div
-                                className="flex items-center"
-                                onClick={() => handleReplyClick(userPosts?.id)}
-                              >
-                                <div className="flex items-center">
-                                  <img
-                                    src={Dialog}
-                                    alt="Dialog"
-                                    className="w-4 h-4"
-                                  />
-                                </div>
-                                <div className="flex items-center cursor-pointer">
-                                  <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
-                                    {userPosts?.total_reply_on_comment || ""}{" "}
-                                    {userPosts?.total_reply_on_comment > 1
-                                      ? "replies"
-                                      : "reply"}{" "}
-                                  </p>
-                                </div>
-                              
                               </div>
                             </div>
-                            
                           </div>
                         </div>
-                        
-                          
+                        {/* Parent Comment Reaction */}
                       </div>
-                      {/* Parent Comment Reaction */}
-                    </div>
-                    {/* SubReplies */}
-                    {userPosts?.replies?.length > 0 &&
-                          userPosts?.replies?.slice(0, visibleReplies[userPosts.id] || 2).map((userReply, replyIndex) => {
+                      {/* SubReplies */}
+                      {userPosts?.replies?.length > 0 &&
+                        userPosts?.replies
+                          ?.slice(0, visibleReplies[userPosts.id] || 2)
+                          .map((userReply, replyIndex) => {
                             return (
                               <div key={userReply?.reply_id}>
                                 <div className="mt-4 ml-8">
                                   <div className="flex items-start rounded-md">
                                     <img
-                                      src={userReply?.reply_user_profile_image || dummyUserImage}
+                                      src={
+                                        userReply?.reply_user_profile_image ||
+                                        dummyUserImage
+                                      }
                                       alt="User"
                                       className="w-8 h-8 rounded-full"
                                     />
@@ -1021,56 +1062,95 @@ const handleCommentImageUpload = async (e) => {
                                       <div className="flex flex-col bg-[#EEF0F29C] p-2 rounded-[12px] w-full">
                                         <div className="flex items-center justify-between cursor-pointer">
                                           <p className="flex items-center font-inter font-medium text-[#212626] text-[16px] text-left">
-                                            {userReply?.reply_user_full_name} &nbsp;{" "}
+                                            {userReply?.reply_user_full_name}{" "}
+                                            &nbsp;{" "}
                                             <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>{" "}
                                             &nbsp;{" "}
                                             <span className="font-inter font-medium text-[16px] text-[#667877]">
-                                              {getTimeDifferenceFromNow(userReply?.reply_created_at) == '0m' ? 'just now' : `${getTimeDifferenceFromNow(userReply?.reply_created_at)} ago`}{" "}
+                                              {getTimeDifferenceFromNow(
+                                                userReply?.reply_created_at
+                                              ) == "0m"
+                                                ? "just now"
+                                                : `${getTimeDifferenceFromNow(
+                                                    userReply?.reply_created_at
+                                                  )} ago`}{" "}
                                             </span>
                                           </p>
                                           <img
                                             src={dots_vertical}
                                             alt="dots_vertical"
                                             className="w-[24px] h-[24px]"
-                                            onClick={() => setOpenDropdownReplyId(userReply?.reply_id)}
+                                            onClick={() =>
+                                              setOpenDropdownReplyId(
+                                                userReply?.reply_id
+                                              )
+                                            }
                                           />
                                           {/* DropdownSetting Menu */}
-                                            {openDropdownReplyId === userReply?.reply_id && (
-                                              <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border border-[#ddd] rounded-md rounded-[16px] shadow-md w-[200px]">
-                                                <div className="flex items-center justify-between p-2 px-4 ">
-                                                  <h6 className="font-poppins font-semibold text-[16px] text-[#212626]">
-                                                    More Options
-                                                  </h6>
+                                          {openDropdownReplyId ===
+                                            userReply?.reply_id && (
+                                            <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border border-[#ddd] rounded-md rounded-[16px] shadow-md w-[200px]">
+                                              <div className="flex items-center justify-between p-2 px-4 ">
+                                                <h6 className="font-poppins font-semibold text-[16px] text-[#212626]">
+                                                  More Options
+                                                </h6>
 
-                                                  {/* Close Button (X) */}
-                                                  <button
-                                                    className="hover:text-[#2DC6BE] font-poppins font-semibold text-[16px] text-[#212626]"
-                                                    onClick={() => setOpenDropdownReplyId(null)}
-                                                    aria-label="Close"
+                                                {/* Close Button (X) */}
+                                                <button
+                                                  className="hover:text-[#2DC6BE] font-poppins font-semibold text-[16px] text-[#212626]"
+                                                  onClick={() =>
+                                                    setOpenDropdownReplyId(null)
+                                                  }
+                                                  aria-label="Close"
+                                                >
+                                                  &#x2715;
+                                                </button>
+                                              </div>
+                                              <ul>
+                                                {/* <li className="font-inter font-medium text-[16px] text-[#212626] px-4 py-2 flex items-center cursor-pointer hover:bg-[#f0f0f0]">
+                                                  <img
+                                                    src={alert}
+                                                    alt="alert"
+                                                    className="w-[20px] h-[20px] cursor-pointer mr-2"
+                                                  />{" "}
+                                                  Report comment
+                                                </li> */}
+                                                <li
+                                                  className="px-4 py-2 flex items-center cursor-pointer hover:bg-[#f0f0f0]"
+                                                  onClick={() =>
+                                                    deleteThisReply(
+                                                      userReply?.reply_id
+                                                    )
+                                                  }
+                                                >
+                                                  <img
+                                                    src={trash}
+                                                    alt="alert"
+                                                    className="w-[20px] h-[20px] cursor-pointer mr-2"
+                                                  />{" "}
+                                                  Delete comment
+                                                </li>
+                                                {userReply?.user_id !==
+                                                  allPosts[0]?.user_id && (
+                                                  <li
+                                                    className="px-4 py-2 flex items-center cursor-pointer hover:bg-[#f0f0f0]"
+                                                    onClick={() =>
+                                                      blockTheUser(
+                                                        userReply?.user_id
+                                                      )
+                                                    }
                                                   >
-                                                    &#x2715;
-                                                  </button>
-                                                </div>
-                                                <ul>
-                                                  <li className="font-inter font-medium text-[16px] text-[#212626] px-4 py-2 flex items-center cursor-pointer hover:bg-[#f0f0f0]">
-                                                    <img
-                                                      src={alert}
-                                                      alt="alert"
-                                                      className="w-[20px] h-[20px] cursor-pointer mr-2"
-                                                    />{" "}
-                                                    Report comment
-                                                  </li>
-                                                  <li className="px-4 py-2 flex items-center cursor-pointer hover:bg-[#f0f0f0]" onClick={() => deleteThisReply(userReply?.reply_id)}>
                                                     <img
                                                       src={trash}
                                                       alt="alert"
                                                       className="w-[20px] h-[20px] cursor-pointer mr-2"
                                                     />{" "}
-                                                    Delete comment
+                                                    Block Account
                                                   </li>
-                                                </ul>
-                                              </div>
-                                            )}
+                                                )}
+                                              </ul>
+                                            </div>
+                                          )}
                                         </div>
 
                                         <p className="font-inter font-normal text-[14px] text-[#212626] text-left">
@@ -1079,15 +1159,15 @@ const handleCommentImageUpload = async (e) => {
                                       </div>
 
                                       <div className="flex items-center gap-2 cursor-pointer">
-                                        <div 
+                                        <div
                                           className="flex items-center"
                                           onClick={() =>
                                             handleCommentLikeUnlikeOnReply(
                                               userReply?.reply_id
                                             )
-                                          }   
+                                          }
                                         >
-                                          <div className="flex items-center" >
+                                          <div className="flex items-center">
                                             <img
                                               src={noto_fire}
                                               alt="noto_fire"
@@ -1096,17 +1176,23 @@ const handleCommentImageUpload = async (e) => {
                                           </div>
                                           <div className="flex items-center">
                                             <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
-                                            {/* {userReply?.total_likes_on_reply > 1 ? "like" : "likes"} */}
-                                            {userReply?.total_likes_on_reply || ""}{" "}
-                                            {userReply?.total_likes_on_reply > 1
-                                              ? "likes"
-                                              : "like"}{" "}
+                                              {/* {userReply?.total_likes_on_reply > 1 ? "like" : "likes"} */}
+                                              {userReply?.total_likes_on_reply ||
+                                                ""}{" "}
+                                              {userReply?.total_likes_on_reply >
+                                              1
+                                                ? "likes"
+                                                : "like"}{" "}
                                             </p>
                                           </div>
                                         </div>
                                         <div
                                           className="flex items-center"
-                                          onClick={() => handleReplyToReplyClick(userReply?.reply_id)}
+                                          onClick={() =>
+                                            handleReplyToReplyClick(
+                                              userReply?.reply_id
+                                            )
+                                          }
                                         >
                                           <div className="flex items-center">
                                             <img
@@ -1117,13 +1203,14 @@ const handleCommentImageUpload = async (e) => {
                                           </div>
                                           <div className="flex items-center cursor-pointer">
                                             <p className="font-inter font-medium text-[12px] text-[#415365] text-left">
-                                              {userPosts?.total_comment_on_reply || ""}{" "}
-                                              {userPosts?.total_comment_on_reply > 1
+                                              {userPosts?.total_comment_on_reply ||
+                                                ""}{" "}
+                                              {userPosts?.total_comment_on_reply >
+                                              1
                                                 ? "replies"
                                                 : "reply"}{" "}
                                             </p>
                                           </div>
-                                        
                                         </div>
                                         <div className="flex items-center">
                                           {/* <div className="flex items-center">
@@ -1140,70 +1227,91 @@ const handleCommentImageUpload = async (e) => {
                                 </div>
                               </div>
                             );
-                    })}
-                   
-                   {/* View More Button */}
-                      {userPosts?.replies?.length > (visibleReplies[userPosts.id] || 2) && (
+                          })}
+
+                      {/* View More Button */}
+                      {userPosts?.replies?.length >
+                        (visibleReplies[userPosts.id] || 2) && (
                         <button
-                          onClick={() => handleViewMoreReplies(userPosts.id, userPosts.replies.length)}
+                          onClick={() =>
+                            handleViewMoreReplies(
+                              userPosts.id,
+                              userPosts.replies.length
+                            )
+                          }
                           className="text-blue-500 mt-2 ml-8 text-sm"
                         >
-                          View {Math.min(5, userPosts.replies.length - (visibleReplies[userPosts.id] || 2))} more replies
+                          View{" "}
+                          {Math.min(
+                            5,
+                            userPosts.replies.length -
+                              (visibleReplies[userPosts.id] || 2)
+                          )}{" "}
+                          more replies
                         </button>
                       )}
 
                       {/* View Less Button */}
-                      {userPosts?.replies?.length > 2 && (visibleReplies[userPosts.id] || 2) >= userPosts?.replies?.length && (
-                        <button
-                          onClick={() => handleViewLessReplies(userPosts.id)}
-                          className="text-red-500 mt-2 ml-8 text-sm"
-                        >
-                          View Less
-                        </button>
-                      )}
+                      {userPosts?.replies?.length > 2 &&
+                        (visibleReplies[userPosts.id] || 2) >=
+                          userPosts?.replies?.length && (
+                          <button
+                            onClick={() => handleViewLessReplies(userPosts.id)}
+                            className="text-red-500 mt-2 ml-8 text-sm"
+                          >
+                            View Less
+                          </button>
+                        )}
 
                       {/* Input Section New */}
                       {replyToCommentId === userPosts?.id && (
-                              <div className="mt-3">
-                                {showTagSuggestionsForReply && (
-                                        <ul className="suggestions">
-                                          {filteredSuggestionsForReply.map((person) => (
-                                            <li key={person.id} onClick={() => handleSuggestionClickForReply(person, replyToCommentId)}>
-                                              {person.full_name}
-                                            </li>
-                                          ))}
-                                        </ul>
-                                )}
-                                <div className="flex items-center gap-2">
-                                  {/* Profile Image */}
-                                  <img
-                                    src={
-                                      (userDetails &&
-                                        userDetails?.profile_image) ||
-                                      dummyUserImage
+                        <div className="mt-3">
+                          {showTagSuggestionsForReply && (
+                            <ul className="suggestions">
+                              {filteredSuggestionsForReply.map((person) => (
+                                <li
+                                  key={person.id}
+                                  onClick={() =>
+                                    handleSuggestionClickForReply(
+                                      person,
+                                      replyToCommentId
+                                    )
+                                  }
+                                >
+                                  {person.full_name}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          <div className="flex items-center gap-2">
+                            {/* Profile Image */}
+                            <img
+                              src={
+                                (userDetails && userDetails?.profile_image) ||
+                                dummyUserImage
+                              }
+                              alt="Profile"
+                              className="w-10 h-10 rounded-full"
+                            />
+
+                            <div className="relative">
+                              {showEmojiPicker && (
+                                <div className="absolute top-10 left-0 z-50">
+                                  <EmojiPicker
+                                    onEmojiClick={(emojiObject) =>
+                                      handleEmojiClickComment(
+                                        emojiObject,
+                                        userPosts?.id
+                                      )
                                     }
-                                    alt="Profile"
-                                    className="w-10 h-10 rounded-full"
+                                    className="w-[250px] h-[300px] shadow-lg rounded-lg"
                                   />
+                                </div>
+                              )}
+                            </div>
 
-                                  <div className="relative">
-                                    {showEmojiPicker && (
-                                      <div className="absolute top-10 left-0 z-50">
-                                        <EmojiPicker
-                                          onEmojiClick={(emojiObject) =>
-                                            handleEmojiClickComment(
-                                              emojiObject,
-                                              userPosts?.id
-                                            )
-                                          }
-                                          className="w-[250px] h-[300px] shadow-lg rounded-lg"
-                                        />
-                                      </div>
-                                    )}
-                                  </div>
-
-                                  <div className="flex items-center bg-gray-200 py-2 pl-2 rounded-full w-[100%]">
-                                    {/* {showEmojiPicker && (
+                            <div className="flex items-center bg-gray-200 py-2 pl-2 rounded-full w-[100%]">
+                              {/* {showEmojiPicker && (
                                     <div className="absolute top-10 right-72 bg-white border rounded-lg shadow-lg p-3 grid grid-cols-8 gap-2 z-50 max-h-48 overflow-y-auto">
                                       {emojis.map((emoji, index) => (
                                         <button
@@ -1219,66 +1327,69 @@ const handleCommentImageUpload = async (e) => {
                                     </div>
                                   )} */}
 
-                                    <img
-                                      src={face_smile}
-                                      alt="smile"
-                                      className="cursor-pointer"
-                                      onClick={() =>
-                                        setShowEmojiPicker(!showEmojiPicker)
-                                      }
-                                    />
-                                    {/* Input Field */}
-                                    <input
-                                      type="text"
-                                      placeholder="Add a Reply"
-                                      onKeyDown={(e) =>
-                                        handleReplyInputEnter(
-                                          e,
-                                          userPosts?.id,
-                                          allPosts[0]?.id
-                                        )
-                                      }
-                                      value={
-                                        commentReplyInputVal[userPosts?.id] ||
-                                        ""
-                                      }
-                                      // onChange={(e) =>
-                                      //   setCommentReplyInputVal((prev) => ({
-                                      //     ...prev,
-                                      //     [userPosts?.id]: e.target.value,
-                                      //   }))
-                                      // }
-                                      onChange={(e) => handleReplyCommentInputChange(e, userPosts?.id)}
-                                      className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-500 ml-2 text-sm"
-                                    />
+                              <img
+                                src={face_smile}
+                                alt="smile"
+                                className="cursor-pointer"
+                                onClick={() =>
+                                  setShowEmojiPicker(!showEmojiPicker)
+                                }
+                              />
+                              {/* Input Field */}
+                              <input
+                                type="text"
+                                placeholder="Add a Reply"
+                                onKeyDown={(e) =>
+                                  handleReplyInputEnter(
+                                    e,
+                                    userPosts?.id,
+                                    allPosts[0]?.id
+                                  )
+                                }
+                                value={
+                                  commentReplyInputVal[userPosts?.id] || ""
+                                }
+                                // onChange={(e) =>
+                                //   setCommentReplyInputVal((prev) => ({
+                                //     ...prev,
+                                //     [userPosts?.id]: e.target.value,
+                                //   }))
+                                // }
+                                onChange={(e) =>
+                                  handleReplyCommentInputChange(
+                                    e,
+                                    userPosts?.id
+                                  )
+                                }
+                                className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-500 ml-2 text-sm"
+                              />
 
-                                    {/* Icons */}
-                                    <div className="flex items-center justify-center space-x-3 text-gray-400">
-                                      <button className="hover:text-gray-600">
-                                        <FontAwesomeIcon
-                                          icon={faPaperclip}
-                                          className="w-5 h-5"
-                                        />
-                                      </button>
-                                      <button className="">
-                                        <img
-                                          src={Send}
-                                          onClick={() =>
-                                            sendReplyComment(
-                                              userPosts?.id,
-                                              allPosts[0]?.id
-                                            )
-                                          }
-                                          className="w-[44px] h-[44px] -my-5"
-                                        />
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
+                              {/* Icons */}
+                              <div className="flex items-center justify-center space-x-3 text-gray-400">
+                                {/* <button className="hover:text-gray-600">
+                                  <FontAwesomeIcon
+                                    icon={faPaperclip}
+                                    className="w-5 h-5"
+                                  />
+                                </button> */}
+                                <button className="">
+                                  <img
+                                    src={Send}
+                                    onClick={() =>
+                                      sendReplyComment(
+                                        userPosts?.id,
+                                        allPosts[0]?.id
+                                      )
+                                    }
+                                    className="w-[44px] h-[44px] -my-5"
+                                  />
+                                </button>
                               </div>
-                            )}
-
-                    </>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
 
@@ -1289,13 +1400,16 @@ const handleCommentImageUpload = async (e) => {
             {/* Bottom Fixed Section */}
 
             {showTagSuggestions && (
-                    <ul className="suggestions">
-                      {filteredSuggestions.map((person) => (
-                        <li key={person.id} onClick={() => handleSuggestionClick(person)}>
-                          {person.full_name}
-                        </li>
-                      ))}
-                    </ul>
+              <ul className="suggestions">
+                {filteredSuggestions.map((person) => (
+                  <li
+                    key={person.id}
+                    onClick={() => handleSuggestionClick(person)}
+                  >
+                    {person.full_name}
+                  </li>
+                ))}
+              </ul>
             )}
             <div className="mt-3">
               <div className="flex items-center gap-2">
@@ -1349,15 +1463,15 @@ const handleCommentImageUpload = async (e) => {
 
                   {/* Input Field */}
                   {/* <div> */}
-                      <input
-                        type="text"
-                        placeholder="Add a comment"
-                        onKeyDown={(e) => handleInputEnter(e, allPosts[0]?.id)}
-                        value={commentInputVal}
-                        // onChange={(e) => setCommentInputVal(e.target.value)}
-                        onChange={(e) => handleCommentInputChange(e)}
-                        className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-500 ml-2 text-sm"
-                      />
+                  <input
+                    type="text"
+                    placeholder="Add a comment"
+                    onKeyDown={(e) => handleInputEnter(e, allPosts[0]?.id)}
+                    value={commentInputVal}
+                    // onChange={(e) => setCommentInputVal(e.target.value)}
+                    onChange={(e) => handleCommentInputChange(e)}
+                    className="flex-1 bg-transparent border-none outline-none text-gray-700 placeholder-gray-500 ml-2 text-sm"
+                  />
 
                   {/* </div> */}
 
@@ -1367,12 +1481,12 @@ const handleCommentImageUpload = async (e) => {
                     <input type="file" id="uploadCommentImage" hidden onChange={(e) => handleCommentImageUpload(e)} />
                       <FontAwesomeIcon icon={faPaperclip} className="w-5 h-5" />
                     </button> */}
-                    <button
+                    {/* <button
                       className="hover:text-gray-600"
                       onClick={() => setShowShareFilePopup(!showShareFilePopup)}
                     >
                       <FontAwesomeIcon icon={faPaperclip} className="w-5 h-5" />
-                    </button>
+                    </button> */}
 
                     {/* Popup Menu */}
                     {showShareFilePopup && (

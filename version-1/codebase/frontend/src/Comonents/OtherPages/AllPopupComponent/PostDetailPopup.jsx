@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import Girl from "../../../assets/headerIcon/girl.jpg";
@@ -17,6 +18,7 @@ import { useSelector } from "react-redux";
 const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [selectedOption, setSelectedOption] = React.useState("Select View");
+  const [isotherDataVisible, setIsotherDataVisible] = useState(false);
   //   const [isFullTextVisible, setIsFullTextVisible] = useState(false);
 
   //   // Function to toggle the full text
@@ -96,17 +98,126 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
                   <h5 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
+                    {/* {userDetails?.full_name} {postData?.buddies.length > 0 ? `with ${postData?.buddies.length} others` : "" } */}
                     {userDetails?.full_name}
                   </h5>
-                  <img
-                    src={BadgesIconFirst}
-                    alt="BadgesIconFirst"
-                    className="w-[24px] h-[24px]"
-                  />
+
+                  <div className="flex space-x-1 relative inline-block">
+                    <p
+                      className="font-poppins font-semibold text-[20px] text-[#212626]"
+                      onClick={() => setIsotherDataVisible(!isotherDataVisible)}
+                    >
+                      {" "}
+                      with<span className="text-[#869E9D]"></span> 2 others{" "}
+                    </p>
+                    <div>
+                      <img
+                        src={BadgesIconFirst}
+                        alt="BadgesIconFirst"
+                        className="w-[24px] h-[24px]"
+                      />
+                    </div>
+
+                    {/* Extra Data */}
+                    {isotherDataVisible && (
+                      <div className="absolute mt-10 w-[416px] p-[24px] bg-white border border-gray-300 rounded-[16px] shadow-lg z-10 flex flex-col gap-[34px]">
+                        <div className="flex flex-col">
+                          <div className="flex items-center space-x-3">
+                            <div>
+                              <img
+                                src={Girl}
+                                alt="Girl"
+                                className="w-[44px] h-[44px] rounded-full"
+                              />
+                            </div>
+                            <div className="flex flex-col">
+                              <div className="flex items-center gap-2">
+                                <h5 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
+                                  Pankaj Reet Tech
+                                </h5>
+                                <div className="relative group">
+                                  <img
+                                    src={BadgesIconFirst}
+                                    alt="BadgesIconFirst"
+                                    className="w-[24px] h-[24px]"
+                                  />
+                                  <div className="absolute left-0 mt-1 hidden group-hover:block bg-[#2DC6BE] text-white text-sm p-2 rounded shadow-lg w-[250px] text-justify">
+                                    Solo travel is an empowering and
+                                    transformative experience where you venture
+                                    out into the world on your own. It's an
+                                    opportunity to discover new destinations,
+                                    meet diverse people, and learn more about
+                                    yourself.
+                                  </div>
+                                </div>
+                              </div>
+                              <div>
+                                <p className="-mt-2 font-inter font-medium text-[16px] text-[#667877] text-left">
+                                  @Madhu.lika
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="md:w-[338px] md:h-[32px] flex items-center justify-center rounded-full bg-[#E5FFFE] mt-3">
+                            <p className="font-inter font-medium items-center text-center text-[12px] text-[#212626]">
+                              Solo Traveler &nbsp;•&nbsp; 252 Trips
+                              &nbsp;•&nbsp; 14K followers &nbsp;•&nbsp; 24
+                              Buddies
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex flex-col">
+                          <div className="flex items-center space-x-3">
+                            <div>
+                              <img
+                                src={Girl}
+                                alt="Girl"
+                                className="w-[44px] h-[44px] rounded-full"
+                              />
+                            </div>
+                            <div className="flex flex-col">
+                              <div className="flex items-center gap-2">
+                                <h5 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
+                                  Pankaj Reet Tech
+                                </h5>
+                                <div className="relative group">
+                                  <img
+                                    src={BadgesIconFirst}
+                                    alt="BadgesIconFirst"
+                                    className="w-[24px] h-[24px]"
+                                  />
+                                  <div className="absolute left-0 mt-1 hidden group-hover:block bg-[#2DC6BE] text-white text-sm p-2 rounded shadow-lg w-[250px] text-justify">
+                                    Solo travel is an empowering and
+                                    transformative experience where you venture
+                                    out into the world on your own. It's an
+                                    opportunity to discover new destinations,
+                                    meet diverse people, and learn more about
+                                    yourself.
+                                  </div>
+                                </div>
+                              </div>
+                              <div>
+                                <p className="-mt-2 font-inter font-medium text-[16px] text-[#667877] text-left">
+                                  @Madhu.lika
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="md:w-[338px] md:h-[32px] flex items-center justify-center rounded-full bg-[#E5FFFE] mt-3">
+                            <p className="font-inter font-medium items-center text-center text-[12px] text-[#212626]">
+                              Solo Traveler &nbsp;•&nbsp; 252 Trips
+                              &nbsp;•&nbsp; 14K followers &nbsp;•&nbsp; 24
+                              Buddies
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <p className="-mt-1 font-inter font-medium text-left text-[12px] text-[#667877]">
-                    {postDetails.subtitle} • {postDetails.subtitleData}
+                    {postDetails.subtitle} • {postData?.location || ""}
                   </p>
                 </div>
               </div>
@@ -120,7 +231,7 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
                   className="flex items-center justify-end w-[120px] h-[24px] bg-[#FFFFFF] text-[#6D6D6D] font-normal text-[14px] rounded-full focus:outline-none"
                   onClick={() => setDropdownOpen((prev) => !prev)}
                 >
-                  { postData.is_public ? "Public" : "Private" } View
+                  {postData.is_public ? "Public" : "Private"} View
                   {/* <img
                     src={chevron_down}
                     alt="Chevron"
@@ -152,55 +263,53 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
 
         {/*---------- Scrollable Part ---------*/}
         <div className="mb-3 px-4 flex-1 overflow-y-auto scrollbar-hidden">
-         {
-          images.length > 0 && (
+          {images.length > 0 && (
             <>
               <div className="relative w-full max-w-4xl mx-auto">
-            {/* Slider */}
-            <div className="overflow-hidden relative">
-              <div>
-                <img
-                  src={images[currentIndex]}
-                  alt={`Slide ${currentIndex}`}
-                  className="rounded-lg w-full h-[344px] object-cover transition duration-500"
-                />
+                {/* Slider */}
+                <div className="overflow-hidden relative">
+                  <div>
+                    <img
+                      src={images[currentIndex]}
+                      alt={`Slide ${currentIndex}`}
+                      className="rounded-lg w-full h-[344px] object-cover transition duration-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Left Button */}
+                <button
+                  onClick={goToPrevious}
+                  className="absolute top-1/2 left-4 w-9 h-9 transform -translate-y-1/2 bg-[#FFFFFFBF] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center"
+                >
+                  <img src={leftIcon} alt="leftIcon" className="" />
+                </button>
+
+                {/* Right Button */}
+                <button
+                  onClick={goToNext}
+                  className="absolute top-1/2 right-4 w-9 h-9 transform -translate-y-1/2 bg-[#FFFFFFBF] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center rotate-180"
+                >
+                  <img src={leftIcon} alt="leftIcon" className="" />
+                </button>
+
+                {/* Dots */}
+                <div className="flex justify-center mt-1 absolute items-center justify-center inline-flex top-[310px] bg-[#FFFFFFBF] w-[68px] h-[16px] rounded-[16px]">
+                  {postData.media_url.map((_, index) => (
+                    <div
+                      key={index}
+                      onClick={() => goToSlide(index)}
+                      className={`w-[8px] h-[8px] mx-1 rounded-full transform transition-transform duration-300 ${
+                        index === currentIndex
+                          ? "bg-[#2DC6BE] scale-150"
+                          : "bg-[#869E9D] hover:bg-[#2DC6BE] scale-100"
+                      } cursor-pointer`}
+                    ></div>
+                  ))}
+                </div>
               </div>
-            </div>
-
-            {/* Left Button */}
-            <button
-              onClick={goToPrevious}
-              className="absolute top-1/2 left-4 w-9 h-9 transform -translate-y-1/2 bg-[#FFFFFFBF] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center"
-            >
-              <img src={leftIcon} alt="leftIcon" className="" />
-            </button>
-
-            {/* Right Button */}
-            <button
-              onClick={goToNext}
-              className="absolute top-1/2 right-4 w-9 h-9 transform -translate-y-1/2 bg-[#FFFFFFBF] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center rotate-180"
-            >
-              <img src={leftIcon} alt="leftIcon" className="" />
-            </button>
-
-            {/* Dots */}
-            <div className="flex justify-center mt-1 absolute items-center justify-center inline-flex top-[310px] bg-[#FFFFFFBF] w-[68px] h-[16px] rounded-[16px]">
-              {postData.media_url.map((_, index) => (
-                <div
-                  key={index}
-                  onClick={() => goToSlide(index)}
-                  className={`w-[8px] h-[8px] mx-1 rounded-full transform transition-transform duration-300 ${
-                    index === currentIndex
-                      ? "bg-[#2DC6BE] scale-150"
-                      : "bg-[#869E9D] hover:bg-[#2DC6BE] scale-100"
-                  } cursor-pointer`}
-                ></div>
-              ))}
-            </div>
-          </div>
             </>
-          ) 
-         }
+          )}
 
           {/* Post Description */}
           <p className="mt-3 font-inter font-medium text-[14px] text-[#212626] text-left text-justify mb-1">
@@ -217,22 +326,26 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
           </p>
 
           {/* Hashtags */}
-          {
-            postData.tags.length > 0 && (
-              <>
-                <p className="text-left text-[#1DB2AA] mb-2">{postData.tags}</p>
-              </>
-            )
-          }
-          
+          {postData.tags.length > 0 && (
+            <>
+              <p className="text-left text-[#1DB2AA] mb-2">{postData.tags}</p>
+            </>
+          )}
         </div>
         {/*---------- Scrollable Part ---------*/}
 
         <div className="px-4 flex items-center justify-between">
-          <button type="button" className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#F0F7F7] text-[#2DC6BE] rounded-[7px] w-[312px] h-[48px]" onClick={() => onClose()}>
+          <button
+            type="button"
+            className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#F0F7F7] text-[#2DC6BE] rounded-[7px] w-[312px] h-[48px]"
+            onClick={() => onClose()}
+          >
             Edit
           </button>
-          <button className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[312px] h-[48px]" onClick={() => handlePostUpload()}>
+          <button
+            className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[312px] h-[48px]"
+            onClick={() => handlePostUpload()}
+          >
             Upload
           </button>
         </div>

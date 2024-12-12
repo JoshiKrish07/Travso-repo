@@ -96,7 +96,7 @@ export const getCommentOnPost = createAsyncThunk(
   'post/getCommentOnPost',
   async (postId,{ rejectWithValue }) => {
     try {
-      console.log("====postId===")
+      // console.log("====postId===")
     //   const token = localStorage.getItem('token');
       const response = await fetch(`${apiUrl}/post/comments/${postId}`, {
         method: 'GET',

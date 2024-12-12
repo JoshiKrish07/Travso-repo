@@ -355,6 +355,11 @@ const SignupPage = () => {
 
         return updatedErrors;
       }
+
+      if(name === "smlink1" || name === "smlink2") {
+        delete updatedErrors.smLinkError
+        return updatedErrors;
+      }
   
       // Clear other errors if the field is not empty
       if (value !== "" && updatedErrors[name]) {
