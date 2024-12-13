@@ -346,14 +346,17 @@ const handleSubmit = async(e) => {
           <p className="mt-4 text-sm md:text-base">
             Discover the most unique places, experiences,<br/> and amazing homes around the world.
           </p>
-          <div className="flex justify-between items-center mt-8">
-            <span className="text-sm">03 — 03</span>
-            <div className="flex space-x-2">
-              {/* Dots */}
-              <span className="w-2 h-2 bg-white rounded-full"></span>
-              <span className="w-2 h-2 bg-white opacity-50 rounded-full"></span>
-              <span className="w-2 h-2 bg-white opacity-50 rounded-full"></span>
+          <div className="flex items-center mt-8 space-x-4 w-[50%] gap-[30px]">
+            <div className="flex-1 relative">
+              <div className="w-full h-0.5 bg-gray-300"></div>{" "}
+              {/* Full horizontal line */}
+              <div
+                className="absolute top-0 left-0 h-0.5 bg-white"
+                style={{ width: "100%" }}
+              ></div>{" "}
+              {/* 100% filled portion */}
             </div>
+            <span className="text-sm">03 — 03</span>
           </div>
         </div>
       </div>

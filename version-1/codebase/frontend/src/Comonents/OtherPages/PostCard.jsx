@@ -264,6 +264,7 @@ const PostCard = () => {
     setActivePostId(null)
   }
 
+
   return (
     <>
       {flashMessage && (
@@ -353,7 +354,7 @@ const PostCard = () => {
                         </div>
                       </div>
                       <p className="-mt-1 font-inter font-medium text-left text-[12px] text-[#667877]">
-                        {postDetails.subtitle} • {postDetails.subtitleData}
+                        {post?.badge.split("-")[0]} • {post?.location}
                       </p>
                     </div>
                   </div>
@@ -604,6 +605,7 @@ const PostCard = () => {
                         // onClose={() => setIsSharePopup(false)}
                         onClose={() => handleSharePopupClose()}
                         postId={activePostId}
+                        userName={post?.user_name}
                       />
                     )
                   }

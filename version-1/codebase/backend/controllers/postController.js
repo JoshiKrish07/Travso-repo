@@ -35,7 +35,7 @@ try {
                 p.description,
                 p.buddies_id,
                 p.tag_id,
-                p.location_id,
+                p.location,
                 p.media_url,
                 p.status,
                 p.block_post,
@@ -56,7 +56,7 @@ try {
                 p.status = 'active'
             GROUP BY 
                 p.id, p.user_id, p.is_public, p.description, p.buddies_id, p.tag_id, 
-                p.location_id, p.media_url, p.status, p.block_post, p.created_at, p.updated_at;`
+                p.location, p.media_url, p.status, p.block_post, p.created_at, p.updated_at;`
     );
     // console.log("===alldata===>",datawithlike)
     return res.status(200).json({
@@ -106,7 +106,7 @@ async function getUserPosts(req , res){
         //     p.description,
         //     p.buddies_id,
         //     p.tag_id,
-        //     p.location_id,
+        //     p.location,
         //     p.media_url,
         //     p.status,
         //     p.block_post,
@@ -136,7 +136,7 @@ async function getUserPosts(req , res){
         //     AND p.user_id = ?
         // GROUP BY 
         //     p.id, p.user_id, p.is_public, p.description, p.buddies_id, p.tag_id, 
-        //     p.location_id, p.media_url, p.status, p.block_post, p.created_at, p.updated_at;
+        //     p.location, p.media_url, p.status, p.block_post, p.created_at, p.updated_at;
         // `,
         ` SELECT 
           p.id,
@@ -145,13 +145,14 @@ async function getUserPosts(req , res){
           p.description,
           p.buddies_id,
           p.tag_id,
-          p.location_id,
+          p.location,
           p.media_url,
           p.status,
           p.block_post,
           u.full_name,
           u.user_name,
           u.profile_image,
+          u.badge,
           p.created_at AS post_created_at,
           p.updated_at AS post_updated_at,
           (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.id) AS total_likes,
@@ -232,7 +233,7 @@ async function getUserPosts(req , res){
           AND p.user_id = ?
       GROUP BY 
           p.id, p.user_id, p.is_public, p.description, p.buddies_id, p.tag_id, 
-          p.location_id, p.media_url, p.status, p.block_post, p.created_at, p.updated_at
+          p.location, p.media_url, p.status, p.block_post, p.created_at, p.updated_at
           ORDER BY 
           p.created_at DESC;
       
@@ -654,7 +655,6 @@ async function getPostComments(req, res) {
                 cr.content AS reply_content,
                 u.full_name AS reply_user_full_name,
                 u.user_name AS reply_user_user_name,
-                u.user_id AS reply_user_id,
                 u.profile_image AS reply_user_profile_image,
                 cr.created_at AS reply_created_at,
                  (SELECT COUNT(*) FROM reply_like crl WHERE crl.reply_id = cr.id) AS total_likes_on_reply,
@@ -873,7 +873,7 @@ async function replyOnComment(req , res){
 //           description,
 //           buddies_id,
 //           tag_id,
-//           location_id,
+//           location,
 //           media_url,
 //           status,
 //           block_post,
@@ -960,7 +960,7 @@ async function storePost(req, res) {
         description,
         buddies_id,
         tag_id,
-        location_id,
+        location,
         media_url,
         status,
         block_post,
@@ -1241,10 +1241,10 @@ async function likeToReply(req, res) {
   }
 }
 
-async function sharePostWithFrineds(req, res) {
+async function sharePostWithFriends(req, res) {
   try {
     const UserId = req.user.userId;
-    const { post_id, shared_to_id, thoughts } = req.body;
+    const { post_id, shared_to_id, thoughts, link } = req.body;
 
     if (!post_id || !UserId || !Array.isArray(shared_to_id))
       return res.status(400).json({
@@ -1254,8 +1254,8 @@ async function sharePostWithFrineds(req, res) {
     const sharedToIdJson = JSON.stringify(shared_to_id);
 
     await pool.execute(
-      `INSERT INTO shared_post(post_id, user_id , shared_to_id, thoughts) VALUES(?,?,?,?)`,
-      [post_id, UserId, sharedToIdJson, thoughts ]
+      `INSERT INTO shared_post(post_id, user_id , shared_to_id, thoughts, link) VALUES(?,?,?,?,?)`,
+      [post_id, UserId, sharedToIdJson, thoughts, link ]
     );
 
     return res.status(200).json({
@@ -1268,6 +1268,49 @@ async function sharePostWithFrineds(req, res) {
     });
   }
 }
+
+async function getPostData (req, res){
+  try {
+    const { postId } = req.params;
+  
+    const [postData] = await pool.execute(
+      // SELECT * FROM posts WHERE id = ?,[postId]
+      `SELECT 
+        p.*,
+        u.user_name,
+        u.profile_image,
+        u.full_name,
+        u.badge,
+        (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.id) AS total_likes,
+          (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
+          (SELECT COUNT(*) FROM shared_post s WHERE s.post_id = p.id) AS total_shared
+      FROM 
+        posts p
+      JOIN 
+        users u 
+      ON 
+         p.user_id = u.id 
+        WHERE 
+          p.id = ?
+      `,[postId]
+    )
+  
+    const post = postData[0];
+    post.buddies_id = JSON.parse(post.buddies_id || "[]");
+    post.tag_id = JSON.parse(post.tag_id || "[]");
+    post.media_url = JSON.parse(post.media_url || "[]");
+  
+    return res.status(200).json({
+      message:"Data Fatched",
+      data:post
+    })
+  } catch (error) {
+    console.log("====error====>",error);
+    return res.status(500).json({
+      error:"Error fetching Data"
+    });
+  }
+  }
 
 module.exports = {
     allPosts,
@@ -1286,6 +1329,7 @@ module.exports = {
     deleteReply,
     followAndUnfollow,
     likeToReply,
-    sharePostWithFrineds,
-    followAndUnfollowFollowing
+    sharePostWithFriends,
+    followAndUnfollowFollowing,
+    getPostData
 }

@@ -24,7 +24,6 @@ const ProfilePageHeaderData = () => {
     }
   }, [dispatch]);
 
-  
   return (
     <div className="mt-5 bg-[#F0F7F7] flex justify-center items-center">
       <div className="w-full max-w-[98%] h-[714px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col items-center">
@@ -45,12 +44,40 @@ const ProfilePageHeaderData = () => {
               </div>
             )
           }
+
+          {
+              // Badge mapping and rendering
+              (() => {
+                const badges = {
+                  Adventurer: travel_badges,
+                  Explorer: travel_badges,
+                  Foodie: travel_badges,
+                  'Solo Traveler': travel_badges,
+                  'Luxury Traveler': travel_badges,
+                };
+
+                const badgeParts = userDetails?.badge?.split("-");
+                const badgeName = badgeParts?.[0]?.trim();
+                const badgeDescription = badgeParts?.[1]?.trim();
+                const badgeImage = badges[badgeName];
+
+                return badgeImage ? (
+                  <div className="relative group">
+                    <img
+                    src={badgeImage}
+                    alt={`${badgeName} Badge`}
+                    className="absolute -top-[325px] left-[15px] w-[192px] h-[60px]"
+                  />
+                    <div className="absolute left-[20px] -top-[260px]  mt-1 hidden group-hover:block bg-[#2DC6BE] text-white text-sm p-2 rounded shadow-lg w-[250px] text-left">
+                    {badgeDescription}
+                    </div>
+                  </div>
+                ) : null;
+
+              })()
+            }
             
-            <img
-              src={travel_badges}
-              className="absolute top-[138px] left-[60px] w-[192px] h-[60px]"
-            />
-          </div>
+            </div>
           {/* Profile Photo */}
           <div className="flex flex-col items-center justify-center">
             <div className="relative -top-20 border-4 border-white bg-white rounded-full p-[2px]">
@@ -67,14 +94,14 @@ const ProfilePageHeaderData = () => {
                 {userDetails?.full_name}
               </h2>
               <p className="-mt-2 font-inter font-medium text-[20px] items-center text-[#667877]">
-                @{userDetails?.user_name}
+                {userDetails?.user_name}
               </p>
               <p className="font-inter font-medium text-[16px] items-center text-[#667877] mt-2">
                 {userDetails?.description}
               </p>
               <div className="md:w-[470px] md:h-[40px] flex items-center justify-center rounded-full bg-[#E5FFFE] mt-3">
                 <p className="font-poppins font-semibold items-center text-center text-[16px] text-[#212626]">
-                  Solo Traveler &nbsp;•&nbsp; 252 Trips &nbsp;•&nbsp; {userFollowers && userFollowers.length}{" "}
+                  {userDetails?.badge.split("-")[0]} &nbsp;•&nbsp; 0 Trip &nbsp;•&nbsp; {userFollowers && userFollowers.length}{" "}
                   followers &nbsp;•&nbsp; {userBuddies && userBuddies.length} Buddies
                 </p>
               </div>

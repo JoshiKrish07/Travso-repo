@@ -98,11 +98,11 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
                   <h5 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
-                    {/* {userDetails?.full_name} {postData?.buddies.length > 0 ? `with ${postData?.buddies.length} others` : "" } */}
-                    {userDetails?.full_name}
+                    {userDetails?.full_name} {postData?.buddies.length > 0 ? `with ${postData?.buddies.length} others` : "" }
+                    {/* {userDetails?.full_name} */}
                   </h5>
 
-                  <div className="flex space-x-1 relative inline-block">
+                  {/* <div className="flex space-x-1 relative inline-block">
                     <p
                       className="font-poppins font-semibold text-[20px] text-[#212626]"
                       onClick={() => setIsotherDataVisible(!isotherDataVisible)}
@@ -118,7 +118,7 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
                       />
                     </div>
 
-                    {/* Extra Data */}
+                
                     {isotherDataVisible && (
                       <div className="absolute mt-10 w-[416px] p-[24px] bg-white border border-gray-300 rounded-[16px] shadow-lg z-10 flex flex-col gap-[34px]">
                         <div className="flex flex-col">
@@ -213,7 +213,7 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
                         </div>
                       </div>
                     )}
-                  </div>
+                  </div> */}
                 </div>
                 <div>
                   <p className="-mt-1 font-inter font-medium text-left text-[12px] text-[#667877]">

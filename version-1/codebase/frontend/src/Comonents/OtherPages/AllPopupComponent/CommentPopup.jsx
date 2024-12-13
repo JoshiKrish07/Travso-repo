@@ -203,7 +203,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
       dispatch(getUserBuddies());
     }
 
-    const foundPost = userPosts.find((post) => post.id === postId);
+    const foundPost = userPosts && userPosts.find((post) => post.id === postId);
 
     if (foundPost) {
       setAllPosts([foundPost]); // Place the found post at the 0 index

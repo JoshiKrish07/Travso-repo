@@ -245,7 +245,7 @@ const CommunityPage = () => {
         commitPost(postData)
       ).unwrap();
       if (commentResult) {
-        console.log("=====commentResult===>", commentResult.message);
+        // console.log("=====commentResult===>", commentResult.message);
         // await dispatch(getAllPosts());
         await dispatch(getUserPosts());
         setPostData({
@@ -431,7 +431,7 @@ const CommunityPage = () => {
                   </button>
 
                   {/* Dots */}
-                  <div className="flex justify-center">
+                  <div className="flex justify-center mt-1 absolute items-center justify-center inline-flex top-[400px] bg-[#FFFFFFBF] w-[68px] h-[16px] rounded-[16px]">
                     {images.map((_, index) => (
                       <div
                         key={index}
@@ -630,7 +630,7 @@ const CommunityPage = () => {
                   </button>
 
                   {/* Dots */}
-                  <div className="flex justify-center">
+                  <div className="flex justify-center mt-1 absolute items-center justify-center inline-flex top-[400px] bg-[#FFFFFFBF] w-[68px] h-[16px] rounded-[16px]">
                     {images.map((_, index) => (
                       <div
                         key={index}
@@ -913,7 +913,7 @@ const CommunityPage = () => {
                   </button>
 
                   {/* Dots */}
-                  <div className="flex justify-center">
+                  <div className="flex justify-center mt-1 absolute items-center justify-center inline-flex top-[400px] bg-[#FFFFFFBF] w-[68px] h-[16px] rounded-[16px]">
                     {images.map((_, index) => (
                       <div
                         key={index}
@@ -1112,7 +1112,7 @@ const CommunityPage = () => {
                   </button>
 
                   {/* Dots */}
-                  <div className="flex justify-center">
+                  <div className="flex justify-center mt-1 absolute items-center justify-center inline-flex top-[400px] bg-[#FFFFFFBF] w-[68px] h-[16px] rounded-[16px]">
                     {images1.map((_, index) => (
                       <div
                         key={index}
