@@ -16,8 +16,13 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
- const { userBuddies, user: userDetails, userPosts, userFollowers, toWhomUserFollows } = useSelector((state) => state.auth);
-
+  const {
+    userBuddies,
+    user: userDetails,
+    userPosts,
+    userFollowers,
+    toWhomUserFollows,
+  } = useSelector((state) => state.auth);
 
   const [posts, setPosts] = useState([
     {
@@ -106,11 +111,17 @@ const Sidebar = () => {
 
   // Show only first 9 posts or all posts based on state
   // const visiblePosts = showAllPost ? posts : posts.slice(0, 9);
-  const visiblePosts = showAllPost ? (userPosts ? userPosts : []) : (userPosts ? userPosts.slice(0, 9) : []);
+  const visiblePosts = showAllPost
+    ? userPosts
+      ? userPosts
+      : []
+    : userPosts
+    ? userPosts.slice(0, 9)
+    : [];
 
-  const handleAllBucketList =()=>{
-    navigate("/bucketlist")
-  }
+  const handleAllBucketList = () => {
+    navigate("/bucketlist");
+  };
 
   // for capitalizing first word of string
   function capitalizeFirstLetter(str) {
@@ -121,18 +132,28 @@ const Sidebar = () => {
   // format in format for dob like 25 Aug 2002 and for joined Feb 2022
   function formatDate(isoDate, type) {
     const date = new Date(isoDate);
-  
+
     // Array of month names
     const months = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
-  
+
     const day = date.getUTCDate(); // Day of the month
     const month = months[date.getUTCMonth()]; // Full month name
     const shortMonth = month.slice(0, 3); // Abbreviated month name
     const year = date.getUTCFullYear(); // Full year
-  
+
     // Handle different formats
     if (type === "dob") {
       return `${day} ${shortMonth} ${year}`; // Example: 25 Aug 2002
@@ -143,10 +164,9 @@ const Sidebar = () => {
     }
   }
 
-  const handleAllPost = () =>{
-    navigate("/postData")
-  }
-
+  const handleAllPost = () => {
+    navigate("/postData");
+  };
 
   return (
     <>
@@ -209,7 +229,7 @@ const Sidebar = () => {
 
               <span className="font-inter font-medium text-[16px] text-[#212626]">
                 {/* DOB: 25 Aug 2002 */}
-                {userDetails ? formatDate(userDetails?.dob, 'dob') : ''}
+                {userDetails ? formatDate(userDetails?.dob, "dob") : ""}
               </span>
             </li>
             <li className="flex items-center text-gray-700">
@@ -239,7 +259,10 @@ const Sidebar = () => {
 
               <span className="font-inter font-medium text-[16px] text-[#212626]">
                 {/* From: Nagpur, Maharashtra */}
-                From: {userDetails ? `${userDetails?.city}, ${userDetails?.state}`: ''}
+                From:{" "}
+                {userDetails
+                  ? `${userDetails?.city}, ${userDetails?.state}`
+                  : ""}
               </span>
             </li>
             <li className="flex items-center text-gray-700">
@@ -261,7 +284,10 @@ const Sidebar = () => {
               </svg>
 
               <span className="font-inter font-medium text-[16px] text-[#212626]">
-                Joined: {userDetails ? formatDate(userDetails?.created_at, 'joined') : ''}
+                Joined:{" "}
+                {userDetails
+                  ? formatDate(userDetails?.created_at, "joined")
+                  : ""}
               </span>
             </li>
           </ul>
@@ -282,24 +308,20 @@ const Sidebar = () => {
         </div>
         <div className="grid grid-cols-3 gap-2">
           {/* Dynamically render images and titles */}
-          {visiblePosts.map((post) => (
-            <div key={post.id}>
-              {/* <img
-                src={post.imageUrl}
-                alt={post.title}
-                className="w-full h-[92px] rounded-[8px] object-cover"
-              /> */}
-              {
-                  (post.media_url).length > 0 && (
+
+          {visiblePosts &&
+            visiblePosts.map(
+              (post) =>
+                post.media_url.length > 0 && (
+                  <div key={post.id}>
                     <img
                       src={post.media_url[0]}
                       alt={post.description}
                       className="w-full h-[130px] rounded-sm object-cover"
                     />
-                  )
-                }
-            </div>
-          ))}
+                  </div>
+                )
+            )}
         </div>
       </div>
 
@@ -316,39 +338,36 @@ const Sidebar = () => {
           </p>
         </div>
         {sampleData.map((item, index) => (
-        <div key={index} className="mt-8">
-          {/* Flexbox for vertical and horizontal image arrangement */}
-          <div className="flex gap-2">
-            {/* Vertical image */}
-            <img
-              src={item.images[0]}
-              alt="Vertical Image"
-              className="w-1/2 h-auto object-cover rounded-md"
-            />
-            {/* Two horizontal images */}
-            <div className="flex flex-col w-1/2 gap-2">
-              {item.images.slice(1, 3).map((img, imgIndex) => (
-                <img
-                  key={imgIndex}
-                  src={img}
-                  alt="Horizontal Image"
-                  className="w-full h-24 object-cover rounded-md"
-                />
-              ))}
+          <div key={index} className="mt-8">
+            {/* Flexbox for vertical and horizontal image arrangement */}
+            <div className="flex gap-2">
+              {/* Vertical image */}
+              <img
+                src={item.images[0]}
+                alt="Vertical Image"
+                className="w-1/2 h-auto object-cover rounded-md"
+              />
+              {/* Two horizontal images */}
+              <div className="flex flex-col w-1/2 gap-2">
+                {item.images.slice(1, 3).map((img, imgIndex) => (
+                  <img
+                    key={imgIndex}
+                    src={img}
+                    alt="Horizontal Image"
+                    className="w-full h-24 object-cover rounded-md"
+                  />
+                ))}
+              </div>
             </div>
+            {/* Title */}
+            <p className="text-left font-inter text-[16px] font-medium text-[#212626] mt-2">
+              {item.title}
+            </p>
           </div>
-          {/* Title */}
-          <p className="text-left font-inter text-[16px] font-medium text-[#212626] mt-2">
-            {item.title}
-          </p>
-        </div>
-      ))}
+        ))}
       </div>
-
-
     </>
   );
 };
 
 export default Sidebar;
-

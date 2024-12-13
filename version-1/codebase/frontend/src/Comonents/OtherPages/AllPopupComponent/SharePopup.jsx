@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Boy1 from "../../../assets/headerIcon/boy1.png";
 import Girl from "../../../assets/headerIcon/girl.jpg";
 import SearchIcon from "@mui/icons-material/Search";
@@ -7,39 +7,27 @@ import "../Header.css";
 import { useDispatch, useSelector } from "react-redux";
 import { SharePostWithFriends } from "../../../redux/slices/postSlice";
 import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
+import { getUserBuddies } from "../../../redux/slices/authSlice";
 
 
-const SharePopup = ({ isOpen, onClose, postId }) => {
+const SharePopup = ({ isOpen, onClose, postId,userName }) => {
 
   const dispatch = useDispatch();
   const { userBuddies } = useSelector((state) => state.auth);
   const [shareIds, setShareIds] = useState([]);
   const [thought, setThought] = useState("");
   const [buddieList, setBuddieList] = useState(userBuddies);
-  // console.log("====userBuddies on sharepopup====>", userBuddies);
 
-  const data = [
-    { id: 1, src: Boy1, label: "Arjun Kumar" },
-    { id: 2, src: Girl, label: "Priya Sharma" },
-    { id: 3, src: Boy1, label: "Rohit Singh" },
-    { id: 4, src: Girl, label: "Sneha Patel" },
-    { id: 5, src: Boy1, label: "Vikram Das" },
-    { id: 6, src: Boy1, label: "Amit Verma" },
-    { id: 7, src: Girl, label: "Anjali Mehta" },
-    { id: 8, src: Boy1, label: "Karan Thakur" },
-    { id: 9, src: Girl, label: "Simran Kaur" },
-    { id: 10, src: Boy1, label: "Rahul Gupta" },
-    { id: 11, src: Boy1, label: "Siddharth Rao" },
-    { id: 12, src: Girl, label: "Nisha Agarwal" },
-    { id: 13, src: Boy1, label: "Aakash Roy" },
-    { id: 14, src: Girl, label: "Pooja Iyer" },
-    { id: 15, src: Boy1, label: "Deepak Mishra" },
-    { id: 16, src: Boy1, label: "Rahul Gupta" },
-    { id: 17, src: Boy1, label: "Siddharth Rao" },
-    { id: 18, src: Girl, label: "Nisha Agarwal" },
-    { id: 19, src: Boy1, label: "Aakash Roy" },
-    { id: 20, src: Girl, label: "Pooja Iyer" },
-  ];
+
+  useEffect(() => {
+    if(!userBuddies) {
+      dispatch(getUserBuddies());
+      
+    }
+    if(userBuddies) {
+      setBuddieList(userBuddies);
+    }
+  },[dispatch, userBuddies]);
 
   // select the people to share post with
   const handleSelect = (id) => {
@@ -63,10 +51,13 @@ const SharePopup = ({ isOpen, onClose, postId }) => {
   // to share post with friends
   const handleShare = async() => {
     try {
+      const host = window.location.origin; 
+      const link = `${host}/${userName}/${postId}`;
       const shareData = {
         'post_id': postId,
         'shared_to_id': shareIds,
-        'thoughts': thought
+        'thoughts': thought,
+        'link': link
       }
 
       const response = await dispatch(SharePostWithFriends(shareData)).unwrap();
@@ -89,18 +80,34 @@ const SharePopup = ({ isOpen, onClose, postId }) => {
   }
 
   // to copy link to clipboard
-  const copyLinkToClipBoard = async() => {
-    const text = "hello world";
+  // const copyLinkToClipBoard = async() => {
+  //   const text = "hello world";
+  //   console.log("====userName===>", userName);
+  //   console.log("====postId===>", postId);
+  //   await navigator.clipboard.writeText(text)
+  //       .then(() => {
+  //           console.log('Text successfully copied to clipboard');
+  //       })
+  //       .catch((err) => {
+  //           console.error('Failed to copy text: ', err);
+  //       });
 
-    await navigator.clipboard.writeText(text)
-        .then(() => {
-            console.log('Text successfully copied to clipboard');
-        })
-        .catch((err) => {
-            console.error('Failed to copy text: ', err);
-        });
+  // }
 
-  }
+  const copyLinkToClipBoard = async () => {
+    try {
+      // Replace `window.location.origin` with your desired host if needed
+      const host = window.location.origin; 
+      const link = `${host}/${userName}/${postId}`;
+ 
+      console.log("====Generated Link===>", link);
+  
+      await navigator.clipboard.writeText(link);
+      console.log('Link successfully copied to clipboard');
+    } catch (err) {
+      console.error('Failed to copy link: ', err);
+    }
+  };
 
   if (!isOpen) return null;
 

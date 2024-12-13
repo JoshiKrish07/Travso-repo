@@ -205,7 +205,7 @@ export const commitPost = createAsyncThunk(
       }
 
       const data = await response.json();
-      console.log("=====data===in commentOnReply===>", data);
+      // console.log("=====data===in commentOnReply===>", data);
       return data;
     } catch (error) {
       console.log("error in commentOnReply call thunk", error.message)
@@ -399,6 +399,32 @@ export const followUnfollowOnFollowing = createAsyncThunk(
   }
 );
 
+// Thunk for getSharePostData details
+export const getSharePostData = createAsyncThunk(
+  'post/getSharePostData',
+  async ({userName, postId},{ rejectWithValue }) => {
+    console.log("===userName===>", userName)
+    console.log("===postId===>", postId)
+    try {
+      const response = await fetch(`${apiUrl}/post/post-data/${postId}`, {
+        method: 'GET',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in getSharePostData===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in getSharePostData call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 
 const postSlice = createSlice({
   name: 'postSlice',
@@ -407,12 +433,14 @@ const postSlice = createSlice({
     error: null,
     allPosts: null,
     postComment: null,
+    sharedPostData: null
   },
   reducers: {
     resetPostsState: (state) => {
       state.postComment = null;
       state.loading = false;
       state.error = null;
+      state.sharedPostData = null;
     },
    },
   extraReducers: (builder) => {
@@ -560,6 +588,19 @@ const postSlice = createSlice({
         state.loading = false;
       })
       .addCase(SharePostWithFriends.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle SharePostWithFriends
+      .addCase(getSharePostData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getSharePostData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.sharedPostData = action.payload.data;
+      })
+      .addCase(getSharePostData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

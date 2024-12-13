@@ -218,7 +218,7 @@ export const loginUser = createAsyncThunk(
       }
 
       const data = await response.json();
-      console.log("===data==in login user ===>", data);
+      // console.log("===data==in login user ===>", data);
       return data;
     } catch (error) {
       console.log("error in login user call thunk", error.message)

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 12, 2024 at 05:19 PM
+-- Generation Time: Dec 13, 2024 at 12:39 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -99,7 +99,9 @@ CREATE TABLE `buddies` (
 INSERT INTO `buddies` (`id`, `user_id`, `buddies_id`, `created_at`) VALUES
 (1, 27, 19, '2024-11-25 10:58:02'),
 (2, 27, 23, '2024-11-25 10:58:02'),
-(3, 27, 11, '2024-12-10 11:27:40');
+(3, 27, 11, '2024-12-10 11:27:40'),
+(31, 27, 13, '2024-12-13 05:15:31'),
+(32, 13, 27, '2024-12-13 05:15:31');
 
 -- --------------------------------------------------------
 
@@ -248,6 +250,14 @@ CREATE TABLE `followers` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `followers`
+--
+
+INSERT INTO `followers` (`id`, `follower_id`, `followee_id`, `created_at`) VALUES
+(624, 27, 13, '2024-12-13 05:14:58'),
+(625, 13, 27, '2024-12-13 05:14:58');
+
 -- --------------------------------------------------------
 
 --
@@ -276,7 +286,7 @@ INSERT INTO `likes` (`id`, `post_id`, `user_id`, `created_at`) VALUES
 (77, 12, 27, '2024-12-09 09:39:16'),
 (84, 11, 27, '2024-12-09 09:56:17'),
 (86, 9, 27, '2024-12-09 12:22:25'),
-(94, 14, 27, '2024-12-12 08:18:51');
+(99, 14, 27, '2024-12-13 11:00:05');
 
 -- --------------------------------------------------------
 
@@ -304,7 +314,7 @@ CREATE TABLE `posts` (
   `description` text DEFAULT NULL,
   `buddies_id` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`buddies_id`)),
   `tag_id` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`tag_id`)),
-  `location_id` int(11) DEFAULT NULL,
+  `location` varchar(255) DEFAULT NULL,
   `media_url` longtext NOT NULL DEFAULT '[]',
   `status` enum('active','inactive','deleted') DEFAULT 'active',
   `block_post` tinyint(1) DEFAULT 0,
@@ -316,12 +326,12 @@ CREATE TABLE `posts` (
 -- Dumping data for table `posts`
 --
 
-INSERT INTO `posts` (`id`, `user_id`, `is_public`, `description`, `buddies_id`, `tag_id`, `location_id`, `media_url`, `status`, `block_post`, `created_at`, `updated_at`) VALUES
-(1, 27, 1, 'An application designed and developed to serve the purpose of traveling, like planning, booking, and managing is a travel app. An application has various other features, such as saving all the travel-related information and managing travel apps.', '2', '[\"#posttag\",\"#testtag\"]', 1, '[\"https://images.unsplash.com/photo-1521575107034-e0fa0b594529?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fHBvc3R8ZW58MHx8MHx8fDA%3D\",\"https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"]', 'active', 0, '2024-11-25 06:29:48', '2024-12-09 09:09:14'),
-(2, 27, 0, 'Post description 2', '1', '[]', 2, '[\"https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"]', 'inactive', 0, '2024-11-25 06:29:48', '2024-12-09 09:09:20'),
-(3, 27, 1, 'Post description 3', '1', '[]', 3, '[\"https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg\"]', 'deleted', 1, '2024-11-25 06:29:48', '2024-12-09 09:09:26'),
-(4, 27, 1, 'Post description 4', '3', '[]', 1, '[\"https://image-processor-storage.s3.us-west-2.amazonaws.com/images/866759932dc5358cee86f6552d1250f2/inside-bubble-spheres.jpg\"]', 'active', 1, '2024-11-25 06:29:48', '2024-12-09 09:09:32'),
-(5, 27, 0, 'Post description 5', '1', '[]', 2, '[\"https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg\"]', 'active', 0, '2024-11-25 06:29:48', '2024-12-09 09:09:38'),
+INSERT INTO `posts` (`id`, `user_id`, `is_public`, `description`, `buddies_id`, `tag_id`, `location`, `media_url`, `status`, `block_post`, `created_at`, `updated_at`) VALUES
+(1, 27, 1, 'An application designed and developed to serve the purpose of traveling, like planning, booking, and managing is a travel app. An application has various other features, such as saving all the travel-related information and managing travel apps.', '2', '[\"#posttag\",\"#testtag\"]', 'Indore', '[\"https://images.unsplash.com/photo-1521575107034-e0fa0b594529?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fHBvc3R8ZW58MHx8MHx8fDA%3D\",\"https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"]', 'active', 0, '2024-11-25 06:29:48', '2024-12-13 09:48:33'),
+(2, 27, 0, 'Post description 2', '1', '[]', 'Pune', '[\"https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"]', 'inactive', 0, '2024-11-25 06:29:48', '2024-12-13 09:48:39'),
+(3, 27, 1, 'Post description 3', '1', '[]', 'Bhopal', '[\"https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg\"]', 'deleted', 1, '2024-11-25 06:29:48', '2024-12-13 09:48:49'),
+(4, 27, 1, 'Post description 4', '3', '[]', 'Mumbai', '[\"https://image-processor-storage.s3.us-west-2.amazonaws.com/images/866759932dc5358cee86f6552d1250f2/inside-bubble-spheres.jpg\"]', 'active', 1, '2024-11-25 06:29:48', '2024-12-13 09:48:57'),
+(5, 27, 0, 'Post description 5', '1', '[]', 'Goa', '[\"https://d38b044pevnwc9.cloudfront.net/cutout-nuxt/enhancer/2.jpg\"]', 'active', 0, '2024-11-25 06:29:48', '2024-12-13 09:49:12'),
 (6, 27, 1, 'My First Post', NULL, NULL, NULL, '[]', 'active', 0, '2024-12-03 13:19:58', '2024-12-03 13:19:58'),
 (7, 27, 1, 'Second Post😀', NULL, NULL, NULL, '[]', 'active', 0, '2024-12-03 13:28:55', '2024-12-03 13:28:55'),
 (8, 27, 1, 'Third Post', NULL, NULL, NULL, '[]', 'active', 0, '2024-12-03 13:40:10', '2024-12-03 13:40:10'),
@@ -330,7 +340,9 @@ INSERT INTO `posts` (`id`, `user_id`, `is_public`, `description`, `buddies_id`, 
 (11, 27, 1, 'Test Post for images', '[]', '[]', NULL, '[\"http://localhost:3000/uploads/post_img/post_1733721996316.webp\"]', 'active', 0, '2024-12-09 05:26:36', '2024-12-09 05:26:36'),
 (12, 27, 1, 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.', '[19]', '[]', NULL, '[\"http://localhost:3000/uploads/post_img/post_1733722360997.webp\",\"http://localhost:3000/uploads/post_img/post_1733722361000.jpeg\"]', 'active', 0, '2024-12-09 05:32:41', '2024-12-09 08:50:42'),
 (13, 27, 1, 'Uploading Post from Profile Section', '[23]', '[\"#travelprofile\"]', NULL, '[\"http://localhost:3000/uploads/post_img/post_1733746079858.webp\",\"http://localhost:3000/uploads/post_img/post_1733746079870.webp\"]', 'active', 0, '2024-12-09 12:07:59', '2024-12-09 12:07:59'),
-(14, 27, 1, 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.', '[19]', '[\"#traveltest\"]', NULL, '[\"http://localhost:3000/uploads/post_img/post_1733747951307.jpeg\",\"http://localhost:3000/uploads/post_img/post_1733747951309.jpeg\"]', 'active', 0, '2024-12-09 12:39:11', '2024-12-09 12:39:11');
+(14, 27, 1, 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.', '[19]', '[\"#traveltest\"]', 'Nashik', '[\"http://localhost:3000/uploads/post_img/post_1733747951307.jpeg\",\"http://localhost:3000/uploads/post_img/post_1733747951309.jpeg\"]', 'active', 0, '2024-12-09 12:39:11', '2024-12-13 09:50:00'),
+(15, 27, 1, 'test story for location', '[13]', '[]', 'Rameshwaram', '[]', 'active', 0, '2024-12-13 09:45:21', '2024-12-13 09:45:21'),
+(16, 27, 1, 'Travel is the act of moving from one place to another, often for leisure, work, or to visit family and friends. It can involve short stays between movements, such as tourism. ', '[13]', '[]', NULL, '[]', 'active', 0, '2024-12-13 11:26:09', '2024-12-13 11:26:09');
 
 -- --------------------------------------------------------
 
@@ -409,6 +421,7 @@ CREATE TABLE `shared_post` (
   `user_id` int(11) NOT NULL,
   `shared_to_id` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`shared_to_id`)),
   `thoughts` varchar(255) DEFAULT NULL,
+  `link` varchar(255) DEFAULT NULL,
   `shared_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -416,16 +429,17 @@ CREATE TABLE `shared_post` (
 -- Dumping data for table `shared_post`
 --
 
-INSERT INTO `shared_post` (`id`, `post_id`, `user_id`, `shared_to_id`, `thoughts`, `shared_at`) VALUES
-(1, 1, 26, '', NULL, '2024-11-26 06:23:29'),
-(2, 1, 13, '', NULL, '2024-11-26 06:24:46'),
-(3, 4, 28, '', NULL, '2024-11-26 06:24:46'),
-(4, 14, 27, '[1,2,3,6,7,8]', '', '2024-12-10 08:01:20'),
-(5, 14, 27, '[19,23]', 'hello first thought with nikhil and krishna', '2024-12-10 08:13:06'),
-(6, 14, 27, '[19,23]', 'Second thought', '2024-12-10 08:14:58'),
-(7, 14, 27, '[23]', 'share with nikhil', '2024-12-10 08:26:21'),
-(8, 14, 27, '[23]', 'hello from comment section', '2024-12-10 09:54:33'),
-(9, 14, 27, '[19,23]', 'share from comment section 2', '2024-12-10 09:55:13');
+INSERT INTO `shared_post` (`id`, `post_id`, `user_id`, `shared_to_id`, `thoughts`, `link`, `shared_at`) VALUES
+(1, 1, 26, '', NULL, NULL, '2024-11-26 06:23:29'),
+(2, 1, 13, '', NULL, NULL, '2024-11-26 06:24:46'),
+(3, 4, 28, '', NULL, NULL, '2024-11-26 06:24:46'),
+(4, 14, 27, '[1,2,3,6,7,8]', '', NULL, '2024-12-10 08:01:20'),
+(5, 14, 27, '[19,23]', 'hello first thought with nikhil and krishna', NULL, '2024-12-10 08:13:06'),
+(6, 14, 27, '[19,23]', 'Second thought', NULL, '2024-12-10 08:14:58'),
+(7, 14, 27, '[23]', 'share with nikhil', NULL, '2024-12-10 08:26:21'),
+(8, 14, 27, '[23]', 'hello from comment section', NULL, '2024-12-10 09:54:33'),
+(9, 14, 27, '[19,23]', 'share from comment section 2', NULL, '2024-12-10 09:55:13'),
+(10, 15, 27, '[13]', '', NULL, '2024-12-13 11:08:23');
 
 -- --------------------------------------------------------
 
@@ -495,7 +509,7 @@ INSERT INTO `users` (`id`, `full_name`, `first_name`, `last_name`, `gender`, `do
 (19, 'krishna', NULL, NULL, 'male', '1995-03-07', 'Madhya Pradesh', 'Indore', 'kk19@kk.com', '9977194285', '1466', 0, 0, 'Krish003', NULL, NULL, 1, 'traveler', NULL, NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0, 1, NULL),
 (23, 'Nikhil', NULL, NULL, 'male', '2007-02-25', 'Madhya Pradesh', 'Indore', 'kktest@kk.com', '1212121212', '3725', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0, 1, NULL),
 (26, 'Nikhil Sir', NULL, NULL, 'male', '2006-02-26', 'Madhya Pradesh', 'Indore', 'nikhil02.1998@gmail.com', '7415872603', '0640', 0, 0, 'nikhil-02', NULL, NULL, 1, 'traveler', NULL, NULL, NULL, NULL, '2024-11-26 11:37:50', 0, 0, 1, NULL),
-(27, 'Krishna Kant Malviya', 'Krishna Kant', 'Malviya', 'male', '2006-02-08', 'Madhya Pradesh', 'Indore', 'learncoding299@gmail.com', '9755895314', '0325', 0, 0, 'Krishna005', 'Test Description 004', '$2b$10$OW4ZCAzq3XiY2n/Yb1TSBu1zY1EOyO.yiUIHkMzpu.xC3b0LLhqiC', 1, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1733739127944.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733745929342.webp', '2024-11-26 11:37:50', 0, 1, 1, 'Adventurer'),
+(27, 'Krishna Kant Malviya', 'Krishna Kant', 'Malviya', 'male', '2006-02-08', 'Madhya Pradesh', 'Indore', 'learncoding299@gmail.com', '9755895314', '0325', 0, 0, 'Krishna005', 'Test Description 004', '$2b$10$OW4ZCAzq3XiY2n/Yb1TSBu1zY1EOyO.yiUIHkMzpu.xC3b0LLhqiC', 1, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1733739127944.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733745929342.webp', '2024-11-26 11:37:50', 0, 1, 1, 'Adventurer - Adventurers explore uncharted places, gather information, and share their experiences. They can also raise funds to support their travels'),
 (30, 'Test', NULL, NULL, 'male', '2007-02-27', 'Madhya Pradesh', 'Indore', 'test@test.com', '1212121211', '5133', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, NULL, '2024-11-27 01:54:23', 0, 0, 1, NULL),
 (31, 'bdh', NULL, NULL, 'female', '2004-02-28', 'Andhra Pradesh', 'Ādoni', 'emai@email.com', '9340169945', '1929', 0, 0, NULL, NULL, NULL, 1, 'traveler', NULL, NULL, NULL, NULL, '2024-11-27 12:19:35', 0, 0, 1, NULL),
 (32, 'Prashant', NULL, NULL, 'male', '2003-01-28', 'Madhya Pradesh', 'Indore', 'prashant@prashant.com', '9340169981', '7723', 0, 0, NULL, NULL, NULL, NULL, 'traveler', NULL, NULL, NULL, NULL, '2024-11-28 13:52:29', 0, 0, 1, NULL),
@@ -597,7 +611,7 @@ ALTER TABLE `list_posts`
 ALTER TABLE `posts`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`),
-  ADD KEY `location_id` (`location_id`);
+  ADD KEY `location_id` (`location`);
 
 --
 -- Indexes for table `recent_search`
@@ -665,7 +679,7 @@ ALTER TABLE `bucket_list`
 -- AUTO_INCREMENT for table `buddies`
 --
 ALTER TABLE `buddies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `comments`
@@ -689,13 +703,13 @@ ALTER TABLE `comment_reply`
 -- AUTO_INCREMENT for table `followers`
 --
 ALTER TABLE `followers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=624;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=626;
 
 --
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
 
 --
 -- AUTO_INCREMENT for table `list_posts`
@@ -707,7 +721,7 @@ ALTER TABLE `list_posts`
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `recent_search`
@@ -731,7 +745,7 @@ ALTER TABLE `reply_like`
 -- AUTO_INCREMENT for table `shared_post`
 --
 ALTER TABLE `shared_post`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `tags`

@@ -381,7 +381,6 @@ const EditProfile = () => {
     setProfilePhoto(null); // Remove the profile photo
   };
 
-
   return (
     <>
       {/* Header Section */}
@@ -548,31 +547,31 @@ const EditProfile = () => {
                     </option>
                     <option
                       className="font-inter font-medium text-[16px] text-[#869E9D]"
-                      value="Explorer"
+                      value="Explorer - a person who travels around a place in order to learn about it"
                     >
                       Explorer
                     </option>
                     <option
                       className="font-inter font-medium text-[16px] text-[#869E9D]"
-                      value="Adventurer"
+                      value="Adventurer - Adventurers explore uncharted places, gather information, and share their experiences. They can also raise funds to support their travels"
                     >
                       Adventurer
                     </option>
                     <option
                       className="font-inter font-medium text-[16px] text-[#869E9D]"
-                      value="Foodie"
+                      value="Foodie - A foodie is a person who has an ardent or refined interest in food, and who eats food not only out of hunger but also as a hobby."
                     >
                       Foodie
                     </option>
                     <option
                       className="font-inter font-medium text-[16px] text-[#869E9D]"
-                      value="Solo Traveler"
+                      value="Solo Traveler - A solo traveler is someone who travels independently, without friends or companions."
                     >
                       Solo Traveler
                     </option>
                     <option
                       className="font-inter font-medium text-[16px] text-[#869E9D]"
-                      value="Luxury Traveler"
+                      value="Luxury Traveler - Luxury travel is a type of leisure tourism that involves high-end accommodations, personalized service, and exclusive experiences"
                     >
                       Luxury Traveler
                     </option>
