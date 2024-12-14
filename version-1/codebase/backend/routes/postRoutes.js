@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {  allPosts, postWithlikes , getActiveStories , getPostComments ,getUserPosts, postComment, postLike, likeAnyComment, replyOnComment, storePost, deleteComments, deleteReply, followAndUnfollow, likeToReply, followAndUnfollowFollowing, getPostData, sharePostWithFriends} = require('../controllers/postController');
+const {  allPosts, postWithlikes , getActiveStories , getPostComments ,getUserPosts, postComment, postLike, likeAnyComment, replyOnComment, storePost, deleteComments, deleteReply, followAndUnfollow, likeToReply, followAndUnfollowFollowing, getPostData, sharePostWithFriends, communityPagePosts} = require('../controllers/postController');
 const verifyToken = require("../utils/verifyToken");
 
 
@@ -11,9 +11,8 @@ const verifyToken = require("../utils/verifyToken");
 // // router.get('/userpost/:postId', getUserPosts);
 // router.get('/userpost',verifyToken, getUserPosts);
 
-
-// router.get('/allposts', allPosts);
-router.get('/allposts', postWithlikes);
+// router.get('/allposts', postWithlikes);
+router.get('/allposts', verifyToken, communityPagePosts );
 router.get('/stories', getActiveStories);
 router.get('/comments/:postId', getPostComments);
 // router.get('/userpost/:postId', getUserPosts);

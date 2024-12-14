@@ -43,6 +43,7 @@ import {
   commentOnReply,
   deleteCommentByPostOwner,
   deleteReplyByPostOwner,
+  getAllPosts,
   getCommentOnPost,
   likeAnyComment,
   likeUnlikeAnyReply,
@@ -152,11 +153,18 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
   };
 
   const { postComment } = useSelector((state) => state.postSlice);
+  // const {
+  //   userPosts,
+  //   user: userDetails,
+  //   userBuddies,
+  // } = useSelector((state) => state.auth);
+
   const {
-    userPosts,
     user: userDetails,
     userBuddies,
   } = useSelector((state) => state.auth);
+
+  const { allPosts: userPosts} = useSelector((state) => state.postSlice);  // changed the name to userpost as it was made earlier for user only 
 
   /* emoji functionality starts */
   const [showEmojiPicker, setShowEmojiPicker] = useState(false); // working on reply on comment
@@ -187,9 +195,11 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
 
   useEffect(() => {
     if (!userPosts) {
-      // dispatch(getAllPosts());
-      dispatch(getUserPosts());
+      dispatch(getAllPosts());
+      // dispatch(getUserPosts());
     }
+
+    // if()
 
     // if (!postComment) {
     dispatch(getCommentOnPost(postId));

@@ -1619,6 +1619,50 @@ async function blockAccount(req , res){
   }
 }
 
+// to show suggestions to user for follow and add buddy
+async function suggestions(req, res) {
+  try {
+    // const { userId } = req.params; // User requesting suggestions
+    const userId = req.user.userId;
+    const { page = 1, limit = 10 } = req.query; // Optional pagination params
+    const offset = (page - 1) * limit; // Calculate offset
+
+    // Fetch suggested users based on logic (excluding already followed and userId)
+    const [suggestions] = await pool.execute(
+      `
+      SELECT 
+        u.id AS user_id,
+        u.full_name,
+        u.user_name,
+        u.profile_image,
+        u.badge,
+        (SELECT COUNT(*) FROM followers f WHERE f.followee_id = u.id) AS followers_count,
+        (SELECT COUNT(*) FROM posts p WHERE p.user_id = u.id AND p.status = 'active') AS posts_count
+      FROM users u
+      WHERE 
+        u.id != ? -- Exclude the requesting user
+        AND u.id NOT IN (SELECT followee_id FROM followers WHERE follower_id = ?) -- Exclude already followed users
+      ORDER BY followers_count DESC, posts_count DESC -- Sort by activity/popularity
+      LIMIT ? OFFSET ?;
+      `,
+      [userId, userId, parseInt(limit), parseInt(offset)] // Bind params
+    );
+
+    return res.status(200).json({
+      message: 'Suggestions fetched successfully',
+      data: suggestions,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching suggestions:', error);
+    return res.status(500).json({
+      error: 'Error getting suggestions',
+    });
+  }
+}
 
 module.exports = {
   registerUser,
@@ -1648,5 +1692,6 @@ module.exports = {
   onlineFriends,
   addBuddies,
   removeBuddy,
-  blockAccount
+  blockAccount,
+  suggestions
 };

@@ -271,3 +271,48 @@ Right and Left Sidebar of Profile page(components) :-
    handleAddBuddy() function :- It is used to add user as buddy.
    handleBuddyRemove() function :- It is used to remove user as buddy.
    handleFollowUnfollowForFollowing() function :- It is used to follow a user.
+
+=====================================================================================================================================
+
+Module :- ShowSharedPost
+
+=> When user shares a post or copy post url and then paste on browser, then it will show the post but if user did not login and clicks
+   on like comment button, he will be redirected to login, else he can perform any operation.
+
+file destination :- src/Components/OtherPages/ShowSharedPost.jsx
+
+-> This page is opened when url is hitted like :- http://localhost:5173/username/postid
+
+-> When this page is opened redux function getSharePostData() is called through which post data is shown.
+
+Main functions used :-
+-> handleLikeUnlike() :- To like and unlike a post.
+-> handleOpenCommentPopup() :- To open comments of post in a popup.
+-> handleOpenBucketSavedPopup() :- To open bucket list popup.
+-> handleOpenSharePopup() :- To open share popup .
+
+======================================================================================================================================
+
+Module :- Dashboard(landing page)
+
+file destination :- src/Components/OtherPages/CommunityPage.jsx
+
+-> Using allPosts redux state gets all posts(buddies, public, followers) and displays on UI.
+
+Main functions used :-
+-> handleLikeUnlike() :- To like and unlike a post.
+-> handleOpenCommentPopup() :- To open comments of post in a popup.
+-> handleOpenBucketSavedPopup() :- To open bucket list popup.
+-> handleOpenSharePopup() :- To open share popup .
+-> togglePopup() function :- To open the details of tagged buddies in a post.
+
+-> badges stored in a variable
+ const badges = {
+    Adventurer: BadgesIconFirst,
+    Explorer: BadgesIconFirst,
+    Foodie: BadgesIconFirst,
+    "Solo Traveler": BadgesIconFirst,
+    "Luxury Traveler": BadgesIconFirst,
+  };
+
+====================================================================================================================================

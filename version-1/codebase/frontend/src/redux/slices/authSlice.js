@@ -723,7 +723,7 @@ export const getSuggestionList = createAsyncThunk(
   async (_,{ rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${apiUrl}/auth/online-friends`, {
+      const response = await fetch(`${apiUrl}/auth/get-suggestions`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
