@@ -49,7 +49,7 @@ const CommunityRightSidebar = () => {
   /* redux state data starts */
 
   const { onlineFriends, allUsers, suggestionList } = useSelector((state) => state.auth);
-  const [suggestions, setSuggestions] = useState(allUsers || null);
+  const [suggestions, setSuggestions] = useState(suggestionList || null);
 
   /* redux state data ends */
 
