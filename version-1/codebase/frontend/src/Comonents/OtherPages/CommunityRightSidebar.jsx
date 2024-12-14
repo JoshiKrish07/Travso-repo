@@ -51,7 +51,6 @@ const CommunityRightSidebar = () => {
   const { onlineFriends, allUsers, suggestionList } = useSelector((state) => state.auth);
   const [suggestions, setSuggestions] = useState(allUsers || null);
 
- console.log("======suggestionList=====>", suggestionList);
   /* redux state data ends */
 
   useEffect(() => {
@@ -66,7 +65,6 @@ const CommunityRightSidebar = () => {
   },[suggestionList, dispatch]);
 
   const handleFollow = async(followeeID) => {
-
     // setSuggestions((prevSuggestions) =>
     //   prevSuggestions.map((user) =>
     //     user.id === followeeID
@@ -77,7 +75,7 @@ const CommunityRightSidebar = () => {
 
     try {
        const followResponse = await dispatch(followUnfollow(followeeID)).unwrap();
-       console.log("====followResponse===>", followResponse);
+      //  console.log("====followResponse===>", followResponse);
        if(followResponse) {
         dispatch(getSuggestionList());
        }

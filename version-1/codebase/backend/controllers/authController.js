@@ -1631,7 +1631,7 @@ async function suggestions(req, res) {
     const [suggestions] = await pool.execute(
       `
       SELECT 
-        u.id AS user_id,
+        u.id,
         u.full_name,
         u.user_name,
         u.profile_image,
