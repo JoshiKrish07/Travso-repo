@@ -25,6 +25,108 @@ async function allPosts(req , res){
     
 }
 
+// get all post of user buddies, followers and public posts
+async function communityPagePosts(req, res) {
+  try {
+    // const { userId } = req.params; // Assuming the user ID is passed as a URL parameter
+    const userId = req.user.userId;
+    const [data] = await pool.execute(
+      `SELECT 
+        p.id,
+        p.user_id,
+        p.is_public,
+        p.description,
+        p.buddies_id,
+        p.tag_id,
+        p.location,
+        p.media_url,
+        p.status,
+        p.block_post,
+        u.full_name,
+        u.user_name,
+        u.profile_image,
+        u.badge,
+        p.created_at AS post_created_at,
+        p.updated_at AS post_updated_at,
+        (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.id) AS total_likes,
+        (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS total_comments,
+        (SELECT COUNT(*) FROM shared_post sp WHERE sp.post_id = p.id) AS total_shared,
+        (SELECT COUNT(*) FROM bucket_list bl WHERE bl.post_id = p.id) AS total_buckets,
+        EXISTS (SELECT 1 FROM likes l WHERE l.post_id = p.id AND l.user_id = ?) AS is_liked
+      FROM 
+        posts p
+      JOIN users u ON p.user_id = u.id
+      LEFT JOIN buddies b ON b.buddies_id = p.user_id
+      LEFT JOIN followers f ON f.followee_id = p.user_id
+      WHERE 
+        p.status = 'active' 
+        AND (p.is_public = 1 
+          OR f.follower_id = ? 
+          OR b.user_id = ?)
+      ORDER BY 
+        p.created_at ASC;`,
+      [userId, userId, userId] // Bind userId for followers and buddies
+    );
+
+    // Parse buddies_id and enrich with data from users table
+    const parsedData = await Promise.all(
+      data.map(async (post) => {
+        let taggedBuddies = [];
+        try {
+          const buddiesIds = post.buddies_id ? JSON.parse(post.buddies_id) : [];
+          if (buddiesIds.length > 0) {
+            const placeholders = buddiesIds.map(() => '?').join(', ');
+            const [buddiesData] = await pool.execute(
+              `SELECT 
+                id, 
+                full_name, 
+                profile_image, 
+                badge,
+                (SELECT COUNT(*) FROM followers WHERE followee_id = users.id) AS followers_count,
+                (SELECT COUNT(*) FROM buddies WHERE user_id = users.id) AS buddies_count
+              FROM users
+              WHERE id IN (${placeholders})`,
+              buddiesIds
+            );
+            taggedBuddies = buddiesData;
+          }
+        } catch (parseError) {
+          console.error('Error parsing buddies_id:', parseError);
+        }
+
+        // Parse other JSON fields safely
+        let tagId = [];
+        let mediaUrl = [];
+        try {
+          tagId = post.tag_id ? JSON.parse(post.tag_id) : [];
+          mediaUrl = post.media_url ? JSON.parse(post.media_url) : [];
+        } catch (parseError) {
+          console.error('Error parsing tag_id or media_url:', parseError);
+        }
+
+        return {
+          ...post,
+          buddies_id: taggedBuddies, // Enriched buddies data
+          tag_id: tagId,
+          media_url: mediaUrl,
+          is_liked: !!post.is_liked
+        };
+      })
+    );
+
+    console.log('===alldata===>', parsedData);
+    return res.status(200).json({
+      message: 'Data fetched successfully',
+      data: parsedData,
+    });
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
+  }
+}
+
  async function postWithlikes(req , res){
 try {
     const [datawithlike] = await pool.execute(
@@ -1331,5 +1433,6 @@ module.exports = {
     likeToReply,
     sharePostWithFriends,
     followAndUnfollowFollowing,
-    getPostData
+    getPostData,
+    communityPagePosts
 }

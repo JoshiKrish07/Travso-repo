@@ -4,7 +4,7 @@ import Girl from "../../assets/headerIcon/girl.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import dummyUserImage from "../../assets/user_image-removebg-preview.png";
 import { followUnfollow } from "../../redux/slices/postSlice";
-import { getAllUsers } from "../../redux/slices/authSlice";
+import { getAllUsers, getOnlineFriends, getSuggestionList } from "../../redux/slices/authSlice";
 
 const CommunityRightSidebar = () => {
   const dispatch = useDispatch();
@@ -48,17 +48,22 @@ const CommunityRightSidebar = () => {
 
   /* redux state data starts */
 
-  const { onlineFriends, allUsers } = useSelector((state) => state.auth);
+  const { onlineFriends, allUsers, suggestionList } = useSelector((state) => state.auth);
   const [suggestions, setSuggestions] = useState(allUsers || null);
 
-
+ console.log("======suggestionList=====>", suggestionList);
   /* redux state data ends */
 
   useEffect(() => {
-    if(allUsers) {
-      setSuggestions(allUsers)
+
+    if(!suggestionList) {
+      dispatch(getSuggestionList());
     }
-  },[allUsers, dispatch]);
+
+    if(suggestionList) {
+      setSuggestions(suggestionList)
+    }
+  },[suggestionList, dispatch]);
 
   const handleFollow = async(followeeID) => {
 
@@ -73,6 +78,9 @@ const CommunityRightSidebar = () => {
     try {
        const followResponse = await dispatch(followUnfollow(followeeID)).unwrap();
        console.log("====followResponse===>", followResponse);
+       if(followResponse) {
+        dispatch(getSuggestionList());
+       }
     } catch (error) {
       console.log("===error===in handleFollow===>", error);
     }

@@ -7,11 +7,12 @@ export const getAllPosts = createAsyncThunk(
   'post/getAllPosts',
   async (_,{ rejectWithValue }) => {
     try {
-    //   const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token');
       const response = await fetch(`${apiUrl}/post/allposts`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
       });
 
@@ -403,8 +404,7 @@ export const followUnfollowOnFollowing = createAsyncThunk(
 export const getSharePostData = createAsyncThunk(
   'post/getSharePostData',
   async ({userName, postId},{ rejectWithValue }) => {
-    console.log("===userName===>", userName)
-    console.log("===postId===>", postId)
+
     try {
       const response = await fetch(`${apiUrl}/post/post-data/${postId}`, {
         method: 'GET',
