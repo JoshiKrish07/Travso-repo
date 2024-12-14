@@ -210,7 +210,7 @@ function ShowSharedPost() {
         sharedPostData && (
             <div className="bg-white rounded-lg shadow-[0_2px_6px_rgba(0,0,0,0.10)] p-5 mt-4">
               {/* Top Fixed Section */}
-              <div className="flex items-center justify-between space-x-4 mb-1 pb-2">
+              <div className="flex items-center justify-between space-x-4 mb-1 pb-2 w-full max-w-4xl mx-auto">
                 <div className="flex items-center gap-2">
                   <img
                     src={sharedPostData?.profile_image || dummyUserImage} 
@@ -299,7 +299,7 @@ function ShowSharedPost() {
                 }
                 
                 {/* Post Description */}
-                <p className="font-inter font-medium text-[14px] text-[#212626] text-left text-justify mb-1 mt-3">
+                <p className="font-inter font-medium text-[14px] text-[#212626] text-left text-justify mb-1 mt-3 flex w-full max-w-4xl mx-auto">
                   {isFullTextVisible
                     ? sharedPostData?.description
                     : sharedPostData?.description?.length > 170 ? `${sharedPostData.description.slice(0, 170)}...` : sharedPostData?.description}
@@ -317,14 +317,14 @@ function ShowSharedPost() {
                 </p>
 
                 {/* Hashtags */}
-                <p className="text-left text-[#1DB2AA] mb-2">
+                <p className="text-left text-[#1DB2AA] mb-2 flex w-full max-w-4xl mx-auto">
                   {sharedPostData?.hashtag}
                 </p>
               </div>
               {/*---------- Scrollable Part ---------*/}
 
               {/* Bottom Fixed Section */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between w-full max-w-4xl mx-auto">
                 <ul className="flex gap-2">
                   <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
                     {sharedPostData?.total_likes || 0} Love &nbsp; &nbsp;{" "}
@@ -352,7 +352,7 @@ function ShowSharedPost() {
                   {formatDate(sharedPostData?.created_at)}
                 </p>
               </div>
-              <div className="flex items-center justify-between mt-3">
+              <div className="flex items-center justify-between mt-3 w-full max-w-4xl mx-auto">
                 <button
                   aria-label="Edit Info"
                 //   className="flex items-center justify-center w-[130px] h-[36px] bg-[#2DC6BE] text-white text-[#434C50] hover:text-gray-800 py-1 px-2 rounded-full hover:bg-[#2DC6BE] hover:text-white"

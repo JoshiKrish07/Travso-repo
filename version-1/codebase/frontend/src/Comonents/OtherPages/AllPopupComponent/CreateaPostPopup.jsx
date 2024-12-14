@@ -244,6 +244,7 @@ const CreateaPostPopup = ({
 
   const handleFileChange = (e) => {
     const files = e.target.files;
+    console.log("===files===>", files);
     if (files.length > 0) {
       handleFileSelect(files);
     }
@@ -272,7 +273,7 @@ const CreateaPostPopup = ({
   };
 
   /* for setting image in postData */
-  const handleFileSelect = (files) => {
+  const handleFileSelect1 = (files) => {
     const file = files[0];
     const reader = new FileReader();
 
@@ -285,6 +286,25 @@ const CreateaPostPopup = ({
     };
 
     reader.readAsDataURL(file); // Read the file as base64
+  };
+
+  const handleFileSelect = (files) => {
+
+    for(let img in files) {
+
+      const file = files[img];
+      const reader = new FileReader();
+  
+      reader.onloadend = () => {
+        const imageUrl = reader.result; // Base64 encoded image
+        setPostData((prevState) => ({
+          ...prevState,
+          media_url: [...prevState.media_url, imageUrl], // Add image URL to media_url array
+        }));
+      };
+  
+      reader.readAsDataURL(file); // Read the file as base64
+    }
   };
 
   // Remove image from media_url
