@@ -315,4 +315,17 @@ Main functions used :-
     "Luxury Traveler": BadgesIconFirst,
   };
 
+
+Section :- Active Stories
+-> Using activeStories redux state shown the list of active stories.
+
+Major functions working :-
+-> handleStoryReplyInputChange() function :- sets the values inserted in comment box in storyReply state.
+-> handleEmojiClickStory() function :- Sets the selected emoji with text written in comment box in storyReply state.
+-> handleStoryCommentEnter() function :- When user writes something in comment box and hits enter, then this function runs and calls
+                                        commentOnStory() redux function.
+-> handleLikeUnlikeStory() function :- To like and unlike any story.
+-> blockTheUser() function :- To block any user.
+-> handleOpenShareStoryPopup() function :- It is used to open a share popup having buddies in popup in the story section.
+-> handleShareStoryPopupClose() function :- It is used to close share popup in story section.
 ====================================================================================================================================

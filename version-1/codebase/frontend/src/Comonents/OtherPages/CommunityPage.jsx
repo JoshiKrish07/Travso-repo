@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 // import BadgesIconFirst from "../../../assets/BadgesIconFirst.png";
 import BadgesIconFirst from "../../assets/BadgesIconFirst.png";
 import {
+  blockAccount,
   getAllUsers,
   getOnlineFriends,
   getUserDetails,
@@ -31,9 +32,12 @@ import {
 import CreateaPostPopup from "./AllPopupComponent/CreateaPostPopup";
 import PostDetailPopup from "./AllPopupComponent/PostDetailPopup";
 import {
+  commentOnStory,
   commitPost,
+  getActiveStories,
   getAllPosts,
   LikeUnlikePost,
+  likeUnlikeStory,
 } from "../../redux/slices/postSlice";
 import dummyUserImage from "../../assets/user_image-removebg-preview.png";
 import SavedPopup from "./AllPopupComponent/SavedPopup";
@@ -42,6 +46,8 @@ import CommentPopup from "./AllPopupComponent/CommentPopup";
 import { formatePostDate } from "../../utils/formatPostDate";
 import logo from "../../assets/headerIcon/logo.png";
 import Background from "../../assets/Background.png";
+import EmojiPicker from "emoji-picker-react";
+import ShareStoryPopup from "./AllPopupComponent/ShareStoryPopup";
 
 const CommunityPage = () => {
   const dispatch = useDispatch();
@@ -49,6 +55,26 @@ const CommunityPage = () => {
   let isDragging = false;
   let startX;
   let scrollLeft;
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isFullTextVisible, setIsFullTextVisible] = useState(false);
+  const [isCreatePostPopup, setIsCreatePostPopup] = useState(false);
+  const [isPostDetailPopup, setIsPostDetailPopup] = useState(false);
+
+  /* for comment popup and saved popup */
+  const [isCommentPopup, setIsCommentPopup] = useState(false);
+  const [activePostId, setActivePostId] = useState(null);
+  const [isCommentWithSavedPopup, setIsCommentWithSavedPopup] = useState(false);
+  const [isSharePopup, setIsSharePopup] = useState(false);
+
+  /* for showing tagged buddies */
+  const [isotherDataVisible, setIsotherDataVisible] = useState(false);
+  const [showTaggedBuddiesPostId, setShowTaggedBuddiesPostId] = useState(false);
+
+  /* for story section */
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const [isShareStoryPopup, setIsShareStoryPopup] = useState(false);
+  const [activeStoryId, setActiveStoryId] = useState(null);
 
   const handleMouseDown = (e) => {
     isDragging = true;
@@ -69,7 +95,7 @@ const CommunityPage = () => {
   };
 
   const data = [
-    { id: 1, src: story, label: "My Story" },
+    // { id: 1, src: story, label: "My Story" },
     { id: 2, src: Girl, label: "Priya Sharma" },
     { id: 3, src: Boy1, label: "Rohit Singh" },
     { id: 4, src: Girl, label: "Sneha Patel" },
@@ -116,28 +142,37 @@ const CommunityPage = () => {
   const [popupBuddiesReelVisible, setPopupBuddiesReelVisible] = useState(false);
   const [currentBuddiesReelIndex, setCurrentBuddiesReelIndex] = useState(0);
   const [dropdownOpenSetting, setDropdownOpenSetting] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false); // working on reply on comment
+  const [storyReply, setStoryReply] = useState({});
 
   const toggleSetting = () => {
     setDropdownOpenSetting(!dropdownOpenSetting);
   };
 
-  const handleBuddiesReelNext = () => {
-    if (currentBuddiesReelIndex < mediaArray.length - 1) {
+  /* to see next story */
+  const handleBuddiesStoryNext = () => {
+    if (currentBuddiesReelIndex < activeStories.length - 1) {
       setCurrentBuddiesReelIndex(currentBuddiesReelIndex + 1);
     }
   };
 
-  const handleBuddiesReelPrevious = () => {
+  /* to see previous story */
+  const handleBuddiesStoryPrevious = () => {
     if (currentBuddiesReelIndex > 0) {
       setCurrentBuddiesReelIndex(currentBuddiesReelIndex - 1);
     }
   };
 
-  const handleItemBuddiesReelClick = (item) => {
+  /* This function is running when clicked on any active story */
+  const handleItemBuddiesStoryClick = (itemId) => {
+    // console.log("===itemId====>", itemId);
+    setCurrentBuddiesReelIndex(itemId-1);
     setPopupBuddiesReelVisible(true); // Show the popup
   };
 
-  const closeBuddiesReelPopup = () => {
+  /* to close story popup */
+  const closeBuddiesStoryPopup = () => {
+    setCurrentBuddiesReelIndex(0);
     setPopupBuddiesReelVisible(false); // Hide the popup
   };
 
@@ -155,21 +190,6 @@ const CommunityPage = () => {
 
   const images = postDetails.image;
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFullTextVisible, setIsFullTextVisible] = useState(false);
-  const [isCreatePostPopup, setIsCreatePostPopup] = useState(false);
-  const [isPostDetailPopup, setIsPostDetailPopup] = useState(false);
-
-  /* for comment popup and saved popup */
-  const [isCommentPopup, setIsCommentPopup] = useState(false);
-  const [activePostId, setActivePostId] = useState(null);
-  const [isCommentWithSavedPopup, setIsCommentWithSavedPopup] = useState(false);
-  const [isSharePopup, setIsSharePopup] = useState(false);
-
-  /* for showing tagged buddies */
-  const [isotherDataVisible, setIsotherDataVisible] = useState(false);
-  const [showTaggedBuddiesPostId, setShowTaggedBuddiesPostId] = useState(false);
-
   const [postData, setPostData] = useState({
     description: "",
     location: "",
@@ -186,7 +206,7 @@ const CommunityPage = () => {
     allUsers,
     user: userDetails,
   } = useSelector((state) => state.auth);
-  const { allPosts } = useSelector((state) => state.postSlice);
+  const { allPosts, activeStories } = useSelector((state) => state.postSlice);
 
   useEffect(() => {
     if (!onlineFriends) {
@@ -200,6 +220,10 @@ const CommunityPage = () => {
     if (!userDetails) {
       dispatch(getUserDetails());
     }
+
+    if(!activeStories) {
+      dispatch(getActiveStories());
+    }
   }, [dispatch]);
 
   /* redux state data ends */
@@ -209,15 +233,15 @@ const CommunityPage = () => {
     setIsFullTextVisible(!isFullTextVisible);
   };
 
-  const goToPrevious = () => {
+  const goToPrevious = (mediaLength) => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+      prevIndex === 0 ? mediaLength - 1 : prevIndex - 1
     );
   };
 
-  const goToNext = () => {
+  const goToNext = (mediaLength) => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1
+      prevIndex === mediaLength - 1 ? 0 : prevIndex + 1
     );
   };
 
@@ -406,22 +430,6 @@ const CommunityPage = () => {
     dispatch(getUserPosts());
   };
 
-  // Function to determine badge image based on badge name
-  const getBadgeImage = (badge) => {
-    const badges = {
-      Adventurer: BadgesIconFirst,
-      Explorer: BadgesIconFirst,
-      Foodie: BadgesIconFirst,
-      "Solo Traveler": BadgesIconFirst,
-      "Luxury Traveler": BadgesIconFirst,
-    };
-
-    const badgeParts = badge?.split("-");
-    const badgeName = badgeParts?.[0]?.trim();
-
-    return badges[badgeName] || null;
-  };
-
   // Simplified badge image logic
   const badges = {
     Adventurer: BadgesIconFirst,
@@ -437,6 +445,107 @@ const CommunityPage = () => {
     setShowTaggedBuddiesPostId(postId);
   };
 
+  /* handle input change on story reply input */
+  const handleStoryReplyInputChange = (e, storyId) => {
+    const { value } = e.target;
+    setStoryReply((prev) => ({
+      ...prev,
+      [storyId]: value,
+    }));
+  }
+
+  /* Runs when user selects a emoji, then updates emoji in value */
+  const handleEmojiClickStory = (emojiObject, storyId) => {
+  //  console.log("===storyId===>", storyId);
+    setStoryReply((prevReplies) => ({
+      ...prevReplies,
+      [storyId]: (prevReplies[storyId] || "") + emojiObject.emoji,
+    }));
+    setShowEmojiPicker(false); // Close the emoji picker after selection
+  };
+
+  /* when user press enters on comment section after writing comment in story */
+  const handleStoryCommentEnter = async (e, storyId, userId) => {
+      // console.log("=====storyId====>", storyId, "====userId===>", userId);
+      if (e.key === "Enter" && !e.shiftKey) {
+        try {
+          const commentPayload = {
+            story_id: storyId,
+            content: storyReply[storyId], // Full comment text
+          };
+          // console.log("==commentPayload==>", commentPayload);
+          const replyResponse = await dispatch(
+            commentOnStory(commentPayload)
+          ).unwrap();
+          if (replyResponse) {
+            setStoryReply({});
+          }
+        } catch (error) {
+          console.log("error in handleStoryCommentEnter ", error);
+          const errorMessage = error.error || "Unexpected Error Occured";
+          // handleFlashMessage(errorMessage, 'error')
+        }
+      }
+    };
+
+  /* to send any reply on story */
+  const sendReplyToStory = async (storyId, userId) => {
+    try {
+        const commentPayload = {
+          story_id: storyId,
+          content: storyReply[storyId], // Full comment text
+        };
+        // console.log("==commentPayload==>", commentPayload);
+        const replyResponse = await dispatch(
+          commentOnStory(commentPayload)
+        ).unwrap();
+        if (replyResponse) {
+          setStoryReply({});
+        }
+      } catch (error) {
+        console.log("error in sendReplyToStory", error);
+      }
+    };
+
+    /* handle like and unlike on a story */
+  const handleLikeUnlikeStory = async(storyId) => {
+    try {
+      console.log("=====storyId====>", storyId);
+      const likeUnlikeResult = await dispatch(
+        likeUnlikeStory({ story_id: storyId })
+      ).unwrap();
+      console.log("===likeUnlikeResult===>", likeUnlikeResult);
+    } catch (error) {
+      console.log("error in handleLikeUnlikeStory", error);
+    }
+  }
+
+  /* to block an account */
+  const blockTheUser = async (blockId) => {
+      try {
+        const response = await dispatch(blockAccount(blockId)).unwrap();
+        console.log("===response===>", response);
+        if(response) {
+          setOpenDropdownId(null);
+        }
+      } catch (error) {
+        console.log("===error in blocktheuser===>", error);
+      }
+    };
+
+  // to open share popup
+    const handleOpenShareStoryPopup = (storyId) => {
+      // console.log("===storyId==>", storyId);
+      setActiveStoryId(storyId);
+      setIsShareStoryPopup(true);
+    };
+  
+    // to close share popup
+    const handleShareStoryPopupClose = () => {
+      setIsShareStoryPopup(false);
+      setActiveStoryId(null);
+      // dispatch(getUserPosts());
+    };
 
   return (
     <>
@@ -466,20 +575,42 @@ const CommunityPage = () => {
                 onTouchMove={(e) => handleMouseMove(e.touches[0])}
                 onTouchEnd={handleMouseUpOrLeave}
               >
-                {data.map((item) => (
+                <div
+                  className="flex flex-col items-center mb-2 mr-2 cursor-pointer"
+                  style={{ flex: "0 0 auto" }}
+                >
+                  <img
+                    src={story}
+                    alt="My Story"
+                    className="w-[64px] h-[64px] object-cover rounded-full border-2 border-[#2DC6BE] p-[2px]"
+                    // onClick={() => setIsCreateSocialPopup(true)}
+                  />
+                  <p
+                    className="font-inter font-medium text-[14px] mt-2 text-[#212626]"
+                    // onClick={() => setIsCreateSocialPopup(true)}
+                  >
+                    My Story
+                  </p>
+
+                  {/* <StoryPage
+                    isOpen={isCreateSocialPopup}
+                    onClose={() => setIsCreateSocialPopup(false)}
+                  /> */}
+                </div>
+                {activeStories && activeStories.map((user) => (
                   <div
-                    key={item.id}
+                    key={user.id}
                     className="flex flex-col items-center mb-2 mr-2"
                     style={{ flex: "0 0 auto" }}
-                    onClick={() => handleItemBuddiesReelClick(item)}
+                    onClick={() => handleItemBuddiesStoryClick(user.id)}
                   >
                     <img
-                      src={item.src}
-                      alt={item.label}
+                      src={user.profile_image || dummyUserImage}
+                      alt={"Profile"}
                       className="w-[64px] h-[64px] object-cover rounded-full border-2 border-[#2DC6BE] p-[2px]"
                     />
                     <p className="font-inter font-medium text-[14px] mt-2 text-[#212626]">
-                      {item.label}
+                      {user.full_name}
                     </p>
                   </div>
                 ))}
@@ -503,7 +634,7 @@ const CommunityPage = () => {
                       {/* Close Tab */}
                       <div
                         className="absolute -top-[10px] -right-[540px] z-10 cursor-pointer"
-                        onClick={closeBuddiesReelPopup}
+                        onClick={closeBuddiesStoryPopup}
                       >
                         <svg
                           width="44"
@@ -570,7 +701,7 @@ const CommunityPage = () => {
                       {/* Left Navigation Button */}
                       <button
                         className="absolute top-1/2 -left-[50px] w-9 h-9 transform -translate-y-1/2 bg-white text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center rotate-180"
-                        onClick={handleBuddiesReelPrevious}
+                        onClick={handleBuddiesStoryPrevious}
                       >
                         <svg
                           width="8"
@@ -599,9 +730,9 @@ const CommunityPage = () => {
                             }% + ${currentBuddiesReelIndex * -16}px))`,
                           }}
                         >
-                          {mediaArray.map((media, index) => (
+                          {activeStories && activeStories.map((userStory, index) => (
                             <div
-                              key={index}
+                              key={userStory?.id}
                               className={`w-[396px] h-[650px] flex-shrink-0 ${
                                 index === currentBuddiesReelIndex
                                   ? "scale-100 z-10"
@@ -613,14 +744,14 @@ const CommunityPage = () => {
                                 <div className="flex items-center gap-[8px]">
                                   <div>
                                     <img
-                                      src={Girl}
+                                      src={userStory?.profile_image || dummyUserImage}
                                       alt="Girl"
                                       className="w-[44px] h-[44px] rounded-full"
                                     />
                                   </div>
                                   <div className="flex flex-col">
                                     <p className="flex items-center gap-[5px] font-poppins font-semibold text-[16px] text-[#FFFFFF]">
-                                      Pankaj Reet Tech{" "}
+                                      {userStory?.full_name}{" "}
                                       <svg
                                         width="16"
                                         height="16"
@@ -641,7 +772,7 @@ const CommunityPage = () => {
                                       </svg>
                                     </p>
                                     <p className="-mt-1 text-left font-inter font-medium text-[14px] text-[#FFFFFF]">
-                                      Solo Traveler
+                                     {userStory?.badge.split("-")[0]}
                                     </p>
                                   </div>
                                 </div>
@@ -687,7 +818,10 @@ const CommunityPage = () => {
                                       viewBox="0 0 24 24"
                                       fill="none"
                                       xmlns="http://www.w3.org/2000/svg"
-                                      onClick={toggleSetting}
+                                      // onClick={toggleSetting}
+                                      onClick={() =>
+                                        setOpenDropdownId(userStory.id)
+                                      }
                                     >
                                       <path
                                         d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z"
@@ -712,7 +846,7 @@ const CommunityPage = () => {
                                       />
                                     </svg>
                                     {/* DropdownSetting Menu */}
-                                    {dropdownOpenSetting && (
+                                    {openDropdownId === userStory?.id && (
                                       <div className="fixed top-1/4 left-2/3 transform -translate-x-1/2 -translate-y-1/2 bg-white border border-[#ddd] rounded-md rounded-[16px] shadow-md w-[200px]">
                                         <div className="flex items-center justify-between p-2 px-4 border-b border-b-gray-500 w-full">
                                           <h6 className="font-poppins font-semibold text-[16px] text-[#212626] ">
@@ -722,9 +856,7 @@ const CommunityPage = () => {
                                           {/* Close Button (X) */}
                                           <button
                                             className="hover:text-[#2DC6BE] font-poppins font-semibold text-[16px] text-[#212626]"
-                                            onClick={() =>
-                                              setDropdownOpenSetting(false)
-                                            }
+                                            onClick={() => setOpenDropdownId(null)}
                                             aria-label="Close"
                                           >
                                             &#x2715;
@@ -767,24 +899,35 @@ const CommunityPage = () => {
                                             </svg>
                                             Mute Story
                                           </li>
-                                          <li className="px-4 py-2 flex items-center gap-[5px] cursor-pointer hover:bg-[#f0f0f0]">
-                                            <svg
-                                              width="22"
-                                              height="22"
-                                              viewBox="0 0 22 22"
-                                              fill="none"
-                                              xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                              <path
-                                                d="M3.93 3.93L18.07 18.07M21 11C21 16.5228 16.5228 21 11 21C5.47715 21 1 16.5228 1 11C1 5.47715 5.47715 1 11 1C16.5228 1 21 5.47715 21 11Z"
-                                                stroke="#212626"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                              />
-                                            </svg>
-                                            Block account
-                                          </li>
+
+                                          {userStory?.user_id !==
+                                              userDetails?.id && (
+                                                <li 
+                                                className="px-4 py-2 flex items-center gap-[5px] cursor-pointer hover:bg-[#f0f0f0]"
+                                                onClick={() =>
+                                                    blockTheUser(userStory?.user_id)
+                                                  }
+                                              >
+                                                <svg
+                                                  width="22"
+                                                  height="22"
+                                                  viewBox="0 0 22 22"
+                                                  fill="none"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                  <path
+                                                    d="M3.93 3.93L18.07 18.07M21 11C21 16.5228 16.5228 21 11 21C5.47715 21 1 16.5228 1 11C1 5.47715 5.47715 1 11 1C16.5228 1 21 5.47715 21 11Z"
+                                                    stroke="#212626"
+                                                    strokeWidth="2"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                  />
+                                                </svg>
+                                                Block account
+                                              </li>
+                                            )}
+
+                                          
                                         </ul>
                                       </div>
                                     )}
@@ -797,7 +940,10 @@ const CommunityPage = () => {
                                   <input
                                     type="text"
                                     placeholder="Add a comment"
+                                    onKeyDown={(e) => handleStoryCommentEnter(e, userStory?.id, userStory?.user_id)}
                                     className="flex-1 bg-[#FFFFFFBF] focus:outline-none text-gray-600 rounded-[24px] md:w-[256px] h-[44px] placeholder:font-inter placeholder:font-medium placeholder:text-[14px] placeholder:text-[#212626] pl-9"
+                                    value={storyReply[userStory?.id] || ""}
+                                    onChange={(e) => handleStoryReplyInputChange(e, userStory?.id)}
                                   />
                                   <svg
                                     width="20"
@@ -805,7 +951,10 @@ const CommunityPage = () => {
                                     viewBox="0 0 20 20"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
-                                    className="absolute left-2"
+                                    className="absolute left-2 cursor-pointer"
+                                    onClick={() =>
+                                      setShowEmojiPicker(!showEmojiPicker)
+                                    }
                                   >
                                     <g clipPath="url(#clip0_40000261_30967)">
                                       <path
@@ -826,6 +975,21 @@ const CommunityPage = () => {
                                       </clipPath>
                                     </defs>
                                   </svg>
+                                  <div className="relative">
+                                    {showEmojiPicker && (
+                                      <div className="absolute -top-[380px] left-0 z-50">
+                                        <EmojiPicker
+                                          onEmojiClick={(emojiObject) =>
+                                            handleEmojiClickStory(
+                                              emojiObject,
+                                              userStory?.id
+                                            )
+                                          }
+                                          className="w-[250px] h-[300px] shadow-lg rounded-lg"
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                                 <div>
                                   <svg
@@ -834,6 +998,8 @@ const CommunityPage = () => {
                                     viewBox="0 0 44 44"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
+                                    className="cursor-pointer "
+                                    onClick={() => handleLikeUnlikeStory(userStory?.id)}
                                   >
                                     <rect
                                       width="44"
@@ -858,6 +1024,8 @@ const CommunityPage = () => {
                                     viewBox="0 0 44 44"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
+                                    className="cursor-pointer "
+                                    onClick={() => handleOpenShareStoryPopup(userStory?.id)}
                                   >
                                     <g filter="url(#filter0_b_40000261_30974)">
                                       <rect
@@ -912,9 +1080,19 @@ const CommunityPage = () => {
                                       </filter>
                                     </defs>
                                   </svg>
+                                  {/* to show sharepopup on story section */}
+                                  {activeStoryId === userStory?.id && isShareStoryPopup && (
+                                      <ShareStoryPopup
+                                        isOpen={isShareStoryPopup}
+                                        // onClose={() => setIsSharePopup(false)}
+                                        onClose={() => handleShareStoryPopupClose()}
+                                        storyId={userStory?.id}
+                                        userName={userStory?.user_name}
+                                      />
+                                    )}
                                 </div>
                               </div>
-                              {media.type === "image" ? (
+                              {/* {media.type === "image" ? (
                                 <img
                                   src={media.src}
                                   alt={`Slide ${index + 1}`}
@@ -927,6 +1105,20 @@ const CommunityPage = () => {
                                   controls
                                   className="w-full h-[650px] object-cover rounded-lg"
                                 />
+                              )} */}
+                              {userStory?.media_url?.length > 0 ? (
+                                <img
+                                  src={userStory?.media_url[0]}
+                                  alt={`Media`}
+                                  className="w-full h-[650px] object-cover rounded-lg"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <video
+                                  src={userStory.src}
+                                  controls
+                                  className="w-full h-[650px] object-cover rounded-lg"
+                                />
                               )}
                             </div>
                           ))}
@@ -936,7 +1128,7 @@ const CommunityPage = () => {
                       {/* Right Navigation Button */}
                       <button
                         className="absolute top-1/2 -right-[50px] w-9 h-9 transform -translate-y-1/2 bg-white text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center"
-                        onClick={handleBuddiesReelNext}
+                        onClick={() => handleBuddiesStoryNext()}
                       >
                         <svg
                           width="8"

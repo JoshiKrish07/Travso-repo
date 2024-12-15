@@ -426,6 +426,98 @@ export const getSharePostData = createAsyncThunk(
 );
 
 
+// Thunk for getActiveStories details
+export const getActiveStories = createAsyncThunk(
+  'post/getActiveStories',
+  async (_,{ rejectWithValue }) => {
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/stories`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in getActiveStories===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in getActiveStories call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Thunk for likeUnlikeStory details
+export const likeUnlikeStory = createAsyncThunk(
+  'post/likeUnlikeStory',
+  async ({story_id},{ rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/like-unlike-story`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({story_id})
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in likeUnlikeStory=>", data);
+      return data;
+    } catch (error) {
+      console.log("error in likeUnlikeStory call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Thunk for commentOnStory details
+export const commentOnStory = createAsyncThunk(
+  'post/commentOnStory',
+  async (commentData,{ rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/comment-on-story`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(commentData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in commentOnStory===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in commentOnStory call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
+
 const postSlice = createSlice({
   name: 'postSlice',
   initialState: {
@@ -433,7 +525,8 @@ const postSlice = createSlice({
     error: null,
     allPosts: null,
     postComment: null,
-    sharedPostData: null
+    sharedPostData: null,
+    activeStories: null
   },
   reducers: {
     resetPostsState: (state) => {
@@ -601,6 +694,43 @@ const postSlice = createSlice({
         state.sharedPostData = action.payload.data;
       })
       .addCase(getSharePostData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle getActiveStories
+      .addCase(getActiveStories.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getActiveStories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.activeStories = action.payload.data;
+      })
+      .addCase(getActiveStories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle likeUnlikeStory
+      .addCase(likeUnlikeStory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(likeUnlikeStory.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(likeUnlikeStory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle commentOnStory
+      .addCase(commentOnStory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(commentOnStory.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(commentOnStory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
