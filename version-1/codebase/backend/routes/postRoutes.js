@@ -13,7 +13,7 @@ const verifyToken = require("../utils/verifyToken");
 
 // router.get('/allposts', postWithlikes);
 router.get('/allposts', verifyToken, communityPagePosts );
-router.get('/stories', getActiveStories);
+router.get('/stories', verifyToken, getActiveStories);
 router.get('/comments/:postId', getPostComments);
 // router.get('/userpost/:postId', getUserPosts);
 router.get('/userpost',verifyToken, getUserPosts);

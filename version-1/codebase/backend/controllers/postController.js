@@ -173,27 +173,69 @@ try {
         error: "Internal server Error"
     });
 }
-
-
 }
-async function getActiveStories(req , res){
-    try {
-        
-        const [getactivestories] = await pool.execute(
-       "SELECT * FROM stories WHERE expires_at > NOW();"
-        );
-        console.log("===data fetched===>",getactivestories)
-        return res.status(200).json({
-            message:"data of active stories.",
-            data: getactivestories
-        });
 
-    } catch (error) {
-        console.log(" Error fetch data",error).json({
-            error: "Internal server Error"
-        });  
-    }
+// function to get active stories
+async function getActiveStories1(req , res){
+  try {
+    // const {userid} = req.params;
+    const userid = req.user.userId;
+
+    // const  [data]  = await pool.execute(
+    //   `SELECT * FROM stories WHERE user_id  = ? AND expires_at = NOW()`,[userid]
+    // );
+
+    const  [data]  = await pool.execute(
+      `SELECT * FROM stories`
+    );
+
+    return res.status(200).json({
+      message:"All Actives Stories.",
+      data: data
+    });
+    
+  } catch (error) {
+    console.log("===error===",error);
+    return res.status(500).json({
+      error:"error fetching active stories"
+    });
+  }
 }
+
+// function to get active stories
+async function getActiveStories(req, res) {
+  try {
+    // SQL query to fetch stories with user details using JOIN
+    const [data] = await pool.execute(
+      `SELECT 
+         stories.*, 
+         users.profile_image, 
+         users.user_name, 
+         users.full_name, 
+         users.badge
+       FROM stories
+       JOIN users ON stories.user_id = users.id`
+    );
+
+    // Parse `media_url` and `tag` fields from JSON strings to arrays if needed
+    const parsedData = data.map(story => ({
+      ...story,
+      media_url: story.media_url ? JSON.parse(story.media_url) : [],
+      tag: story.tag ? JSON.parse(story.tag) : []
+    }));
+
+    return res.status(200).json({
+      message: "All Active Stories.",
+      data: parsedData,
+    });
+  } catch (error) {
+    console.log("===error===", error);
+    return res.status(500).json({
+      error: "Error fetching active stories",
+    });
+  }
+}
+
 
 async function getUserPosts(req , res){
     try {

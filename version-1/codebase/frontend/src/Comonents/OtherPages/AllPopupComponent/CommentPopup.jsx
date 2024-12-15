@@ -868,9 +868,9 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
             {activePostId === postId && isSharePopup && (
               <SharePopup
                 isOpen={isSharePopup}
-                // onClose={() => setIsSharePopup(false)}
                 onClose={() => handleSharePopupClose()}
                 postId={activePostId}
+                // userName={allPosts[0]?.user_name}
               />
             )}
 

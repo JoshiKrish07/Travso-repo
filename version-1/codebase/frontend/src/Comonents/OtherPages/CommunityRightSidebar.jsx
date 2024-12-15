@@ -4,7 +4,7 @@ import Girl from "../../assets/headerIcon/girl.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import dummyUserImage from "../../assets/user_image-removebg-preview.png";
 import { followUnfollow } from "../../redux/slices/postSlice";
-import { getAllUsers, getOnlineFriends, getSuggestionList } from "../../redux/slices/authSlice";
+import { addBuddy, getAllUsers, getOnlineFriends, getSuggestionList, removeBuddy } from "../../redux/slices/authSlice";
 
 const CommunityRightSidebar = () => {
   const dispatch = useDispatch();
@@ -49,9 +49,8 @@ const CommunityRightSidebar = () => {
   /* redux state data starts */
 
   const { onlineFriends, allUsers, suggestionList } = useSelector((state) => state.auth);
-  const [suggestions, setSuggestions] = useState(allUsers || null);
+  const [suggestions, setSuggestions] = useState(suggestionList || null);
 
- console.log("======suggestionList=====>", suggestionList);
   /* redux state data ends */
 
   useEffect(() => {
@@ -66,7 +65,6 @@ const CommunityRightSidebar = () => {
   },[suggestionList, dispatch]);
 
   const handleFollow = async(followeeID) => {
-
     // setSuggestions((prevSuggestions) =>
     //   prevSuggestions.map((user) =>
     //     user.id === followeeID
@@ -77,7 +75,7 @@ const CommunityRightSidebar = () => {
 
     try {
        const followResponse = await dispatch(followUnfollow(followeeID)).unwrap();
-       console.log("====followResponse===>", followResponse);
+      //  console.log("====followResponse===>", followResponse);
        if(followResponse) {
         dispatch(getSuggestionList());
        }
@@ -96,6 +94,31 @@ const CommunityRightSidebar = () => {
 
 
   const displayedSuggestion = suggestions ? showAllSuggestions ? suggestions : suggestions.slice(0, 4) : null;
+
+  // handle add buddy
+  const handleAddBuddy = async(buddyId) => {
+    try {
+      const response = await dispatch(addBuddy(buddyId));
+      if(response) {
+        await dispatch(getSuggestionList());
+      }
+    } catch (error) {
+      console.log("==error in handleAddBuddy==", error);
+    }
+  }
+  
+  // handle remove buddy
+  const handleBuddyRemove = async(buddyId) => {
+    
+    try {
+      const response = await dispatch(removeBuddy(buddyId));
+      if(response) {
+        await dispatch(getSuggestionList());
+      }
+    } catch (error) {
+      console.log("==error in handleBuddyRemove ===>", error);
+    }
+  }
 
   return (
     <>
@@ -138,7 +161,8 @@ const CommunityRightSidebar = () => {
            className="font-inter font-medium text-[#2DC6BE] text-[14px] px-4 py-2 hover:px-4 hover:py-2 rounded-md hover:bg-teal-600 hover:text-white"
            onClick={() => setShowAllSuggestions(!showAllSuggestions)} 
           >
-            See All
+            {showAllSuggestions ? "See Less" : "See All"}
+            
           </button>
         </div>
 
@@ -171,7 +195,7 @@ const CommunityRightSidebar = () => {
               >
                 {user.isFollowing ? "Following" : "Follow"}
               </button>
-              <button
+              {/* <button
                 className={`w-[36px] h-[36px] text-sm font-semibold border-2 rounded-lg font-semibold ${
                   user.isFollowing
                     ? "text-white border-[#2DC6BE] bg-[#2DC6BE] hover:bg-[#2DC6BE] hover:text-white"
@@ -179,7 +203,56 @@ const CommunityRightSidebar = () => {
                 }`}
               >
                 +
-              </button>
+              </button> */}
+              {
+                  user?.is_buddies === 0 ? (<>
+                  <button
+                  className={`w-[36px] h-[36px] text-[20px] text-sm border rounded-[4px] font-medium bg-[#2DC6BE] text-white border-[#2DC6BE] flex items-center justify-center ${
+                    user.is_buddies === 0
+                      ? "bg-[#2DC6BE] text-white border-[#2DC6BE]"
+                      : "text-[#2DC6BE] border-[#2DC6BE]"
+                  }`}
+                onClick={() => handleAddBuddy(user?.id)}
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M6.99984 1.16699V12.8337M1.1665 7.00033H12.8332"
+                      stroke="white"
+                      strokeWidth="1.66667"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+                  </>) : (<>
+                    <button 
+                    className="w-[36px] h-[36px] text-[20px] text-[#2DC6BE] border border-[#2DC6BE] rounded-[4px] font-medium flex items-center justify-center"
+                    onClick={() => handleBuddyRemove(user?.id)}
+                  >
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 10 10"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M0.875278 0.875211L9.12486 9.12479M0.875278 9.12479L9.12486 0.875211"
+                        stroke="#2DC6BE"
+                        strokeWidth="1.66667"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                  </>)
+                }
             </div>
           </div>
         ))}
