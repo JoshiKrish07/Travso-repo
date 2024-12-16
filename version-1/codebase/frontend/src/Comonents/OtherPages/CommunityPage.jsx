@@ -48,6 +48,8 @@ import logo from "../../assets/headerIcon/logo.png";
 import Background from "../../assets/Background.png";
 import EmojiPicker from "emoji-picker-react";
 import ShareStoryPopup from "./AllPopupComponent/ShareStoryPopup";
+import StoryPage from "./AllStoriesPages/StoryPage";
+
 
 const CommunityPage = () => {
   const dispatch = useDispatch();
@@ -75,6 +77,7 @@ const CommunityPage = () => {
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const [isShareStoryPopup, setIsShareStoryPopup] = useState(false);
   const [activeStoryId, setActiveStoryId] = useState(null);
+  const [isCreateSocialPopup, setIsCreateSocialPopup] = useState(false)
 
   const handleMouseDown = (e) => {
     isDragging = true;
@@ -207,6 +210,8 @@ const CommunityPage = () => {
     user: userDetails,
   } = useSelector((state) => state.auth);
   const { allPosts, activeStories } = useSelector((state) => state.postSlice);
+
+  // console.log("=====allPosts===>", allPosts);
 
   useEffect(() => {
     if (!onlineFriends) {
@@ -376,6 +381,7 @@ const CommunityPage = () => {
 
   // to like and unlike post
   const handleLikeUnlike = async (postId) => {
+    console.log("====postId===>", postId);
     try {
       const likeUnlikeResult = await dispatch(
         LikeUnlikePost({ post_id: postId })
@@ -471,12 +477,13 @@ const CommunityPage = () => {
         try {
           const commentPayload = {
             story_id: storyId,
-            content: storyReply[storyId], // Full comment text
+            reply_text: storyReply[storyId], // Full comment text
           };
-          // console.log("==commentPayload==>", commentPayload);
+          console.log("==commentPayload==>", commentPayload);
           const replyResponse = await dispatch(
             commentOnStory(commentPayload)
           ).unwrap();
+          console.log("==replyResponse===>", replyResponse);
           if (replyResponse) {
             setStoryReply({});
           }
@@ -583,19 +590,19 @@ const CommunityPage = () => {
                     src={story}
                     alt="My Story"
                     className="w-[64px] h-[64px] object-cover rounded-full border-2 border-[#2DC6BE] p-[2px]"
-                    // onClick={() => setIsCreateSocialPopup(true)}
+                    onClick={() => setIsCreateSocialPopup(true)}
                   />
                   <p
                     className="font-inter font-medium text-[14px] mt-2 text-[#212626]"
-                    // onClick={() => setIsCreateSocialPopup(true)}
+                    onClick={() => setIsCreateSocialPopup(true)}
                   >
                     My Story
                   </p>
 
-                  {/* <StoryPage
+                  <StoryPage
                     isOpen={isCreateSocialPopup}
                     onClose={() => setIsCreateSocialPopup(false)}
-                  /> */}
+                  />
                 </div>
                 {activeStories && activeStories.map((user) => (
                   <div
@@ -1518,7 +1525,7 @@ const CommunityPage = () => {
                         <button
                           aria-label="Edit Info"
                           className={`flex items-center justify-center w-[144px] h-[36px] py-1 px-2 rounded-full ${
-                            post?.user_liked_post == 1
+                            post?.is_liked
                               ? "bg-[#2DC6BE] text-white"
                               : "bg-[#F0F7F7] text-[#434C50]"
                           }`}
@@ -1530,7 +1537,7 @@ const CommunityPage = () => {
                             className="mr-2 w-[20px] h-[20px]"
                           />
                           {/* <span className="font-inter font-medium text-[14px] text-[#212626] "> */}
-                          {post?.user_liked_post == 0 ? "Like" : "Liked"}
+                          {!post?.is_liked ? "Like" : "Liked"}
                           {/* </span> */}
                         </button>
 
