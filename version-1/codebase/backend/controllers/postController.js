@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 
 const POST_UPLOAD_DIR = path.join(__dirname, "../uploads/post_img");
+const STORY_UPLOAD_DIR = path.join(__dirname, "../uploads/story_img");
 
 async function allPosts(req , res){
   try {
@@ -236,6 +237,65 @@ async function getActiveStories(req, res) {
   }
 }
 
+// api to like story
+const likeStory = async (req, res) => {
+  try {
+    // const { user_id } = req.params; // Extract user_id from request parameters
+    const user_id = req.user.userId;  // get user id from token
+    const { story_id } = req.body; // Extract story_id from request body
+
+    // Validate required fields
+    if (!user_id || !story_id) {
+      return res.status(400).json({
+        message: "Missing required fields (user_id or story_id).",
+      });
+    }
+
+    // Check if the story exists
+    const [story] = await pool.execute(`SELECT id FROM stories WHERE id = ?`, [
+      story_id,
+    ]);
+
+    if (story.length === 0) {
+      return res.status(404).json({
+        message: "Story not found.",
+      });
+    }
+
+    // Check if the user already liked the story
+    const [existingLike] = await pool.execute(
+      `SELECT * FROM story_likes WHERE story_id = ? AND user_id = ?`,
+      [story_id, user_id]
+    );
+
+    if (existingLike.length > 0) {
+      // If a like exists, remove it
+      await pool.execute(
+        `DELETE FROM story_likes WHERE story_id = ? AND user_id = ?`,
+        [story_id, user_id]
+      );
+
+      return res.status(200).json({
+        message: "Like removed successfully.",
+      });
+    } else {
+      // If no like exists, add it
+      await pool.execute(
+        `INSERT INTO story_likes (story_id, user_id) VALUES (?, ?)`,
+        [story_id, user_id]
+      );
+
+      return res.status(200).json({
+        message: "Story liked successfully.",
+      });
+    }
+  } catch (err) {
+    console.error("Error in likeStory:", err);
+    return res.status(500).json({
+      error: "An error occurred while processing your request.",
+    });
+  }
+};
 
 async function getUserPosts(req , res){
     try {
@@ -439,39 +499,39 @@ async function addBucketList( req , res){
     }
     }
     
-    // function to share post
-    async function sharedPost(req , res){
-        try {
-            const { post_id, user_id} = req.body;
-            
-            if(!post_id || !user_id)
-                return res.status(400).json({
-                 error:"All fields are required.",error
-        });
-    
-        await pool.execute(
-         `INSERT INTO shared_post(post_id, user_id) VALUES(?,?)`,
-            [post_id, user_id]
-        );
-    
-        return res.status(200).json({
-            message:"Shared Post Successfully",
-            data: {
-                post_id,
-                user_id
-            }
-    
-        })
-    
-        } catch (error) {
-            console.log("==Error shareding post===>",error);
-            return res.status(500).json({
-                error: "Internal Server Error",
-            });
+// function to share post
+async function sharedPost(req , res){
+    try {
+        const { post_id, user_id} = req.body;
+        
+        if(!post_id || !user_id)
+            return res.status(400).json({
+              error:"All fields are required.",error
+    });
+
+    await pool.execute(
+      `INSERT INTO shared_post(post_id, user_id) VALUES(?,?)`,
+        [post_id, user_id]
+    );
+
+    return res.status(200).json({
+        message:"Shared Post Successfully",
+        data: {
+            post_id,
+            user_id
         }
+
+    })
+
+    } catch (error) {
+        console.log("==Error shareding post===>",error);
+        return res.status(500).json({
+            error: "Internal Server Error",
+        });
     }
+}
   
-    // function to comment on post
+// function to comment on post
 async function postComment(req , res){
 try {
     const userId = req.user.userId; // extract user id from token 
@@ -1456,6 +1516,130 @@ async function getPostData (req, res){
   }
   }
 
+  /* to reply on a story */
+  const replyOnStory = async (req, res) => {
+    try {
+      // const { user_id } = req.params; // Extract user_id from request parameters
+      const user_id = req.user.userId;
+      const { story_id, reply_text } = req.body; // Extract story_id and reply_text from the request body
+  
+      // Validate required fields
+      if (!user_id || !story_id || !reply_text) {
+        return res.status(400).json({
+          message: "Missing required fields (user_id, story_id, or reply_text).",
+        });
+      }
+  
+      // Check if the story exists
+      const [story] = await pool.execute(`SELECT id FROM stories WHERE id = ?`, [
+        story_id,
+      ]);
+  
+      if (story.length === 0) {
+        return res.status(404).json({
+          message: "Story not found.",
+        });
+      }
+  
+      // Insert the reply into the database
+      const [result] = await pool.execute(
+        `INSERT INTO story_replies (story_id, user_id, reply_text, created_at) VALUES (?, ?, ?, ?)`,
+        [story_id, user_id, reply_text, new Date()]
+      );
+  
+      return res.status(201).json({
+        message: "Reply added successfully.",
+        data: {
+          reply_id: result.insertId,
+          story_id,
+          user_id,
+          reply_text,
+          created_at: new Date(),
+        },
+      });
+    } catch (error) {
+      console.error("Error in replyOnStory:", error);
+      return res.status(500).json({
+        error: "An error occurred while processing your request.",
+      });
+    }
+  };
+
+  /* to add a story */
+  async function storeStory(req, res) {
+    try {
+
+      const user_id = req.user.userId;
+      const userName = req.user.userName
+      const { media_url = [], tags = [], view = "Public", story_text = '' } = req.body;
+      console.log("===view===>",view);
+      console.log("===media_url===>",media_url.length);
+      // Validate required fields
+      if (!user_id) {
+        return res.status(400).json({
+          message: "Missing required fields (user_id).",
+        });
+      }
+  
+      const storyImages = [];
+      const created_at = new Date();
+      const expires_at = new Date(created_at.getTime() + 12 * 60 * 60 * 1000); 
+  
+      // Validate and process media_url
+      if (Array.isArray(media_url) && media_url.length > 0) {
+        for (let image of media_url) {
+          try {
+            // Extract Base64 part of the image
+            const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
+            const extension = image.substring("data:image/".length, image.indexOf(";base64"));
+            const fileName = `story_${Date.now()}.${extension}_${user_id}_${userName}`;
+            const filePath = path.join(STORY_UPLOAD_DIR, fileName);
+            const imagePath = `${process.env.APP_SERVER_URL}/uploads/story_img/${fileName}`;
+            storyImages.push(imagePath);
+  
+            // Write image to file system
+            await fs.promises.writeFile(filePath, base64Data, { encoding: "base64" });
+          } catch (err) {
+            console.error("Failed to save image:", err);
+            return res.status(500).json({ error: "Failed to save image." });
+          }
+        }
+      }
+  
+      // Insert the story into the database
+      const [result] = await pool.execute(
+        `INSERT INTO stories (
+          user_id,
+          tag,
+          media_url,
+          view,
+          story_text,
+          created_at,
+          expires_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [
+          user_id,
+          JSON.stringify(tags), // Serialize tags as JSON
+          JSON.stringify(storyImages), // Serialize media URLs as JSON
+          view, // Default to 'active' if not provided
+          JSON.stringify(story_text), // Story text,
+          created_at,
+          expires_at
+        ]
+      );
+  
+      // Respond with success message
+      return res.status(200).json({
+        message: "Story added successfully.",
+        story_id: result.insertId, // Return the ID of the newly created story
+      });
+    } catch (error) {
+      console.error("Error in storing story:", error);
+      return res.status(500).json({
+        error: "Internal Server Error",
+      });
+    }
+  }
 module.exports = {
     allPosts,
     postWithlikes,
@@ -1476,5 +1660,8 @@ module.exports = {
     sharePostWithFriends,
     followAndUnfollowFollowing,
     getPostData,
-    communityPagePosts
+    communityPagePosts,
+    likeStory,
+    replyOnStory,
+    storeStory
 }

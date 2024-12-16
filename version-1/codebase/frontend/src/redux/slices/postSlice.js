@@ -516,7 +516,36 @@ export const commentOnStory = createAsyncThunk(
   }
 );
 
+// Thunk for createStory details
+export const createStory = createAsyncThunk(
+  'post/createStory',
+  async (storyData,{ rejectWithValue }) => {
+    try {
+  
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/create-story`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(storyData)
+      });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in commentOnReply===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in commentOnReply call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const postSlice = createSlice({
   name: 'postSlice',
@@ -731,6 +760,18 @@ const postSlice = createSlice({
         state.loading = false;
       })
       .addCase(commentOnStory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle createStory
+      .addCase(createStory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createStory.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(createStory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
