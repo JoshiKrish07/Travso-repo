@@ -5,7 +5,7 @@ import Girl from "../../../assets/headerIcon/girl.jpg";
 import SearchIcon from "@mui/icons-material/Search";
 import "../Header.css";
 import { useDispatch, useSelector } from "react-redux";
-import { SharePostWithFriends } from "../../../redux/slices/postSlice";
+import { SharePostWithFriends, ShareStoryWithFriends } from "../../../redux/slices/postSlice";
 import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
 import { getUserBuddies } from "../../../redux/slices/authSlice";
 
@@ -60,7 +60,7 @@ const ShareStoryPopup = ({ isOpen, onClose, storyId ,userName }) => {
         'link': link
       }
 
-      const response = await dispatch(SharePostWithFriends(shareData)).unwrap();
+      const response = await dispatch(ShareStoryWithFriends(shareData)).unwrap();
       if(response) onClose();
 
     } catch (error) {

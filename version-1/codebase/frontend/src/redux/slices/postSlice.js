@@ -547,6 +547,37 @@ export const createStory = createAsyncThunk(
   }
 );
 
+// Thunk for ShareStoryWithFriends details
+export const ShareStoryWithFriends = createAsyncThunk(
+  'post/ShareStoryWithFriends',
+  async (shareData,{ rejectWithValue }) => {
+    try {
+  
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/share-story`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(shareData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in ShareStoryWithFriends===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in ShareStoryWithFriends call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const postSlice = createSlice({
   name: 'postSlice',
   initialState: {
@@ -772,6 +803,18 @@ const postSlice = createSlice({
         state.loading = false;
       })
       .addCase(createStory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle ShareStoryWithFriends
+      .addCase(ShareStoryWithFriends.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(ShareStoryWithFriends.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(ShareStoryWithFriends.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
