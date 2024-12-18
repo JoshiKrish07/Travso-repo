@@ -53,7 +53,7 @@ export const commentOnPost = createAsyncThunk(
       }
 
       const data = await response.json();
-      console.log("=====data===in commentOnPost=>", data);
+      // console.log("=====data===in commentOnPost=>", data);
       return data;
     } catch (error) {
       console.log("error in commentOnPost call thunk", error.message)
@@ -578,6 +578,66 @@ export const ShareStoryWithFriends = createAsyncThunk(
   }
 );
 
+
+// Thunk for addCountOnStoryView details
+export const addCountOnStoryView = createAsyncThunk(
+  'post/addCountOnStoryView',
+  async (storyId,{ rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/story-view-count/${storyId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in addCountOnStoryView=>", data);
+      return data;
+    } catch (error) {
+      console.log("error in addCountOnStoryView call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Thunk for deleteStory details(user can delete comment on it's post)
+export const deleteStory = createAsyncThunk(
+  'post/deleteStory',
+  async (storyID,{ rejectWithValue }) => {
+    try {
+      console.log("======storyID======",storyID);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/delete-story/${storyID}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      console.log("=====data===in deleteStory===>", data);
+      return data;
+    } catch (error) {
+      console.log("error in deleteStory call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const postSlice = createSlice({
   name: 'postSlice',
   initialState: {
@@ -815,6 +875,30 @@ const postSlice = createSlice({
         state.loading = false;
       })
       .addCase(ShareStoryWithFriends.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle addCountOnStoryView
+      .addCase(addCountOnStoryView.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addCountOnStoryView.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(addCountOnStoryView.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle deleteStory
+      .addCase(deleteStory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteStory.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(deleteStory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

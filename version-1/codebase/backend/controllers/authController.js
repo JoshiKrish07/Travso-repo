@@ -553,6 +553,15 @@ async function loginUser(req, res) {
     // Generate JWT
     const token = await jwt.sign({ userId: user[0].id, email: user[0].email, userName: user[0].user_name }, process.env.JWT_SECRET_KEY, { expiresIn: "1d" });
 
+    const [result] = await pool.execute(
+      "UPDATE users SET is_online = ? WHERE id = ? AND email = ?",
+      [1, user[0].id, email]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
     return res.status(200).json({ message: "Login successful", token, is_follow_selected: user[0].is_follow_selected });
 
   } catch (err) {
@@ -807,7 +816,7 @@ async function getUserBuddies(req, res) {
     const userId = req.user.userId;
     const [buddies] = await pool.execute(
       `
-      SELECT 
+      SELECT DISTINCT
         u.id,
         u.profile_image,
         u.full_name,
@@ -1324,7 +1333,7 @@ async function logOut(req, res) {
 
   try {
     const [result] = await pool.execute(
-      `UPDATE users SET is_logged_in = 0 WHERE id = ?`,
+      `UPDATE users SET is_online = 0 WHERE id = ?`,
       [userId]
     );
 
@@ -1446,8 +1455,9 @@ async function onlineFriends(req, res) {
         ON (u.id = f.follower_id OR u.id = f.followee_id)
       WHERE (b.user_id = ? OR b.buddies_id = ? OR f.followee_id = ?) 
         AND u.is_online = 1
+        AND u.id != ?
       `,
-      [userId, userId, userId]
+      [userId, userId, userId, userId]
     );
 
     return res.status(200).json({
@@ -1473,8 +1483,8 @@ async function addBuddies(req, res) {
       `SELECT * FROM buddies WHERE user_id = ? AND buddies_id = ?`,
       [user_id, buddies_id]
     );
-
-    if (existReply.length > 0) {
+    console.log("===existReply===>", existReply);
+    if (existReply.length > 2) {
       return res.status(409).json({
         message: "Buddy relationship already exists",
         data: {
@@ -1637,7 +1647,19 @@ async function suggestions(req, res) {
         u.profile_image,
         u.badge,
         (SELECT COUNT(*) FROM followers f WHERE f.followee_id = u.id) AS followers_count,
-        (SELECT COUNT(*) FROM posts p WHERE p.user_id = u.id AND p.status = 'active') AS posts_count
+        (SELECT COUNT(*) FROM posts p WHERE p.user_id = u.id AND p.status = 'active') AS posts_count,
+        EXISTS(
+          SELECT 1 
+          FROM followers f1 
+          WHERE f1.follower_id = u.id 
+          AND f1.followee_id = ?
+        ) AS is_mutual,
+         EXISTS(
+          SELECT 1 
+          FROM buddies b 
+          WHERE (b.user_id = ? AND b.buddies_id = u.id) 
+             OR (b.user_id = u.id AND b.buddies_id = ?)
+        ) AS is_buddies
       FROM users u
       WHERE 
         u.id != ? -- Exclude the requesting user
@@ -1645,7 +1667,7 @@ async function suggestions(req, res) {
       ORDER BY followers_count DESC, posts_count DESC -- Sort by activity/popularity
       LIMIT ? OFFSET ?;
       `,
-      [userId, userId, parseInt(limit), parseInt(offset)] // Bind params
+      [userId, userId, userId,userId,userId, parseInt(limit), parseInt(offset)] // Bind params
     );
 
     return res.status(200).json({

@@ -199,7 +199,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
       // dispatch(getUserPosts());
     }
 
-
+    // if()
 
     // if (!postComment) {
     dispatch(getCommentOnPost(postId));
@@ -222,14 +222,13 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
 
   // to handle like and unlike
   const handleLikeUnlike = async (postId) => {
-    console.log("===postId===>",postId)
     try {
       const likeUnlikeResult = await dispatch(
         LikeUnlikePost({ post_id: postId })
       ).unwrap();
       if (likeUnlikeResult) {
-        await dispatch(getAllPosts());
-        // await dispatch(getUserPosts());
+        // await dispatch(getAllPosts());
+        await dispatch(getUserPosts());
         // handleFlashMessage(likeUnlikeResult.message, 'success');
       }
     } catch (error) {
@@ -265,8 +264,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
           // await dispatch(getAllPosts());
           // handleFlashMessage(commentResult.message, 'success');
           await dispatch(getCommentOnPost(postId));
-          await dispatch(getAllPosts());
-          // await dispatch(getUserPosts());   // will be using getAllPosts later
+          await dispatch(getUserPosts());
           setCommentInputVal("");
           setTaggedUsers([]);
         }
@@ -293,8 +291,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
         // await dispatch(getAllPosts());
         // handleFlashMessage(commentResult.message, 'success');
         await dispatch(getCommentOnPost(postId));
-        // await dispatch(getUserPosts());  // will be using getAllPosts later
-        await dispatch(getAllPosts());
+        await dispatch(getUserPosts());
       }
     } catch (error) {
       console.log("error in sendComment", error);
@@ -562,7 +559,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
 
   const handleCommentImageUpload = async (e) => {
     const file = e.target.files[0];
-    // console.log("===file===>", file);
+    console.log("===file===>", file);
     if (file) {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -619,7 +616,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
     }
   };
 
-  console.log("===allposts===", allPosts)
+  // console.log("===allposts===", allPosts)
 
   if (!isOpen) return null;
 
@@ -661,7 +658,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                     {allPosts && allPosts[0]?.full_name}
                   </h3>
                   <p className="-mt-1 font-inter font-medium text-left text-[12px] text-[#667877]">
-                    {allPosts && allPosts[0].badge.split("-")[0].trim || ''} • {allPosts && allPosts[0].location}
+                    {postDetails.subtitle} • {postDetails.subtitleData}
                   </p>
                 </div>
               </div>
@@ -801,7 +798,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
               </p>
             </div>
             <div className="flex items-center justify-between mt-3">
-              {/* <button
+              <button
                 aria-label="Edit Info"
                 className={`flex items-center justify-center w-[130px] h-[36px] py-1 px-2 rounded-full ${
                   allPosts && allPosts[0].user_liked_post == 0
@@ -813,23 +810,6 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                 <img src={like} alt="like" className="mr-2 w-[20px] h-[20px]" />
                 <span className="font-inter font-medium text-[14px] text-[#212626]">
                   {allPosts && allPosts[0].user_liked_post == 0
-                    ? "Like"
-                    : "Liked"}
-                </span>
-              </button> */}
-
-              <button
-                aria-label="Edit Info"
-                className={`flex items-center justify-center w-[130px] h-[36px] py-1 px-2 rounded-full ${
-                  allPosts && !allPosts[0]?.is_liked
-                    ? "bg-[#cdd0d499] text-[#434C50]"
-                    : "bg-[#2DC6BE] text-white"
-                }`}
-                onClick={() => handleLikeUnlike(allPosts[0].id)}
-              >
-                <img src={like} alt="like" className="mr-2 w-[20px] h-[20px]" />
-                <span className="font-inter font-medium text-[14px] text-[#212626]">
-                  {allPosts && !allPosts[0].is_liked
                     ? "Like"
                     : "Liked"}
                 </span>

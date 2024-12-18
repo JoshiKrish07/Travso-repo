@@ -12,7 +12,7 @@ import Travel from "../../../assets/travel.png";
 import Background from "../../../assets/Background.png";
 import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
 import { useDispatch, useSelector } from "react-redux";
-import { createStory } from "../../../redux/slices/postSlice";
+import { createStory, getActiveStories } from "../../../redux/slices/postSlice";
 
 const StoryPage = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
@@ -182,6 +182,7 @@ const handleStorySubmit = async() => {
         const response = await dispatch(createStory(storyData)).unwrap();
         console.log("=====response==handleStorySubmit==>", response);
         if(response) {
+            await dispatch(getActiveStories());
             onClose();
         }
     } catch (error) {

@@ -32,7 +32,7 @@ async function communityPagePosts(req, res) {
     // const { userId } = req.params; // Assuming the user ID is passed as a URL parameter
     const userId = req.user.userId;
     const [data] = await pool.execute(
-      `SELECT 
+      `SELECT DISTINCT
         p.id,
         p.user_id,
         p.is_public,
@@ -176,35 +176,9 @@ try {
 }
 }
 
-// function to get active stories
-async function getActiveStories1(req , res){
-  try {
-    // const {userid} = req.params;
-    const userid = req.user.userId;
-
-    // const  [data]  = await pool.execute(
-    //   `SELECT * FROM stories WHERE user_id  = ? AND expires_at = NOW()`,[userid]
-    // );
-
-    const  [data]  = await pool.execute(
-      `SELECT * FROM stories`
-    );
-
-    return res.status(200).json({
-      message:"All Actives Stories.",
-      data: data
-    });
-    
-  } catch (error) {
-    console.log("===error===",error);
-    return res.status(500).json({
-      error:"error fetching active stories"
-    });
-  }
-}
 
 // function to get active stories
-async function getActiveStories(req, res) {
+async function getActiveStories1(req, res) {
   try {
     // SQL query to fetch stories with user details using JOIN
     const [data] = await pool.execute(
@@ -231,6 +205,211 @@ async function getActiveStories(req, res) {
     });
   } catch (error) {
     console.log("===error===", error);
+    return res.status(500).json({
+      error: "Error fetching active stories",
+    });
+  }
+}
+
+async function getActiveStories2(req, res) {
+  try {
+    // const { userid } = req.params;
+    const userid = req.user.userId;
+    // Fetch logged-in user's stories with user details
+    const [userStories] = await pool.execute(
+      `SELECT 
+         stories.*, 
+         users.profile_image, 
+         users.full_name, 
+         users.user_name,
+         users.badge 
+       FROM stories 
+       INNER JOIN users ON stories.user_id = users.id 
+       WHERE stories.user_id = ? AND stories.expires_at > NOW()`,
+      [userid]
+    );
+
+    // Fetch stories from other users with user details
+    const [otherUsersStories] = await pool.execute(
+      `SELECT 
+         stories.*, 
+         users.profile_image, 
+         users.full_name, 
+         users.user_name,
+         users.badge 
+       FROM stories 
+       INNER JOIN users ON stories.user_id = users.id 
+       WHERE stories.user_id != ? AND stories.expires_at > NOW()
+       ORDER BY stories.user_id, stories.created_at`,
+      [userid]
+    );
+
+    // Helper function to parse fields into arrays
+    const parseFields = (story) => ({
+      ...story,
+      media_url: JSON.parse(story.media_url || "[]"), // Parse media_url to array
+      tag: JSON.parse(story.tag || "[]"), // Parse tag to array
+    });
+
+    // Parse userStories and otherUsersStories
+    const parsedUserStories = userStories.map(parseFields);
+    const parsedOtherUsersStories = otherUsersStories.map(parseFields);
+
+    // Group stories by user_id
+    const groupedStories = parsedOtherUsersStories.reduce((acc, story) => {
+      if (!acc[story.user_id]) {
+        acc[story.user_id] = {
+          user_id: story.user_id,
+          profile_image: story.profile_image,
+          full_name: story.full_name,
+          user_name: story.user_name,
+          badge: story.badge,
+          stories: [],
+        };
+      }
+      acc[story.user_id].stories.push(story);
+      return acc;
+    }, {});
+
+    // Prepare response: first logged-in user's stories, then others
+    const response = [
+      {
+        user_id: userid,
+        profile_image: userStories[0]?.profile_image || null,
+        full_name: userStories[0]?.full_name || null,
+        user_name: userStories[0]?.user_name || null,
+        badge: userStories[0]?.badge || null,
+        stories: parsedUserStories,
+      },
+      ...Object.values(groupedStories),
+    ];
+    // console.log("=====data===>",message);
+    return res.status(200).json({
+      message: "All Active Stories.",
+      data: response,
+    });
+  } catch (error) {
+    console.error("===error===", error);
+    return res.status(500).json({
+      error: "Error fetching active stories",
+    });
+  }
+}
+
+async function getActiveStories(req, res) {
+  try {
+    // const { userid } = req.params;
+    const userid = req.user.userId;
+    // Fetch logged-in user's stories with viewers
+    const [userStories] = await pool.execute(
+      `SELECT 
+         stories.*, 
+         users.profile_image, 
+         users.full_name, 
+         users.user_name,
+         users.badge,
+         (
+           SELECT CONCAT(
+             '[', 
+             GROUP_CONCAT(
+               CONCAT(
+                 '{"user_id":', sv.user_id, 
+                 ',"profile_image":"', vu.profile_image, '"',
+                 ',"user_name":"', vu.user_name, '"',
+                 ',"full_name":"', vu.full_name, '"}'
+               )
+             ), 
+             ']'
+           )
+           FROM story_views sv
+           INNER JOIN users vu ON sv.user_id = vu.id
+           WHERE sv.story_id = stories.id
+         ) AS viewers
+       FROM stories 
+       INNER JOIN users ON stories.user_id = users.id 
+       WHERE stories.user_id = ? AND stories.expires_at > NOW()`,
+      [userid]
+    );
+
+    // Fetch other users' stories with viewers
+    const [otherUsersStories] = await pool.execute(
+      `SELECT 
+         stories.*, 
+         users.profile_image, 
+         users.full_name, 
+         users.user_name,
+         users.badge,
+         (
+           SELECT CONCAT(
+             '[', 
+             GROUP_CONCAT(
+               CONCAT(
+                 '{"user_id":', sv.user_id, 
+                 ',"profile_image":"', vu.profile_image, '"',
+                 ',"user_name":"', vu.user_name, '"',
+                 ',"full_name":"', vu.full_name, '"}'
+               )
+             ), 
+             ']'
+           )
+           FROM story_views sv
+           INNER JOIN users vu ON sv.user_id = vu.id
+           WHERE sv.story_id = stories.id
+         ) AS viewers
+       FROM stories 
+       INNER JOIN users ON stories.user_id = users.id 
+       WHERE stories.user_id != ? AND stories.expires_at > NOW()
+       ORDER BY stories.user_id, stories.created_at`,
+      [userid]
+    );
+
+    // Helper function to parse fields into arrays and parse viewers
+    const parseFields = (story) => ({
+      ...story,
+      media_url: JSON.parse(story.media_url || "[]"), // Parse media_url to array
+      tag: JSON.parse(story.tag || "[]"), // Parse tag to array
+      viewers: story.viewers ? JSON.parse(story.viewers) : [], // Parse viewers JSON
+    });
+
+    // Parse userStories and otherUsersStories
+    const parsedUserStories = userStories.map(parseFields);
+    const parsedOtherUsersStories = otherUsersStories.map(parseFields);
+
+    // Group stories by user_id
+    const groupedStories = parsedOtherUsersStories.reduce((acc, story) => {
+      if (!acc[story.user_id]) {
+        acc[story.user_id] = {
+          user_id: story.user_id,
+          profile_image: story.profile_image,
+          full_name: story.full_name,
+          user_name: story.user_name,
+          badge: story.badge,
+          stories: [],
+        };
+      }
+      acc[story.user_id].stories.push(story);
+      return acc;
+    }, {});
+
+    // Prepare response: first logged-in user's stories, then others
+    const response = [
+      {
+        user_id: userid,
+        profile_image: userStories[0]?.profile_image || null,
+        full_name: userStories[0]?.full_name || null,
+        user_name: userStories[0]?.user_name || null,
+        badge: userStories[0]?.badge || null,
+        stories: parsedUserStories,
+      },
+      ...Object.values(groupedStories),
+    ];
+
+    return res.status(200).json({
+      message: "All Active Stories.",
+      data: response,
+    });
+  } catch (error) {
+    console.error("===error===", error);
     return res.status(500).json({
       error: "Error fetching active stories",
     });
@@ -1640,6 +1819,157 @@ async function getPostData (req, res){
       });
     }
   }
+
+// to store the count on story view
+async function storeStoryView(req, res) {
+  try {
+
+    const { story_id } = req.params;
+    const user_id = req.user.userId;  // extract the user id from token
+
+    if (!story_id || !user_id) {
+      return res.status(400).json({
+        error: "Missign Fields are required",
+      });
+    }
+
+    //check if story is exist.
+    const [story] = await pool.execute(`SELECT * FROM stories WHERE id = ?`, [
+      story_id,
+    ]);
+
+    if (story.length === 0) {
+      return res.status(404).json({
+        message: "This story is not found!!!",
+      });
+    }
+
+    const [
+      existingView,
+    ] = await pool.execute(
+      `SELECT * FROM story_views WHERE story_id = ? AND user_id = ?`,
+      [story_id, user_id]
+    );
+
+    if (existingView.length > 0) {
+      return res.status(200).json({
+        message: "View allready Exist",
+      });
+    }
+
+    await pool.execute(
+      `INSERT INTO story_views (user_id , story_id) VALUES (?,?)`,
+      [user_id, story_id]
+    );
+
+    return res.status(200).json({
+      message: "Story View record successfully",
+    });
+  } catch (error) {
+    console.log("=====errror======>",error);
+    return res.status(500).json({
+      error: "Internal Server Error"
+    });
+  }
+}
+
+// to delete a story
+const deleteStory = async (req, res) => {
+  try {
+    // const { user_id } = req.params; // Extract user_id from request parameters
+    const user_id = req.user.userId;  // extract the user id from token
+    const {story_id} = req.params; // Extract story_id from request body
+    console.table({
+      user_id,
+      story_id
+    })
+    // Validate required fields
+    if (!user_id || !story_id) {
+      return res.status(400).json({
+        message: "Missing required fields (user_id or story_id).",
+      });
+    }
+
+    // Check if the story exists and belongs to the logged-in user
+    const [
+      story,
+    ] = await pool.execute(
+      `SELECT id FROM stories WHERE id = ? AND user_id = ?`,
+      [story_id, user_id]
+    );
+
+    if (story.length === 0) {
+      return res.status(404).json({
+        message: "Story not found or you do not have permission to delete it.",
+      });
+    }
+
+    // Delete the story
+    await pool.execute(`DELETE FROM stories WHERE id = ? AND user_id = ?`, [
+      story_id,
+      user_id,
+    ]);
+
+    return res.status(200).json({
+      message: "Story deleted successfully.",
+    });
+  } catch (err) {
+    console.error("Error deleting story:", err);
+    return res.status(500).json({
+      error: "An error occurred while deleting the story.",
+    });
+  }
+};
+
+const shareStoryWithFriends = async (req, res) => {
+  try {
+    // const { user_id } = req.params; // Extract user_id from request parameters
+    const user_id = req.user.userId;  // extract the user id from token
+    const { story_id } = req.body; // Extract story_id from request body
+
+    // Validate required fields
+    if (!user_id || !story_id) {
+      return res.status(400).json({
+        message: "Missing required fields (user_id or story_id).",
+      });
+    }
+
+    // Check if the story exists
+    const [story] = await pool.execute(`SELECT * FROM stories WHERE id = ?`, [
+      story_id,
+    ]);
+
+    if (story.length === 0) {
+      return res.status(404).json({
+        message: "Story not found.",
+      });
+    }
+
+    // Insert a record into the story_shares table
+    const [
+      result,
+    ] = await pool.execute(
+      `INSERT INTO story_shares (story_id, user_id, shared_at) VALUES (?, ?, ?)`,
+      [story_id, user_id, new Date()]
+    );
+
+    return res.status(201).json({
+      message: "Story shared successfully.",
+      data: {
+        share_id: result.insertId,
+        story_id,
+        user_id,
+        shared_at: new Date(),
+      },
+    });
+  } catch (error) {
+    console.error("Error in shareStory:", error);
+    return res.status(500).json({
+      error: "An error occurred while processing your request.",
+    });
+  }
+};
+
 module.exports = {
     allPosts,
     postWithlikes,
@@ -1663,5 +1993,8 @@ module.exports = {
     communityPagePosts,
     likeStory,
     replyOnStory,
-    storeStory
+    storeStory,
+    storeStoryView,
+    deleteStory,
+    shareStoryWithFriends
 }

@@ -40,14 +40,40 @@ const CreateaPostPopup = ({
   const [isPostDetailPopup, setIsPostDetailPopup] = useState(false);
   const fileInputRef = useRef(null); // Create a ref for the file input
 
-  const validate = async () => {};
+  const validateFields = () => {
+    const {
+      description,
+      location,
+      buddies,
+      tags,
+      media_url,
+      buddies_id,
+    } = postData;
+
+    // Check if all fields are empty
+    if (
+      !description.trim() &&
+      !location.trim() &&
+      buddies.length === 0 &&
+      tags.length === 0 &&
+      media_url.length === 0 &&
+      buddies_id.length === 0
+    ) {
+      return false;
+    }
+    return true;
+  };
 
   const handlePostUpload = async () => {
-    console.log("running");
-    const isValid = await validate();
-    onClose();
-    // setIsPostDetailPopup(true);
-    openPostDetail();
+    // console.log("running");
+    const isValid = await validateFields();
+    if(isValid) {
+      onClose();
+      // setIsPostDetailPopup(true);
+      openPostDetail();
+    } else {
+      alert("At least one field is required.");
+    }
   };
 
   const handlePostDetailPopup = () => {

@@ -52,7 +52,7 @@ const ShareStoryPopup = ({ isOpen, onClose, storyId ,userName }) => {
   const handleShare = async() => {
     try {
       const host = window.location.origin; 
-      const link = `${host}/${userName}/${storyId}`;
+      const link = `${host}/story/${userName}/${storyId}`;
       const shareData = {
         'story_id': storyId,
         'shared_to_id': shareIds,

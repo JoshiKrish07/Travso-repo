@@ -229,7 +229,7 @@ const Sidebar = () => {
 
               <span className="font-inter font-medium text-[16px] text-[#212626]">
                 {/* DOB: 25 Aug 2002 */}
-                {userDetails ? formatDate(userDetails?.dob, "dob") : ""}
+                DOB: {userDetails ? formatDate(userDetails?.dob, "dob") : ""}
               </span>
             </li>
             <li className="flex items-center text-gray-700">

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {  allPosts, postWithlikes , getActiveStories , getPostComments ,getUserPosts, postComment, postLike, likeAnyComment, replyOnComment, storePost, deleteComments, deleteReply, followAndUnfollow, likeToReply, followAndUnfollowFollowing, getPostData, sharePostWithFriends, communityPagePosts, likeStory, replyOnStory, storeStory} = require('../controllers/postController');
+const {  allPosts, postWithlikes , getActiveStories , getPostComments ,getUserPosts, postComment, postLike, likeAnyComment, replyOnComment, storePost, deleteComments, deleteReply, followAndUnfollow, likeToReply, followAndUnfollowFollowing, getPostData, sharePostWithFriends, communityPagePosts, likeStory, replyOnStory, storeStory, storeStoryView, deleteStory, shareStoryWithFriends} = require('../controllers/postController');
 const verifyToken = require("../utils/verifyToken");
 
 
@@ -33,6 +33,9 @@ router.get("/post-data/:postId", getPostData);
 router.post("/like-unlike-story", verifyToken, likeStory );
 router.post("/comment-on-story", verifyToken, replyOnStory );
 router.post("/create-story", verifyToken, storeStory );
+router.post("/story-view-count/:story_id", verifyToken, storeStoryView );
+router.post("/delete-story/:story_id", verifyToken, deleteStory );
+router.post("/share-story", verifyToken, shareStoryWithFriends );
 
 
 module.exports = router;
