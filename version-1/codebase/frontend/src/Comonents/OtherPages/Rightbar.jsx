@@ -256,7 +256,7 @@ const Rightbar = () => {
   // handle add buddy
 const handleAddBuddy = async(buddyId) => {
   try {
-    const response = await dispatch(addBuddy(buddyId));
+    const response = await dispatch(addBuddy(buddyId)).unwrap();
     if(response) {
       await dispatch(getUserFollowers());
       await dispatch(getUserBuddies());

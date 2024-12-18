@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 16, 2024 at 02:20 PM
+-- Generation Time: Dec 18, 2024 at 02:25 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -100,7 +100,14 @@ CREATE TABLE `buddies` (
 
 INSERT INTO `buddies` (`id`, `user_id`, `buddies_id`, `created_at`) VALUES
 (31, 27, 13, '2024-12-13 05:15:31'),
-(32, 13, 27, '2024-12-13 05:15:31');
+(32, 13, 27, '2024-12-13 05:15:31'),
+(33, 27, 11, '2024-12-18 05:18:01'),
+(34, 27, 19, '2024-12-18 11:51:07'),
+(35, 27, 23, '2024-12-18 11:51:50'),
+(40, 27, 50, '2024-12-18 12:00:28'),
+(41, 27, 50, '2024-12-18 12:01:21'),
+(42, 27, 50, '2024-12-18 12:01:25'),
+(43, 50, 27, '2024-12-18 12:01:31');
 
 -- --------------------------------------------------------
 
@@ -173,7 +180,16 @@ INSERT INTO `comments` (`id`, `post_id`, `user_id`, `content`, `created_at`) VAL
 (64, 14, 27, '@Nikhil hello bhai', '2024-12-10 08:50:30'),
 (66, 14, 27, 'nikhil bhai hello', '2024-12-10 09:55:55'),
 (67, 15, 27, 'comment 1', '2024-12-14 05:06:16'),
-(68, 1, 27, 'comment from community', '2024-12-14 06:42:08');
+(68, 1, 27, 'comment from community', '2024-12-14 06:42:08'),
+(70, 17, 27, 'hello', '2024-12-18 05:28:55'),
+(71, 1, 27, 'new comment', '2024-12-18 05:57:04'),
+(72, 1, 27, 'new comment added', '2024-12-18 06:40:59'),
+(73, 8, 27, 'hello everyone', '2024-12-18 06:45:17'),
+(74, 7, 27, 'first comment', '2024-12-18 06:47:50'),
+(75, 7, 27, 'second comment', '2024-12-18 06:50:47'),
+(76, 7, 27, 'third comment', '2024-12-18 06:57:05'),
+(77, 1, 50, 'comment from tendulkar', '2024-12-18 11:23:46'),
+(78, 1, 50, 'new comment from tendulkar', '2024-12-18 11:37:31');
 
 -- --------------------------------------------------------
 
@@ -199,7 +215,8 @@ INSERT INTO `comments_like` (`id`, `comment_id`, `user_id`, `created_at`) VALUES
 (23, 45, 27, '2024-12-04 07:00:58'),
 (24, 5, 27, '2024-12-05 06:04:05'),
 (30, 61, 27, '2024-12-10 06:11:47'),
-(31, 62, 27, '2024-12-10 06:13:42');
+(31, 62, 27, '2024-12-10 06:13:42'),
+(32, 78, 50, '2024-12-18 11:37:37');
 
 -- --------------------------------------------------------
 
@@ -236,7 +253,9 @@ INSERT INTO `comment_reply` (`id`, `comment_id`, `user_id`, `content`, `created_
 (33, 61, 27, '😆', '2024-12-09 12:40:43'),
 (34, 61, 27, 'hello 3', '2024-12-10 06:12:49'),
 (35, 61, 27, '@Nikhil replied', '2024-12-10 08:51:14'),
-(36, 61, 27, 'hii', '2024-12-10 08:53:33');
+(36, 61, 27, 'hii', '2024-12-10 08:53:33'),
+(37, 78, 27, 'hello tendulkar', '2024-12-18 11:38:06'),
+(38, 78, 27, '2nd tendulkar', '2024-12-18 11:38:18');
 
 -- --------------------------------------------------------
 
@@ -256,10 +275,19 @@ CREATE TABLE `followers` (
 --
 
 INSERT INTO `followers` (`id`, `follower_id`, `followee_id`, `created_at`) VALUES
-(624, 27, 13, '2024-12-13 05:14:58'),
 (625, 13, 27, '2024-12-13 05:14:58'),
 (633, 9, 27, '2024-12-15 13:17:32'),
-(634, 27, 9, '2024-12-16 05:00:24');
+(634, 27, 9, '2024-12-16 05:00:24'),
+(635, 11, 27, '2024-12-18 05:16:54'),
+(636, 27, 11, '2024-12-18 05:18:01'),
+(638, 19, 27, '2024-12-18 10:37:56'),
+(639, 27, 13, '2024-12-18 10:39:31'),
+(642, 27, 19, '2024-12-18 11:51:07'),
+(643, 23, 27, '2024-12-18 11:51:19'),
+(644, 27, 23, '2024-12-18 11:51:50'),
+(645, 27, 50, '2024-12-18 12:00:28'),
+(646, 50, 27, '2024-12-18 12:01:31'),
+(647, 26, 27, '2024-12-18 13:22:20');
 
 -- --------------------------------------------------------
 
@@ -283,12 +311,16 @@ INSERT INTO `likes` (`id`, `post_id`, `user_id`, `created_at`) VALUES
 (2, 1, 13, '2024-11-25 07:13:42'),
 (3, 1, 19, '2024-11-25 07:14:05'),
 (5, 4, 28, '2024-11-26 05:15:51'),
-(43, 4, 27, '2024-12-02 13:52:51'),
-(44, 5, 27, '2024-12-02 17:26:13'),
-(86, 9, 27, '2024-12-09 12:22:25'),
 (99, 14, 27, '2024-12-13 11:00:05'),
 (104, 12, 27, '2024-12-14 08:27:18'),
-(107, 6, 27, '2024-12-16 08:22:43');
+(107, 6, 27, '2024-12-16 08:22:43'),
+(110, 9, 27, '2024-12-18 05:10:29'),
+(111, 4, 27, '2024-12-18 05:10:33'),
+(113, 7, 27, '2024-12-18 06:57:10'),
+(122, 1, 27, '2024-12-18 11:30:51'),
+(135, 16, 27, '2024-12-18 11:36:18'),
+(137, 1, 50, '2024-12-18 11:37:22'),
+(140, 5, 27, '2024-12-18 11:48:24');
 
 -- --------------------------------------------------------
 
@@ -345,7 +377,8 @@ INSERT INTO `posts` (`id`, `user_id`, `is_public`, `description`, `buddies_id`, 
 (14, 27, 1, 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.', '[19]', '[\"#traveltest\"]', 'Nashik', '[\"http://localhost:3000/uploads/post_img/post_1733747951307.jpeg\",\"http://localhost:3000/uploads/post_img/post_1733747951309.jpeg\"]', 'active', 0, '2024-12-09 12:39:11', '2024-12-13 09:50:00'),
 (15, 27, 1, 'test story for location', '[13]', '[]', 'Rameshwaram', '[]', 'active', 0, '2024-12-13 09:45:21', '2024-12-13 09:45:21'),
 (16, 27, 1, 'Travel is the act of moving from one place to another, often for leisure, work, or to visit family and friends. It can involve short stays between movements, such as tourism. ', '[13]', '[]', NULL, '[]', 'active', 0, '2024-12-13 11:26:09', '2024-12-13 11:26:09'),
-(17, 27, 1, 'Travel is the movement of people between distant geographical locations. Travel can be done by foot, bicycle, automobile, train, boat, bus, airplane, ship or other means, with or without luggage, and can be one way or round trip.', '[]', '[]', NULL, '[\"http://localhost:3000/uploads/post_img/post_1734091243065.webp\",\"http://localhost:3000/uploads/post_img/post_1734091243074.webp\",\"http://localhost:3000/uploads/post_img/post_1734091243076.jpeg\"]', 'active', 0, '2024-12-13 12:00:43', '2024-12-13 12:00:43');
+(17, 27, 1, 'Travel is the movement of people between distant geographical locations. Travel can be done by foot, bicycle, automobile, train, boat, bus, airplane, ship or other means, with or without luggage, and can be one way or round trip.', '[]', '[]', NULL, '[\"http://localhost:3000/uploads/post_img/post_1734091243065.webp\",\"http://localhost:3000/uploads/post_img/post_1734091243074.webp\",\"http://localhost:3000/uploads/post_img/post_1734091243076.jpeg\"]', 'active', 0, '2024-12-13 12:00:43', '2024-12-13 12:00:43'),
+(18, 50, 1, 'First post from tendulkar', '[]', '[]', NULL, '[\"http://localhost:3000/uploads/post_img/post_1734522101217.jpeg\"]', 'active', 0, '2024-12-18 11:41:41', '2024-12-18 11:41:41');
 
 -- --------------------------------------------------------
 
@@ -410,7 +443,8 @@ CREATE TABLE `reply_like` (
 --
 
 INSERT INTO `reply_like` (`id`, `reply_id`, `user_id`, `created_at`) VALUES
-(1, 6, 3, '2024-12-06 09:47:29');
+(1, 6, 3, '2024-12-06 09:47:29'),
+(15, 38, 27, '2024-12-18 11:38:35');
 
 -- --------------------------------------------------------
 
@@ -471,7 +505,12 @@ CREATE TABLE `stories` (
 
 INSERT INTO `stories` (`id`, `user_id`, `media_url`, `caption`, `tag`, `view`, `story_text`, `expires_at`, `created_at`) VALUES
 (1, 9, '[\"http://localhost:3000/uploads/post_img/post_1733721996316.webp\"]', NULL, '[27]', 'Public', NULL, '2024-12-15 15:34:58', '2024-12-15 06:39:12'),
-(2, 13, '[\"http://localhost:3000/uploads/post_img/post_1733722361000.jpeg\"]', NULL, '[27]', 'Public', NULL, '2024-12-15 07:41:02', '2024-12-15 17:40:35');
+(2, 13, '[\"http://localhost:3000/uploads/post_img/post_1733722361000.jpeg\"]', NULL, '[27]', 'Public', NULL, '2024-12-15 07:41:02', '2024-12-15 17:40:35'),
+(6, 9, '[\"http://localhost:3000/uploads/post_img/post_1733721996316.webp\"]', NULL, '[27]', 'Public', NULL, '2024-12-19 15:34:58', '2024-12-18 06:39:12'),
+(7, 13, '[\"http://localhost:3000/uploads/story_img/story_1734506949916.jpeg_27_Krishna005\"]', NULL, '[27]', 'Public', NULL, '2024-12-18 07:59:52', '2024-12-18 06:39:12'),
+(9, 13, '[\"http://localhost:3000/uploads/story_img/story_1734506949916.jpeg_27_Krishna005\"]', NULL, '[]', 'Public', '\"\"', '2024-12-18 19:29:09', '2024-12-18 07:29:09'),
+(13, 27, '[\"http://localhost:3000/uploads/story_img/story_1734520324502.jpeg_27_Krishna005\"]', NULL, '[]', 'Public', '\"\"', '2024-12-18 23:12:04', '2024-12-18 11:12:04'),
+(14, 50, '[\"http://localhost:3000/uploads/story_img/story_1734520910931.jpeg_50_nik-07\"]', NULL, '[]', 'Public', '\"\"', '2024-12-18 23:21:50', '2024-12-18 11:21:50');
 
 -- --------------------------------------------------------
 
@@ -516,6 +555,57 @@ CREATE TABLE `story_replies` (
 INSERT INTO `story_replies` (`id`, `story_id`, `user_id`, `reply_text`, `created_at`) VALUES
 (1, 3, 3, 'This is a reply to the story.', '2024-12-16 11:27:00'),
 (2, 2, 27, 'hello 1st reply to story', '2024-12-16 11:40:03');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `story_shares`
+--
+
+CREATE TABLE `story_shares` (
+  `id` int(11) NOT NULL,
+  `story_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `thoughts` varchar(255) DEFAULT NULL,
+  `shared_to_id` longtext NOT NULL,
+  `link` varchar(255) NOT NULL,
+  `shared_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `story_shares`
+--
+
+INSERT INTO `story_shares` (`id`, `story_id`, `user_id`, `thoughts`, `shared_to_id`, `link`, `shared_at`) VALUES
+(1, 14, 27, NULL, '[]', '', '2024-12-18 17:55:45'),
+(2, 14, 27, NULL, '[]', '', '2024-12-18 18:00:50');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `story_views`
+--
+
+CREATE TABLE `story_views` (
+  `id` int(11) NOT NULL,
+  `story_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `viewed_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `story_views`
+--
+
+INSERT INTO `story_views` (`id`, `story_id`, `user_id`, `viewed_at`) VALUES
+(5, 2, 27, '2024-12-18 12:08:24'),
+(6, 6, 27, '2024-12-18 15:56:39'),
+(7, 9, 27, '2024-12-18 15:56:55'),
+(8, 11, 27, '2024-12-18 15:57:54'),
+(9, 9, 50, '2024-12-18 16:50:57'),
+(10, 13, 50, '2024-12-18 16:51:05'),
+(11, 14, 27, '2024-12-18 16:52:33'),
+(12, 6, 50, '2024-12-18 16:53:11');
 
 -- --------------------------------------------------------
 
@@ -601,7 +691,8 @@ INSERT INTO `users` (`id`, `full_name`, `first_name`, `last_name`, `gender`, `do
 (46, 'Prashant ', 'Prashant', '', 'male', '2006-02-03', 'Maharashtra', 'Pune', 'gg@gg.com', '9977720000', '2331', 0, 0, 'pr-003', 'An application designed and developed to serve the purpose of traveling, like planning, booking, and managing is a travel app. An application has various other features, such as saving all the travel-related information and managing travel apps.', '$2b$10$eWLLqhNxhhbkg7WLclilwe8A6vf2GF1aWy8oz92YPIbjEEE/1GAq2', NULL, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1733291489028.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733291479478.webp', '2024-12-04 05:43:28', 0, 1, 1, NULL),
 (47, 'Madhulika ', 'Madhulika', '', 'female', '2008-02-06', 'Maharashtra', 'Pune', 'dhd@gmail.com', '9870516399', '8178', 0, 0, 'Madhu-07', 'An application designed and developed to serve the purpose of traveling, like planning, booking, and managing is a travel app. An application has various other features, such as saving all the travel-related information and managing travel apps.', '$2b$10$XG8n4eQsD9VcPafOJkzeVuBHbrqS3u96GLbQJjxx8qIXywDYie5.y', NULL, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1733294749187.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733294709972.webp', '2024-12-04 06:39:16', 0, 1, 1, NULL),
 (48, 'Narendra ', 'Narendra', '', 'male', '2006-02-09', 'Madhya Pradesh', 'Indore', 'narendra@narendra.com', '1478523691', '0610', 0, 0, 'narendra-001', 'It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum', '$2b$10$fxBKONzVqEQoKtbScGpxZeZ9dAvFiva3/puvAoMR6B9F0alHHMRyO', NULL, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1733747571578.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733747584889.webp', '2024-12-09 12:30:04', 0, 1, 1, NULL),
-(49, 'Anima ', 'Anima', '', 'male', '2007-02-10', 'Madhya Pradesh', 'Indore', 'anima@anima.com', '7897897896', '6492', 0, 0, 'Anima02', 'A profile description is a brief summary of your skills, experiences, and interests that you can use on social media or professional networking sites.', '$2b$10$1D7OGKV1BiJdSSsKWB2AL.DERR8IpvxCkRuHoW5zCN/QLFk3d5APG', NULL, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1733810295840.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733810288168.webp', '2024-12-10 05:56:43', 0, 1, 1, NULL);
+(49, 'Anima ', 'Anima', '', 'male', '2007-02-10', 'Madhya Pradesh', 'Indore', 'anima@anima.com', '7897897896', '6492', 0, 0, 'Anima02', 'A profile description is a brief summary of your skills, experiences, and interests that you can use on social media or professional networking sites.', '$2b$10$1D7OGKV1BiJdSSsKWB2AL.DERR8IpvxCkRuHoW5zCN/QLFk3d5APG', NULL, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1733810295840.jpeg', 'http://localhost:3000/uploads/cover_img/profile_1733810288168.webp', '2024-12-10 05:56:43', 0, 1, 1, NULL),
+(50, 'Nikhil Tendulkar', 'Nikhil', 'Tendulkar', 'male', '2004-02-18', 'Maharashtra', 'Mumbai', 'nikhil@nikhil.com', '1122334455', '8947', 0, 0, 'nik-07', 'This is test account for Nikhil Tendulkar', '$2b$10$A2.U1k0.RLNKdxug53tBb.PAwLmxa/gnL/ZKqW1g0tWjbXRnJQ3aO', NULL, 'traveler', NULL, NULL, 'http://localhost:3000/uploads/profile_img/profile_1734520730312.jpeg', NULL, '2024-12-18 11:17:43', 0, 1, 0, 'Explorer - a person who travels around a place in order to learn about it');
 
 --
 -- Indexes for dumped tables
@@ -739,6 +830,22 @@ ALTER TABLE `story_replies`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `story_shares`
+--
+ALTER TABLE `story_shares`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `story_id` (`story_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `story_views`
+--
+ALTER TABLE `story_views`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `story_id` (`story_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `tags`
 --
 ALTER TABLE `tags`
@@ -777,37 +884,37 @@ ALTER TABLE `bucket_list`
 -- AUTO_INCREMENT for table `buddies`
 --
 ALTER TABLE `buddies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT for table `comments_like`
 --
 ALTER TABLE `comments_like`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `comment_reply`
 --
 ALTER TABLE `comment_reply`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `followers`
 --
 ALTER TABLE `followers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=635;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=648;
 
 --
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=108;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=141;
 
 --
 -- AUTO_INCREMENT for table `list_posts`
@@ -819,7 +926,7 @@ ALTER TABLE `list_posts`
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `recent_search`
@@ -837,7 +944,7 @@ ALTER TABLE `reply_comment`
 -- AUTO_INCREMENT for table `reply_like`
 --
 ALTER TABLE `reply_like`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `shared_post`
@@ -849,7 +956,7 @@ ALTER TABLE `shared_post`
 -- AUTO_INCREMENT for table `stories`
 --
 ALTER TABLE `stories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `story_likes`
@@ -864,6 +971,18 @@ ALTER TABLE `story_replies`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `story_shares`
+--
+ALTER TABLE `story_shares`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `story_views`
+--
+ALTER TABLE `story_views`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
 -- AUTO_INCREMENT for table `tags`
 --
 ALTER TABLE `tags`
@@ -873,7 +992,7 @@ ALTER TABLE `tags`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- Constraints for dumped tables
@@ -891,6 +1010,13 @@ ALTER TABLE `bkt_lists`
 ALTER TABLE `list_posts`
   ADD CONSTRAINT `list_posts_ibfk_1` FOREIGN KEY (`list_id`) REFERENCES `bkt_lists` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `list_posts_ibfk_2` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `story_shares`
+--
+ALTER TABLE `story_shares`
+  ADD CONSTRAINT `story_shares_ibfk_1` FOREIGN KEY (`story_id`) REFERENCES `stories` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `story_shares_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

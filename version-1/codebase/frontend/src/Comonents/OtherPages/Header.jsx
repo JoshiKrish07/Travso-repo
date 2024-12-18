@@ -376,6 +376,8 @@ const Header = () => {
                     )}
                   </div>
 
+                  <div className="flex-1 h-[400px] overflow-auto scrollbar-hidden">
+
                   {!searchAction && searchedKeyword && (
                     <>
                       {seacrhResult.map((suggestion, index) => (
@@ -603,6 +605,8 @@ const Header = () => {
                         </div>
                       </>
                     )}
+
+</div>
                 </div>
               )}
             </div>

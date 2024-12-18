@@ -188,12 +188,12 @@ const CommunityRightSidebar = () => {
               <button
                 onClick={() => handleFollow(user.id)}
                 className={`w-[76px] h-[36px] text-sm font-semibold border-2 rounded-lg font-semibold ${
-                  !user.isFollowing
+                  user.is_mutual == 0
                     ? "text-white border-[#2DC6BE] bg-[#2DC6BE] hover:bg-[#2DC6BE] hover:text-white"
                     : "text-[#2DC6BE] border-[#2DC6BE] hover:bg-[#2DC6BE] hover:text-white"
                 }`}
               >
-                {user.isFollowing ? "Following" : "Follow"}
+                {user.is_mutual == 1 ? "Following" : "Follow"}
               </button>
               {/* <button
                 className={`w-[36px] h-[36px] text-sm font-semibold border-2 rounded-lg font-semibold ${
