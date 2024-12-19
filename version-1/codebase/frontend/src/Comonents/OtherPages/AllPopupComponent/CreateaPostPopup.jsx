@@ -51,13 +51,20 @@ const CreateaPostPopup = ({
     } = postData;
 
     // Check if all fields are empty
+    // if (
+    //   !description.trim() &&
+    //   !location.trim() &&
+    //   buddies.length === 0 &&
+    //   tags.length === 0 &&
+    //   media_url.length === 0 &&
+    //   buddies_id.length === 0
+    // ) {
+    //   return false;
+    // }
+
     if (
       !description.trim() &&
-      !location.trim() &&
-      buddies.length === 0 &&
-      tags.length === 0 &&
-      media_url.length === 0 &&
-      buddies_id.length === 0
+      media_url.length === 0 
     ) {
       return false;
     }
@@ -72,7 +79,7 @@ const CreateaPostPopup = ({
       // setIsPostDetailPopup(true);
       openPostDetail();
     } else {
-      alert("At least one field is required.");
+      alert("At least discription or image is required.");
     }
   };
 

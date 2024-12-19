@@ -555,7 +555,7 @@ async function loginUser(req, res) {
 
     const [result] = await pool.execute(
       "UPDATE users SET is_online = ? WHERE id = ? AND email = ?",
-      [1, user[0].id, email]
+      [1, user[0].id, user[0]?.email]
     );
 
     if (result.affectedRows === 0) {
