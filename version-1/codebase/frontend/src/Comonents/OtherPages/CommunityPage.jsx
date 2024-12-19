@@ -548,6 +548,8 @@ const CommunityPage = () => {
     }
   }
 
+  // console.log("===activestories", activeStories)
+
   return (
     <>
       <Header />
@@ -656,7 +658,10 @@ const CommunityPage = () => {
                             className="w-[64px] h-[64px] object-cover rounded-full border-2 border-[#2DC6BE] p-[2px]"
                           />
                           <p className="font-inter font-medium text-[14px] mt-2 text-[#212626]">
-                            {user.full_name}
+                            {/* {user.full_name} */}
+                            {
+                              user.full_name.length > 7 ? user.full_name.slice(0, 7) + '...' : user.full_name
+                            }
                           </p>
                         </div>
                       )
@@ -779,8 +784,11 @@ const CommunityPage = () => {
                           }}
                         >
                           {activeStories &&
-                            activeStories.map((story, storyIndex) => {
+                            activeStories.slice(1).map((story, storyIndex) => {
                               return story.stories.map((userStory, index) => {
+                                console.log("===userStory===>", userStory);
+                                console.log("===currentBuddiesReelIndex===>", currentBuddiesReelIndex);
+                                console.log("===index===>", index);
                                 return (
                                   <div
                                     key={userStory?.id}
@@ -826,7 +834,7 @@ const CommunityPage = () => {
                                             </svg>
                                           </p>
                                           <p className="-mt-1 text-left font-inter font-medium text-[14px] text-[#FFFFFF]">
-                                            {userStory?.badge.split("-")[0]}
+                                            {userStory?.badge?.split("-")[0]}
                                           </p>
                                         </div>
                                       </div>
@@ -1184,7 +1192,7 @@ const CommunityPage = () => {
                                     className="w-full h-[650px] object-cover rounded-lg"
                                   />
                                 )} */}
-                                    {userStory?.media_url?.length > 0 ? (
+                                    {/* {userStory?.media_url?.length > 0 ? (
                                       <img
                                         src={userStory?.media_url[0]}
                                         alt={`Media`}
@@ -1198,7 +1206,37 @@ const CommunityPage = () => {
                                         controls
                                         className="w-full h-[650px] object-cover rounded-lg"
                                       />
+                                    )} */}
+                                    <div>
+                                    {userStory?.media_url?.length > 0 ? (
+                                      userStory?.media_url.map(
+                                        (media, mediaIndex) => {
+                                          return (
+                                            <div key={mediaIndex}>
+                                              <img
+                                                // src={userStory?.media_url[0]}
+                                                src={media}
+                                                alt={`Media`}
+                                                className="w-full h-[650px] object-cover rounded-lg"
+                                                loading="lazy"
+                                                onMouseEnter={() =>
+                                                  increaseViewersCount(
+                                                    userStory?.id
+                                                  )
+                                                }
+                                              />
+                                            </div>
+                                          );
+                                        }
+                                      )
+                                    ) : (
+                                      <video
+                                        src={userStory.src}
+                                        controls
+                                        className="w-full h-[650px] object-cover rounded-lg"
+                                      />
                                     )}
+                                    </div>
                                   </div>
                                 );
                               });
@@ -1314,9 +1352,9 @@ const CommunityPage = () => {
                                       <img
                                         src={
                                           badges[
-                                            userDetails.badge
-                                              .split("-")[0]
-                                              .trim()
+                                            userDetails?.badge
+                                              ?.split("-")[0]
+                                              ?.trim()
                                           ] || null
                                         }
                                         alt="Badge"

@@ -3,8 +3,8 @@ import Boy1 from "../../assets/headerIcon/boy1.png";
 import Girl from "../../assets/headerIcon/girl.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import dummyUserImage from "../../assets/user_image-removebg-preview.png";
-import { followUnfollow } from "../../redux/slices/postSlice";
-import { addBuddy, getAllUsers, getOnlineFriends, getSuggestionList, removeBuddy } from "../../redux/slices/authSlice";
+import { followUnfollow, followUnfollowOnFollowing } from "../../redux/slices/postSlice";
+import { addBuddy, getAllUsers, getOnlineFriends, getSuggestionList, getUserBuddies, getUserFollowers, removeBuddy, toWhomUserIsFollowing } from "../../redux/slices/authSlice";
 
 const CommunityRightSidebar = () => {
   const dispatch = useDispatch();
@@ -120,6 +120,23 @@ const CommunityRightSidebar = () => {
     }
   }
 
+  // to follow unfollow user in following section
+  const handleFollowUnfollowForFollowing = async(followeeID) => {
+    console.log("=====followeeID====>", followeeID);
+    
+    try {
+      const followUnfollowResponse = await dispatch(followUnfollowOnFollowing(followeeID)).unwrap();
+      if(followUnfollowResponse) {
+        await dispatch(getUserFollowers());
+        await dispatch(toWhomUserIsFollowing());
+        await dispatch(getUserBuddies());
+        await dispatch(getSuggestionList());
+      }
+    } catch (error) {
+      console.log("==error in handleFollowUnfollowForFollowing==", error);
+    }
+  }
+
   return (
     <>
       <div className="bg-white rounded-lg shadow-[0_2px_6px_rgba(0,0,0,0.10)] p-5">
@@ -177,16 +194,19 @@ const CommunityRightSidebar = () => {
               />
               <div>
                 <p className="font-inter font-medium text-[16px] text-[#212626] text-left">
-                  {user.full_name}
+                  {/* {user.full_name} */}
+                  {user.full_name.length > 7 ? user.full_name.slice(0, 7) + '...' : user.full_name}
                 </p>
                 <p className="font-inter font-medium text-[12px] text-[#667877] text-left">
-                  {user.user_name}
+                  {/* {user.user_name} */}
+                  {user.user_name && user.user_name.length > 7 ? user.user_name.slice(0, 7) + '...' : user.user_name}
                 </p>
               </div>
             </div>
             <div className="flex items-center space-x-2">
               <button
-                onClick={() => handleFollow(user.id)}
+                onClick={() => handleFollowUnfollowForFollowing(user.id)}
+                // onClick={() => handleFollow(user.id)}
                 className={`w-[76px] h-[36px] text-sm font-semibold border-2 rounded-lg font-semibold ${
                   user.is_mutual == 0
                     ? "text-white border-[#2DC6BE] bg-[#2DC6BE] hover:bg-[#2DC6BE] hover:text-white"

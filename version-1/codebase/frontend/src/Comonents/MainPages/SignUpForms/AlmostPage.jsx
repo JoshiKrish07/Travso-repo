@@ -2,7 +2,7 @@
 /* This is Signup step 3(final) */
 
 import React, { useState } from "react";
-import backgroundImage from "../../../assets/AlmostThere.png";
+import backgroundImage from "../../../assets/almostthere.jpg";
 import logo from "../../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 
@@ -28,21 +28,13 @@ const AlmostPage = ({ formData, formDataError, handleInputChange, handleSubmit, 
         </div>
         <div className=" absolute inset-0 flex flex-col justify-end p-8 md:p-16 text-white text-left md:ml-10">
           <h1 className="text-3xl md:text-5xl font-bold">
-            Craft Your Own <br /> Adventure Story
+          Connect with Travel <br /> Buddies
           </h1>
           <p className="mt-4 text-sm md:text-base hidden md:flex">
-            Turn your travels into inspiration. Share your unique journey,
-            capture
-            <br /> imaginations, and leave a lasting legacy in the TravSo
-            community. Each
-            <br />
-            story is a piece of the world—make yours unforgettable
+          Join a global community of travel enthusiasts to share your travel story, exchange insider tips, discover hidden gems, and celebrate the beauty of diverse destinations.
           </p>
           <p className="mt-4 text-sm md:text-base flex md:hidden">
-            Turn your travels into inspiration. Share your unique journey,
-            capture imaginations, and leave a lasting legacy in the TravSo
-            community. Each story is a piece of the world—make yours
-            unforgettable.
+          Join a global community of travel enthusiasts to share your travel story, exchange insider tips, discover hidden gems, and celebrate the beauty of diverse destinations.
           </p>
           <div className="flex items-center mt-8 space-x-4 w-[50%] gap-[30px]">
             <div className="flex-1 relative">

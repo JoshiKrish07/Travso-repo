@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Profile from "../../assets/profilePage.jpg";
 import ProfilePhoto from "../../assets/profilePhoto.png";
 import travel_badges from "../../assets/travel_badges.png";
@@ -6,54 +6,96 @@ import { useDispatch, useSelector } from "react-redux";
 import dummyUserImage from "../../assets/user_image-removebg-preview.png";
 import { getUserBuddies, getUserFollowers } from "../../redux/slices/authSlice";
 import { Link } from "react-router-dom";
+import StoryPage from "./AllStoriesPages/StoryPage";
+import { getActiveStories } from "../../redux/slices/postSlice";
+import StoryViewPage from "./AllStoriesPages/StoryViewPage";
 
 const ProfilePageHeaderData = () => {
   const dispatch = useDispatch();
 
-  const { user: userDetails, userFollowers, userBuddies } = useSelector(
-    (state) => state.auth
-  );
+  const [isExpanded, setIsExpanded] = useState(false);
+  const maxWordLimit = 100;
+
+  /* for story section */
+  const [isCreateSocialPopup, setIsCreateSocialPopup] = useState(false);
+  const [dropdownOpenStoryViewSetting, setDropdownOpenStoryViewSetting] =
+    useState(false);
+  const [isCreateSocialPopupUserItself, setIsCreateSocialPopupUserItself] =
+    useState(false);
+  const [isShowvisibleStoryViewID, setIsShowvisibleStoryViewID] =
+    useState(false);
+  const [openDropdownIdUser, setOpenDropdownIdUser] = useState(null);
+
+  // console.log("====isCreateSocialPopup===>", isCreateSocialPopup);
+  
+  const hadleShowViewStory = (storyId) => {
+    setIsShowvisibleStoryViewID(!isShowvisibleStoryViewID);
+  };
+
+  const closeStoryPopup = () => {
+    setIsCreateSocialPopupUserItself(false);
+  };
+
+  const toggleSettingStoryView = (storyId) => {
+    setOpenDropdownIdUser(storyId);
+  };
+  
+  const {
+    user: userDetails,
+    userFollowers,
+    userBuddies,
+  } = useSelector((state) => state.auth);
+  const { allPosts, activeStories } = useSelector((state) => state.postSlice);
+
 
   useEffect(() => {
-    if(!userFollowers) {
+    if (!userFollowers) {
       dispatch(getUserFollowers());
     }
 
-    if(!userBuddies) {
+    if (!userBuddies) {
       dispatch(getUserBuddies());
     }
+
+    if (!activeStories) {
+      dispatch(getActiveStories());
+    }
   }, [dispatch]);
+
+  /* to close story upload popup */
+  const handleStoryPageClose = () => {
+    setIsCreateSocialPopup(false);
+  }
+
 
   return (
     <div className="mt-5 bg-[#F0F7F7] flex justify-center items-center">
       <div className="w-full max-w-[98%] h-[714px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col items-center">
         {/* Cover Photo Section */}
         <div className="flex flex-col justify-center w-full max-w-98% p-4 px-4">
-        <div>
-          {
-            userDetails?.cover_image ? (
-            <div>
-            <img
-              // src={userDetails?.cover_image}
-              src={userDetails?.cover_image}
-              alt="Cover"
-              className="w-full h-[340px] object-cover rounded-[12px]"
-            />
-            </div>) : (
-              <div className="w-full h-[340px] object-cover rounded-[12px] bg-[#F0F7F7]" >
+          <div>
+            {userDetails?.cover_image ? (
+              <div>
+                <img
+                  // src={userDetails?.cover_image}
+                  src={userDetails?.cover_image}
+                  alt="Cover"
+                  className="w-full h-[340px] object-cover rounded-[12px]"
+                />
               </div>
-            )
-          }
+            ) : (
+              <div className="w-full h-[340px] object-cover rounded-[12px] bg-[#F0F7F7]"></div>
+            )}
 
-          {
+            {
               // Badge mapping and rendering
               (() => {
                 const badges = {
                   Adventurer: travel_badges,
                   Explorer: travel_badges,
                   Foodie: travel_badges,
-                  'Solo Traveler': travel_badges,
-                  'Luxury Traveler': travel_badges,
+                  "Solo Traveler": travel_badges,
+                  "Luxury Traveler": travel_badges,
                 };
 
                 const badgeParts = userDetails?.badge?.split("-");
@@ -64,29 +106,69 @@ const ProfilePageHeaderData = () => {
                 return badgeImage ? (
                   <div className="relative group">
                     <img
-                    src={badgeImage}
-                    alt={`${badgeName} Badge`}
-                    className="absolute -top-[325px] left-[15px] w-[192px] h-[60px]"
-                  />
+                      src={badgeImage}
+                      alt={`${badgeName} Badge`}
+                      className="absolute -top-[325px] left-[15px] w-[192px] h-[60px]"
+                    />
                     <div className="absolute left-[20px] -top-[260px]  mt-1 hidden group-hover:block bg-[#2DC6BE] text-white text-sm p-2 rounded shadow-lg w-[250px] text-left">
-                    {badgeDescription}
+                      {badgeDescription}
                     </div>
                   </div>
                 ) : null;
-
               })()
             }
-            
-            </div>
+          </div>
           {/* Profile Photo */}
           <div className="flex flex-col items-center justify-center">
             <div className="relative -top-20 border-4 border-white bg-white rounded-full p-[2px]">
               <div className="border-4 border-[#2DC6BE] rounded-full bg-[#F0F7F7] p-[2px]">
-                <img
-                  src={userDetails?.profile_image || dummyUserImage}
-                  alt="Profile"
-                  className="w-[150px] h-[150px] rounded-full border-4 border-white object-cover"
-                />
+                {activeStories && activeStories[0].stories.length > 0 ? (
+                  <div>
+                    <img
+                      src={activeStories[0]?.profile_image || dummyUserImage}
+                      alt="My Story"
+                      className="w-[150px] h-[150px] rounded-full border-4 border-white object-cover"
+                      // className="w-[64px] h-[64px] object-cover rounded-full border-2 border-[#2DC6BE] p-[2px]"
+                      onClick={() => setIsCreateSocialPopupUserItself(true)}
+                    />
+                    {/* <p
+                      className="font-inter font-medium text-[14px] mt-2 text-[#212626]"
+                      onClick={() => setIsCreateSocialPopupUserItself(true)}
+                    >
+                      My Story
+                    </p> */}
+                    {isCreateSocialPopupUserItself && (
+                      <StoryViewPage
+                        closeStoryPopup={closeStoryPopup}
+                        toggleSettingStoryView={toggleSettingStoryView}
+                        dropdownOpenStoryViewSetting={
+                          dropdownOpenStoryViewSetting
+                        }
+                        setDropdownOpenStoryViewSetting={
+                          setDropdownOpenStoryViewSetting
+                        }
+                        hadleShowViewStory={hadleShowViewStory}
+                        isShowvisibleStoryViewID={isShowvisibleStoryViewID}
+                        storyData={activeStories[0]}
+                        openDropdownIdUser={openDropdownIdUser}
+                        setOpenDropdownIdUser={setOpenDropdownIdUser}
+                        setIsShowvisibleStoryViewID={
+                          setIsShowvisibleStoryViewID
+                        }
+                        isCreateSocialPopup={isCreateSocialPopup}
+                        setIsCreateSocialPopup={setIsCreateSocialPopup}
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <img
+                      src={userDetails?.profile_image || dummyUserImage}
+                      alt="Profile"
+                      className="w-[150px] h-[150px] rounded-full border-4 border-white object-cover"
+                    />
+                  </div>
+                )}
               </div>
             </div>
             <div className="md:w-[720px] -mt-[70px] flex flex-col items-center justify-center">
@@ -96,13 +178,30 @@ const ProfilePageHeaderData = () => {
               <p className="-mt-2 font-inter font-medium text-[20px] items-center text-[#667877]">
                 {userDetails?.user_name}
               </p>
-              <p className="font-inter font-medium text-[16px] items-center text-[#667877] mt-2">
+              {/* <p className="font-inter font-medium text-[16px] items-center text-[#667877] mt-2">
                 {userDetails?.description}
+              </p> */}
+              <p className="font-inter font-medium text-[16px] items-center text-[#667877] mt-2">
+                {isExpanded
+                  ? userDetails?.description
+                  : `${userDetails?.description?.slice(0, maxWordLimit)}${
+                      userDetails?.description?.length > maxWordLimit ? "..." : ""
+                    }`}
+                {userDetails?.description?.length > maxWordLimit && (
+                  <span
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="text-blue-500 hover:underline cursor-pointer ml-1"
+                  >
+                    {isExpanded ? "See Less" : "See More"}
+                  </span>
+                )}
               </p>
               <div className="md:w-[470px] md:h-[40px] flex items-center justify-center rounded-full bg-[#E5FFFE] mt-3">
                 <p className="font-poppins font-semibold items-center text-center text-[16px] text-[#212626]">
-                  {userDetails?.badge.split("-")[0]} &nbsp;•&nbsp; 0 Trip &nbsp;•&nbsp; {userFollowers && userFollowers.length}{" "}
-                  followers &nbsp;•&nbsp; {userBuddies && userBuddies.length} Buddies
+                  {userDetails && userDetails?.badge?.split("-")[0]} &nbsp;•&nbsp; 0 Trip
+                  &nbsp;•&nbsp; {userFollowers && userFollowers.length}{" "}
+                  followers &nbsp;•&nbsp; {userBuddies && userBuddies.length}{" "}
+                  Buddies
                 </p>
               </div>
               <div className="flex items-center gap-2 mt-5">
@@ -127,33 +226,45 @@ const ProfilePageHeaderData = () => {
                     />
                   </svg>
 
-                <Link to={'/editprofile'}>
-                  <span className="text-md font-normal">Edit Profile</span>
-                </Link>
+                  <Link to={"/editprofile"}>
+                    <span className="text-md font-normal">Edit Profile</span>
+                  </Link>
                 </button>
-                <button
-                  aria-label="Liked Info"
-                  className="flex items-center justify-center w-[136px] h-[40px] bg-[#2DC6BE] text-white text-[#434C50] hover:text-gray-800 py-1 px-3 rounded-[4px] hover:bg-[#2DC6BE] hover:text-white"
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 21 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="mr-2"
+                <div onClick={() => setIsCreateSocialPopup(true)}>
+                  <button
+                    aria-label="Liked Info"
+                    className="flex items-center justify-center w-[136px] h-[40px] bg-[#2DC6BE] text-white text-[#434C50] hover:text-gray-800 py-1 px-3 rounded-[4px] hover:bg-[#2DC6BE] hover:text-white"
                   >
-                    <path
-                      d="M10.4998 4.16699V15.8337M4.6665 10.0003H16.3332"
-                      stroke="white"
-                      strokeWidth="1.66667"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 21 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="mr-2"
+                    >
+                      <path
+                        d="M10.4998 4.16699V15.8337M4.6665 10.0003H16.3332"
+                        stroke="white"
+                        strokeWidth="1.66667"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
 
-                  <span className="text-md font-normal">Add a story</span>
-                </button>
+                    <span className="text-md font-normal">Add a story</span>
+                  </button>
+
+                </div>
+                {
+                  isCreateSocialPopup && (
+                  <StoryPage
+                    isOpen={isCreateSocialPopup}
+                    onClose={() => handleStoryPageClose()}
+                  />
+                  )
+                }
+                  
               </div>
             </div>
           </div>

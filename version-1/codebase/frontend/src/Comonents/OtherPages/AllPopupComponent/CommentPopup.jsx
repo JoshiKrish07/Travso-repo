@@ -619,7 +619,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
     }
   };
 
-  console.log("===allposts===", allPosts)
+  // console.log("===allposts===", allPosts)
 
   if (!isOpen) return null;
 
@@ -661,7 +661,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                     {allPosts && allPosts[0]?.full_name}
                   </h3>
                   <p className="-mt-1 font-inter font-medium text-left text-[12px] text-[#667877]">
-                    {allPosts && allPosts[0].badge.split("-")[0].trim || ''} • {allPosts && allPosts[0].location}
+                    {allPosts && allPosts[0]?.badge?.split("-")[0].trim() || ''} • {allPosts && allPosts[0].location}
                   </p>
                 </div>
               </div>
