@@ -50,13 +50,43 @@ const StoryPage = ({ isOpen, onClose }) => {
 
   /* to upload image section starts*/
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload1 = (e) => {
     const files = e.target.files;
     console.log("===files===>", files);
     if (files.length > 0) {
       handleFileSelect(files);
     }
   };
+
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files); // Convert FileList to an array
+    const MAX_FILES = 4;
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+  
+    setStoryData((prevState) => {
+      const currentMediaCount = prevState.media_url.length;
+  
+      // Check if total files exceed the limit
+      if (currentMediaCount + files.length > MAX_FILES) {
+        alert(`You can only upload up to ${MAX_FILES} images in total.`);
+        return prevState; // Do not update the state or process files
+      }
+  
+      // Validate file sizes
+      const invalidFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
+  
+      if (invalidFiles.length > 0) {
+        alert("Each file must be less than 2 MB.");
+        return prevState; // Do not update the state or process files
+      }
+  
+      // Pass valid files to handleFileSelect
+      handleFileSelect(files);
+  
+      return prevState; // State remains unchanged until handleFileSelect updates it
+    });
+  };
+  
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -72,7 +102,7 @@ const StoryPage = ({ isOpen, onClose }) => {
   };
 
   // store image data in storyData
-  const handleFileSelect = (files) => {
+  const handleFileSelect1 = (files) => {
 
     for(let img in files) {
 
@@ -90,6 +120,54 @@ const StoryPage = ({ isOpen, onClose }) => {
       reader.readAsDataURL(file); // Read the file as base64
     }
   };
+
+  const handleFileSelect = (files) => {
+    const MAX_FILES = 4;
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+  
+    setStoryData((prevState) => {
+      const currentMediaCount = prevState.media_url.length;
+  
+      // Check if total files exceed the limit
+      if (currentMediaCount + files.length > MAX_FILES) {
+        alert(`You can only upload up to ${MAX_FILES} images in total.`);
+        return prevState; // Do not update the state
+      }
+  
+      // Validate file sizes
+      const invalidFiles = Array.from(files).filter((file) => file.size > MAX_FILE_SIZE);
+  
+      if (invalidFiles.length > 0) {
+        alert("Each file must be less than 2 MB.");
+        return prevState; // Do not update the state
+      }
+  
+      // Process valid files
+      const newMediaUrls = [];
+      for (let img in files) {
+        const file = files[img];
+        const reader = new FileReader();
+  
+        reader.onloadend = () => {
+          const imageUrl = reader.result; // Base64 encoded image
+          newMediaUrls.push(imageUrl);
+  
+          // Update state only after reading all files
+          if (newMediaUrls.length === files.length) {
+            setStoryData((prevState) => ({
+              ...prevState,
+              media_url: [...prevState.media_url, ...newMediaUrls],
+            }));
+          }
+        };
+  
+        reader.readAsDataURL(file); // Read the file as base64
+      }
+  
+      return prevState;
+    });
+  };
+  
 
   //   const handleImageUpload = (e) => {
   //     const files = Array.from(e.target.files).slice(0, 4);
@@ -180,9 +258,13 @@ const badges = {
 const handleStorySubmit = async() => {
     try {
         const response = await dispatch(createStory(storyData)).unwrap();
-        console.log("=====response==handleStorySubmit==>", response);
+        // console.log("=====response==handleStorySubmit==>", response);
         if(response) {
             await dispatch(getActiveStories());
+            setStoryData({
+              media_url: [],
+              view: 'Public',
+            })
             onClose();
         }
     } catch (error) {
@@ -208,7 +290,7 @@ const handleStorySubmit = async() => {
             </h4>
             <button
               className="text-black hover:text-[#2DC6BE] font-bold text-xl"
-              onClick={onClose}
+              onClick={() => onClose()}
               aria-label="Close"
             >
               &#x2715;
@@ -234,12 +316,12 @@ const handleStorySubmit = async() => {
                     </h5>
                     <div className="relative group">
                       <img
-                        src={badges[userDetails?.badge.split("-")[0].trim()]}
+                        src={badges[userDetails?.badge?.split("-")[0]?.trim()]}
                         alt="BadgesIconFirst"
                         className="w-[24px] h-[24px]"
                       />
                       <div className="absolute left-0 mt-1 hidden group-hover:block bg-[#2DC6BE] text-white text-sm p-2 rounded shadow-lg w-[250px] text-justify">
-                        {userDetails?.badge.split("-")[1]}
+                        {userDetails?.badge?.split("-")[1]}
                       </div>
                     </div>
                   </div>

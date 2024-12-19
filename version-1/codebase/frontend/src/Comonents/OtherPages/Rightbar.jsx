@@ -232,6 +232,7 @@ const Rightbar = () => {
       const followUnfollowResponse = await dispatch(followUnfollow(followeeID)).unwrap();
       if(followUnfollowResponse) {
         await dispatch(getUserFollowers());
+        await dispatch(getUserBuddies());
         await dispatch(toWhomUserIsFollowing());
       }
     } catch (error) {
@@ -241,6 +242,7 @@ const Rightbar = () => {
 
   // to follow unfollow user in following section
   const handleFollowUnfollowForFollowing = async(followeeID) => {
+    console.log("===followeeID===>", followeeID);
     try {
       const followUnfollowResponse = await dispatch(followUnfollowOnFollowing(followeeID)).unwrap();
       if(followUnfollowResponse) {
@@ -329,7 +331,9 @@ const handleBuddyRemove = async(buddyId) => {
                         ? "bg-[#2DC6BE] text-white border-[#2DC6BE]"
                         : "text-[#2DC6BE] border-[#2DC6BE]"
                     }`}
-                    onClick={() => handleFollowUnfollowForFollowing(buddy?.id)}  
+                    // onClick={() => handleFollowUnfollowForFollowing(buddy?.id)}  
+                    // onClick={() => handleFollowUnfollow(buddy?.id)} 
+                    onClick={buddy.is_followers === 1 ? () => handleFollowUnfollowForFollowing(buddy?.id) : () =>handleFollowUnfollow(buddy?.id) } 
                   >
                   {buddy.is_followers === 0 ? "Follow" : "Following"}
                   </button>

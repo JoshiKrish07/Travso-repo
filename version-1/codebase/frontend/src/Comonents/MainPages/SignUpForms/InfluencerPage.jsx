@@ -2,7 +2,7 @@
 /* This is Signup step 2 */
 
 import { useDispatch } from "react-redux";
-import backgroundImage from "../../../assets/influencerImage.png";
+import backgroundImage from "../../../assets/signin.jpg";
 import logo from "../../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import { setInfluencerType } from "../../../redux/slices/authSlice";
@@ -57,15 +57,14 @@ const InfluencerPage = ({
           {/* Logo size and responsiveness */}
         </div>
         <div className=" absolute inset-0 flex flex-col justify-end p-8 md:p-16 text-white text-left md:ml-10">
-          <h1 className="text-3xl md:text-5xl font-bold">
-            Connect with the <br /> Global Travel Tribe
+        <h1 className="text-3xl md:text-5xl font-bold">
+        Weave Your Own Indian  <br /> Travel Story
           </h1>
-          <p className="mt-4 text-sm md:text-base">
-            Become part of an energetic community of explorers just like you.
-            Dive into
-            <br /> lively discussions, discover hidden gems, share travel hacks,
-            and make <br />
-            lifelong friends with adventurers from every corner of the world.
+          <p className="mt-4 text-sm md:text-base hidden md:flex">
+          Inspire others with your unique experiences as you explore India is vibrant tourism destinations, from cultural landmarks to hidden gems. Share your journey and help others discover the beauty and diversity of India.
+          </p>
+          <p className="mt-4 text-sm md:text-base flex md:hidden">
+          Inspire others with your unique experiences as you explore India is vibrant tourism destinations, from cultural landmarks to hidden gems. Share your journey and help others discover the beauty and diversity of India.
           </p>
           <div className="flex items-center mt-8 space-x-4 w-[50%] gap-[30px]">
             <div className="flex-1 relative">

@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useMemo, useState } from "react";
 import logo from "../../../assets/logo.png";
-import backgroundImage from "../../../assets/loginpageimg.png";
+import backgroundImage from "../../../assets/signup.jpg";
 import Select from "react-select";
 import stateData from "../../../statedata/statedata.json";
 import { useNavigate } from "react-router-dom";
@@ -340,20 +340,16 @@ const SignupStep1 = ({
         </div>
         <div className=" absolute inset-0 flex flex-col justify-end p-8 md:p-16 text-white text-left md:ml-10">
           <h1 className="text-3xl md:text-5xl font-bold">
-            TravSo: Spark Your <br /> Wanderlust
+          Where Travelers and Tourism  <br /> Come Together
           </h1>
           <p className="mt-4 text-sm md:text-base hidden md:flex">
-            Step into a world of breathtaking travel tales and awe-inspiring
-            visuals. Let
-            <br /> the beauty of these stories ignite your passion for adventure
-            and set your
+          TravSo is a dynamic platform  that brings together the entire travel and 
+            <br /> tourism community, where explorers, travelers, and industry experts connect,
             <br />
-            soul on a journey to explore the unknown.
+            share experiences, and celebrates the power of travel stories.
           </p>
           <p className="mt-4 text-sm md:text-base flex md:hidden">
-            Step into a world of breathtaking travel tales and awe-inspiring
-            visuals. Let the beauty of these stories ignite your passion for
-            adventure and set your soul on a journey to explore the unknown.
+          TravSo is a dynamic platform  that brings together the entire travel and tourism community, where explorers, travelers, and industry experts connect, share experiences, and celebrates the power of travel stories.
           </p>
           <div className="flex items-center mt-8 space-x-4 w-[50%] gap-[30px]">
             <div className="flex-1 relative">

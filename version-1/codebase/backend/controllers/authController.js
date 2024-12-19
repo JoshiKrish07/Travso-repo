@@ -1630,7 +1630,7 @@ async function blockAccount(req , res){
 }
 
 // to show suggestions to user for follow and add buddy
-async function suggestions(req, res) {
+async function suggestions1(req, res) {
   try {
     // const { userId } = req.params; // User requesting suggestions
     const userId = req.user.userId;
@@ -1686,6 +1686,77 @@ async function suggestions(req, res) {
   }
 }
 
+async function suggestions(req, res) {
+  try {
+    // const { userId } = req.params; // User requesting suggestions
+    const userId = req.user.userId;
+    const { page = 1, limit = 10 } = req.query; // Optional pagination params
+    const offset = (page - 1) * limit; // Calculate offset
+
+    // Fetch suggested users based on logic (excluding already followed and userId)
+    const [suggestions] = await pool.execute(
+      `
+      SELECT 
+        u.id,
+        u.full_name,
+        u.user_name,
+        u.profile_image,
+        u.badge,
+        (SELECT COUNT(*) FROM followers f WHERE f.followee_id = u.id) AS followers_count,
+        (SELECT COUNT(*) FROM posts p WHERE p.user_id = u.id AND p.status = 'active') AS posts_count,
+        EXISTS(
+          SELECT 1 
+          FROM followers f1 
+          WHERE f1.followee_id = u.id 
+          AND f1.follower_id = ?
+        ) AS is_mutual,
+         EXISTS(
+          SELECT 1 
+          FROM buddies b 
+          WHERE (b.user_id = ? AND b.buddies_id = u.id) 
+             OR (b.user_id = u.id AND b.buddies_id = ?)
+        ) AS is_buddies
+      FROM users u
+      WHERE 
+        u.id != ? -- Exclude the requesting user
+        AND u.id NOT IN (SELECT follower_id FROM followers WHERE followee_id = ?) -- Exclude already followed users
+      ORDER BY followers_count DESC, posts_count DESC -- Sort by activity/popularity
+      LIMIT ? OFFSET ?;
+      `,
+      [userId, userId, userId,userId,userId, parseInt(limit), parseInt(offset)] // Bind params
+    );
+
+    return res.status(200).json({
+      message: 'Suggestions fetched successfully',
+      data: suggestions,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching suggestions:', error);
+    return res.status(500).json({
+      error: 'Error getting suggestions',
+    });
+  }
+}
+
+async function validateToken(req, res) {
+  const token = req.body.token;
+  console.log("====token===>", token);
+  if (!token) {
+    return res.status(401).json({ valid: false, message: 'Token is missing' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY); // Replace 'your_secret_key' with your JWT secret
+    return res.status(200).json({ valid: true, decoded });
+  } catch (error) {
+    return res.status(401).json({ valid: false, message: 'Token is invalid or expired' });
+  }
+}
+
 module.exports = {
   registerUser,
   sendOTP,
@@ -1715,5 +1786,6 @@ module.exports = {
   addBuddies,
   removeBuddy,
   blockAccount,
-  suggestions
+  suggestions,
+  validateToken
 };

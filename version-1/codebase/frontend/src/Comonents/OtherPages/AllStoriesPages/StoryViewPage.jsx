@@ -24,9 +24,11 @@ const StoryViewPage = ({
   isCreateSocialPopup,
   setIsCreateSocialPopup
 }) => {
-    console.log("===storyData===>",storyData);
+    // console.log("===storyData===>",storyData);
   const dispatch = useDispatch();
+
   const deleteThisStory = async(storyid) => {
+    // console.log("====storyid===>", storyid);
     try {
         const deleteResponse = await dispatch(deleteStory(storyid)).unwrap();
          await dispatch(getActiveStories());
