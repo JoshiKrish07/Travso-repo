@@ -415,7 +415,7 @@ const handleBuddyRemove = async(buddyId) => {
                 // onClick={() => handleFollowUnfollow(follower?.id)}
                 onClick={follower.is_mutual === 1 ? () => handleFollowUnfollow(follower?.id) : () =>handleFollowUnfollowForFollowing(follower?.id) }
                 >
-                  {follower.is_mutual !== 0 ? "Following" : "Follow"}
+                  {follower.is_mutual !== 0 ? "Remove" : "Follow"}
                 </button>
                 {
                   follower?.is_buddies === 0 ? (<>

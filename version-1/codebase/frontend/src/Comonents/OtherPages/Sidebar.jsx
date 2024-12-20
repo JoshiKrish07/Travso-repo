@@ -9,7 +9,7 @@ import Seventh from "../../assets/PostImage/seventh.png";
 import Eighth from "../../assets/PostImage/eigth.png";
 import Ninth from "../../assets/PostImage/ninth.png";
 import Tenth from "../../assets/PostImage/first.png";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 const Sidebar = () => {
@@ -174,6 +174,7 @@ const Sidebar = () => {
         {/* Header Section */}
         <div className="flex justify-between items-center pb-3">
           <h2 className="text-lg font-semibold text-gray-800">About me</h2>
+          <Link to='/editprofile'>
           <button
             aria-label="Edit Info"
             className="flex items-center text-[#2DC6BE]"
@@ -182,6 +183,7 @@ const Sidebar = () => {
               Edit
             </span>
           </button>
+          </Link>
         </div>
 
         {/* Info List */}
