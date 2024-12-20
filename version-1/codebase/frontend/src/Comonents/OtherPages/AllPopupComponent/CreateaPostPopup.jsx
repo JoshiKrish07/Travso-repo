@@ -352,9 +352,29 @@ const CreateaPostPopup = ({
     });
   };
 
+  // Disable body scroll when popup is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add("no-scroll");
+    } else {
+      document.body.classList.remove("no-scroll");
+    }
+    return () => {
+      document.body.classList.remove("no-scroll");
+    };
+  },[isOpen]);
+  
   if (!isOpen) return null;
 
   return (
+    <>
+    <style>
+        {`
+          .no-scroll {
+            overflow: hidden;
+          }
+        `}
+    </style>
     <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-[16px] shadow-lg w-[696px] px-1 py-5 md:w-[696px] h-[672px] flex flex-col overflow-hidden">
         {/* Header */}
@@ -396,7 +416,7 @@ const CreateaPostPopup = ({
                 </div>
                 <div>
                   <p className="-mt-2 font-inter font-medium text-[16px] text-[#667877] text-left">
-                    @{userDetails?.user_name}
+                    {userDetails?.user_name}
                   </p>
                 </div>
               </div>
@@ -530,7 +550,7 @@ const CreateaPostPopup = ({
               </div> */}
 
               {/* Prashant Code Start */}
-              <div className="flex flex-col">
+              <div className="flex flex-col relative">
                 <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">
                   Add Buddies
                 </p>
@@ -580,7 +600,7 @@ const CreateaPostPopup = ({
 
                 {/* Search show dropdown */}
                 {showTagBuddySuggestions && filteredSuggestions.length > 0 && (
-                  <div className="absolute top-[335px] bg-white border border-gray-200 rounded shadow-lg w-[656px] z-10">
+                  <div className="absolute top-[80px] bg-white border border-gray-200 rounded shadow-lg w-[656px] z-10">
                     <ul className="max-h-40 overflow-y-auto">
                       {filteredSuggestions.map((person) => (
                         <li
@@ -596,7 +616,7 @@ const CreateaPostPopup = ({
                 )}
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex flex-col relative">
                 <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">
                   Add Tags (Up to 10)
                 </p>
@@ -645,7 +665,7 @@ const CreateaPostPopup = ({
                 </div>
 
                 {/* Search show dropdown */}
-                {showTagBuddySuggestions && filteredSuggestions.length > 0 && (
+                {/* {showTagBuddySuggestions && filteredSuggestions.length > 0 && (
                   <div className="absolute top-[335px] bg-white border border-gray-200 rounded shadow-lg w-[656px] z-10">
                     <ul className="max-h-40 overflow-y-auto">
                       {filteredSuggestions.map((person) => (
@@ -659,7 +679,7 @@ const CreateaPostPopup = ({
                       ))}
                     </ul>
                   </div>
-                )}
+                )} */}
               </div>
               {/* Prashant Code End */}
 
@@ -826,6 +846,7 @@ const CreateaPostPopup = ({
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -157,6 +157,7 @@ const ProfilePageHeaderData = () => {
                         }
                         isCreateSocialPopup={isCreateSocialPopup}
                         setIsCreateSocialPopup={setIsCreateSocialPopup}
+                        isOpen={isCreateSocialPopupUserItself}
                       />
                     )}
                   </div>

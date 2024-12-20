@@ -232,18 +232,6 @@ const StoryPage = ({ isOpen, onClose }) => {
     setDropdownOpen(false);
   };
 
-  // Disable body scroll when popup is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add("no-scroll");
-    } else {
-      document.body.classList.remove("no-scroll");
-    }
-    return () => {
-      document.body.classList.remove("no-scroll");
-    };
-  }, [isOpen]);
-
 
 // Simplified badge image logic
 const badges = {
@@ -272,9 +260,29 @@ const handleStorySubmit = async() => {
     }
 }
 
+// Disable body scroll when popup is open
+useEffect(() => {
+  if (isOpen) {
+    document.body.classList.add("no-scroll");
+  } else {
+    document.body.classList.remove("no-scroll");
+  }
+  return () => {
+    document.body.classList.remove("no-scroll");
+  };
+}, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
+    <>
+    <style>
+        {`
+          .no-scroll {
+            overflow: hidden;
+          }
+        `}
+    </style>
     <div
       className="fixed top-0 left-0 w-full h-full bg-cover bg-center flex items-center justify-center z-50"
       style={{
@@ -749,6 +757,7 @@ const handleStorySubmit = async() => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

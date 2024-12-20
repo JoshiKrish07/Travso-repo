@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect } from "react";
+import React from "react";
 import Girl from "../../../assets/headerIcon/girl.jpg";
 import Travel from "../../../assets/travel.png";
 import Background from "../../../assets/Background.png";
@@ -22,8 +22,7 @@ const StoryViewPage = ({
   setOpenDropdownIdUser,
   setIsShowvisibleStoryViewID,
   isCreateSocialPopup,
-  setIsCreateSocialPopup,
-  isOpen
+  setIsCreateSocialPopup
 }) => {
     // console.log("===storyData===>",storyData);
   const dispatch = useDispatch();
@@ -40,29 +39,7 @@ const StoryViewPage = ({
     }
   }
 
-  // Disable body scroll when popup is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add("no-scroll");
-    } else {
-      document.body.classList.remove("no-scroll");
-    }
-    return () => {
-      document.body.classList.remove("no-scroll");
-    };
-  }, [isOpen]);
-  
-    if (!isOpen) return null;
-
   return (
-    <>
-    <style>
-        {`
-          .no-scroll {
-            overflow: hidden;
-          }
-        `}
-    </style>
     <div>
       <div
         className="fixed inset-0 flex items-center justify-center bg-cover bg-center z-50"
@@ -502,7 +479,6 @@ const StoryViewPage = ({
                     </div>
       </div>
     </div>
-    </>
   );
 };
 

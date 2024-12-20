@@ -61,7 +61,7 @@ const BucketList = () => {
               <div
                 key={index}
                 className="bg-white rounded-md shadow-[0_4px_10px_rgba(0,0,0,0.15)] p-4 grid grid-cols-2 gap-2 cursor-pointer"
-                onClick={() => handleBucketClick(bucket.title)}
+                // onClick={() => handleBucketClick(bucket.title)}
               >
                 {/* Large Image */}
                 <div className="">

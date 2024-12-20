@@ -364,6 +364,14 @@ async function getActiveStories(req, res) {
     );
 
     // Helper function to parse fields into arrays and parse viewers
+
+    // const parseFieldUser = (story) => ({
+    //   ...story,
+    //   url: JSON.parse(story.media_url || "[]"), // Parse media_url to array
+    //   tag: JSON.parse(story.tag || "[]"), // Parse tag to array
+    //   viewers: story.viewers ? JSON.parse(story.viewers) : [], // Parse viewers JSON
+    // });
+
     const parseFields = (story) => ({
       ...story,
       media_url: JSON.parse(story.media_url || "[]"), // Parse media_url to array
@@ -371,7 +379,9 @@ async function getActiveStories(req, res) {
       viewers: story.viewers ? JSON.parse(story.viewers) : [], // Parse viewers JSON
     });
 
+
     // Parse userStories and otherUsersStories
+    // const parsedUserStories = userStories.map(parseFields);
     const parsedUserStories = userStories.map(parseFields);
     const parsedOtherUsersStories = otherUsersStories.map(parseFields);
 
@@ -997,7 +1007,7 @@ try {
 // }
 
 
-async function getPostComments(req, res) {
+async function getPostComments1(req, res) {
   try {
     const { postId } = req.params;
     
@@ -1010,6 +1020,7 @@ async function getPostComments(req, res) {
                 c.content,
                 u.full_name,
                 u.profile_image,
+                u.id,
                 c.created_at,
                 -- Count total likes for each comment
                 (SELECT COUNT(*) FROM comments_like cl WHERE cl.comment_id = c.id) AS total_likes_on_comment,
@@ -1142,6 +1153,174 @@ async function getPostComments(req, res) {
       error: "Internal Server Error",
     });
   }
+}
+
+async function getPostComments(req, res) {
+  try {
+    const { postId } = req.params;
+
+    // Fetch the post owner user_id
+    const [postOwner] = await pool.execute(
+      `SELECT user_id AS post_owner_id FROM posts WHERE id = ?`,
+      [postId]
+    );
+
+    if (postOwner.length === 0) {
+      return res.status(404).json({
+        error: "Post not found",
+      });
+    }
+
+    const postOwnerId = postOwner[0].post_owner_id;
+
+    // Fetch all comments
+    const [getComments] = await pool.execute(
+      `SELECT 
+                c.user_id,
+                c.post_id,
+                c.id,
+                c.content,
+                u.full_name,
+                u.profile_image,
+                c.created_at,
+                -- Count total likes for each comment
+                (SELECT COUNT(*) FROM comments_like cl WHERE cl.comment_id = c.id) AS total_likes_on_comment,
+                -- Count total replies for each comment
+                (SELECT COUNT(*) FROM comment_reply cr WHERE cr.comment_id = c.id) AS total_reply_on_comment
+            FROM 
+                comments c
+            JOIN
+                users u
+            ON 
+                c.user_id = u.id
+            WHERE
+                c.post_id = ?
+            ORDER BY 
+                c.created_at ASC
+                `,
+      [postId]
+    );
+
+    // Fetch all replies (for comments)
+    const [replies] = await pool.execute(
+      `SELECT 
+                cr.id AS reply_id,
+                cr.comment_id,
+                cr.user_id,
+                cr.content AS reply_content,
+                u.full_name AS reply_user_full_name,
+                u.user_name AS reply_user_user_name,
+                u.profile_image AS reply_user_profile_image,
+                cr.created_at AS reply_created_at,
+                 (SELECT COUNT(*) FROM reply_like crl WHERE crl.reply_id = cr.id) AS total_likes_on_reply,
+                 (SELECT COUNT(*) FROM reply_comment rc WHERE rc.reply_id = cr.id) AS total_comment_on_reply
+            FROM 
+                comment_reply cr
+            JOIN
+                users u
+            ON 
+                cr.user_id = u.id
+            WHERE 
+                cr.comment_id IN (
+                    SELECT id FROM comments WHERE post_id = ?
+                )`,
+      [postId]
+    );
+
+    // Fetch all replies to replies (nested replies)
+    const [nestedReplies] = await pool.execute(
+      `SELECT 
+                rc.id AS nested_reply_id,
+                rc.reply_id AS parent_reply_id,
+                rc.user_id AS nested_reply_user_id,
+                rc.content AS nested_reply_content,
+                u.full_name AS nested_reply_user_full_name,
+                u.user_name AS nested_reply_user_user_name,
+                u.profile_image AS nested_reply_user_profile_image
+                
+            FROM 
+                reply_comment rc
+            JOIN
+                users u
+            ON 
+                rc.user_id = u.id
+            WHERE
+                rc.reply_id IN (
+                    SELECT id FROM comment_reply WHERE comment_id IN (
+                        SELECT id FROM comments WHERE post_id = ?
+                    )
+                )`,
+      [postId]
+    );
+
+    console.log("=========replies=============>", replies);
+
+    // Group replies by comment ID
+    const groupedReplies = replies.reduce((acc, reply) => {
+      if (!acc[reply.comment_id]) {
+        acc[reply.comment_id] = [];
+      }
+      acc[reply.comment_id].push({
+        reply_id: reply.reply_id,
+        reply_content: reply.reply_content,
+        reply_user_full_name: reply.reply_user_full_name,
+        reply_user_user_name: reply.reply_user_user_name,
+        reply_user_profile_image: reply.reply_user_profile_image,
+        reply_created_at: reply.reply_created_at,
+        total_likes_on_reply: reply.total_likes_on_reply,
+        total_comment_on_reply: reply.total_comment_on_reply,
+        user_id: reply?.user_id,
+        post_owner_id: postOwnerId, // Add post owner ID to each reply
+        // Nested replies (reply to reply)
+        nested_replies: [],
+      });
+      return acc;
+    }, {});
+
+    // Group nested replies by reply ID
+    const groupedNestedReplies = nestedReplies.reduce((acc, nestedReply) => {
+      if (!acc[nestedReply.parent_reply_id]) {
+        acc[nestedReply.parent_reply_id] = [];
+      }
+      acc[nestedReply.parent_reply_id].push({
+        nested_reply_id: nestedReply.nested_reply_id,
+        nested_reply_content: nestedReply.nested_reply_content,
+        nested_reply_user_full_name: nestedReply.nested_reply_user_full_name,
+        nested_reply_user_user_name: nestedReply.nested_reply_user_user_name,
+        nested_reply_user_profile_image: nestedReply.nested_reply_user_profile_image,
+        nested_reply_created_at: nestedReply.nested_reply_created_at,
+        post_owner_id: postOwnerId, // Add post owner ID to each nested reply
+      });
+      return acc;
+    }, {});
+
+    // Attach nested replies to their respective replies
+    for (const reply of replies) {
+      const nested = groupedNestedReplies[reply.reply_id] || [];
+      const replyIndex = groupedReplies[reply.comment_id].findIndex(r => r.reply_id === reply.reply_id);
+      if (replyIndex !== -1) {
+        groupedReplies[reply.comment_id][replyIndex].nested_replies = nested;
+      }
+    }
+
+    // Attach replies (with nested replies) to their respective comments
+    const finalComments = getComments.map((comment) => ({
+      ...comment,
+      post_owner_id: postOwnerId, // Add post owner ID to each comment
+      replies: groupedReplies[comment.id] || [],
+    }));
+
+    return res.status(200).json({
+      message: "All comments of post",
+      data: finalComments,
+      // post_owner_id: postOwnerId, // Add the post owner's user_id to the response
+    });
+  } catch (error) {
+    console.log("Error to get data", error);
+    res.status(500).json({
+      error: "Internal Server Error",
+    });
+  }
 }
 
 
@@ -1385,6 +1564,7 @@ async function   deleteComments(req, res) {
     const UserId = req.user.userId; // extrcting from token
     const { id } = req.params;       // Extract comment ID from request body
 
+    
     // Begin a database transaction
     // await pool.execute('START TRANSACTION');
 
@@ -1395,7 +1575,7 @@ async function   deleteComments(req, res) {
 
     // Delete the comment
     const [commentData] = await pool.execute(
-      'DELETE FROM comments WHERE id = ? AND user_id = ?', [id, UserId]
+      'DELETE FROM comments WHERE id = ?', [id]
     );
     console.log("===Comment Deleted===>", commentData);
 
