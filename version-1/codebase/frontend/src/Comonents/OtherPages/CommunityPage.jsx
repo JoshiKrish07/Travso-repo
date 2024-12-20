@@ -133,6 +133,19 @@ const CommunityPage = () => {
     }
   };
 
+//   const handleBuddiesStoryNext = () => {
+//   setCurrentBuddiesReelIndex((prevIndex) =>
+//     prevIndex < activeStories.length - 1 ? prevIndex + 1 : prevIndex
+//   );
+// };
+
+// const handleBuddiesStoryPrevious = () => {
+//   setCurrentBuddiesReelIndex((prevIndex) =>
+//     prevIndex > 0 ? prevIndex - 1 : prevIndex
+//   );
+// };
+
+
   /* This function is running when clicked on any active story */
   const handleItemBuddiesStoryClick = async (itemId, index) => {
     // console.log("===itemId====>", itemId);
@@ -614,6 +627,7 @@ const CommunityPage = () => {
                           setIsShowvisibleStoryViewID={setIsShowvisibleStoryViewID}
                           isCreateSocialPopup={isCreateSocialPopup}
                           setIsCreateSocialPopup={setIsCreateSocialPopup}
+                          isOpen={isCreateSocialPopupUserItself}
                         />
                       )}
                     </div>
@@ -641,9 +655,9 @@ const CommunityPage = () => {
                   )}
                 </div>
                 {activeStories &&
-                  activeStories.map((user, index) => {
+                  activeStories.slice(1).map((user, index) => {
                     return (
-                      index > 0 && (
+                      // index > 0 && (
                         <div
                           key={user.id}
                           className="flex flex-col items-center mb-2 mr-2"
@@ -664,7 +678,7 @@ const CommunityPage = () => {
                             }
                           </p>
                         </div>
-                      )
+                      // )
                     );
                   })}
                 {popupBuddiesReelVisible && (
@@ -786,9 +800,9 @@ const CommunityPage = () => {
                           {activeStories &&
                             activeStories.slice(1).map((story, storyIndex) => {
                               return story.stories.map((userStory, index) => {
-                                console.log("===userStory===>", userStory);
-                                console.log("===currentBuddiesReelIndex===>", currentBuddiesReelIndex);
-                                console.log("===index===>", index);
+                                // console.log("===userStory===>", userStory);
+                                // console.log("===currentBuddiesReelIndex===>", currentBuddiesReelIndex);
+                                // console.log("===index===>", index);
                                 return (
                                   <div
                                     key={userStory?.id}
@@ -1178,35 +1192,6 @@ const CommunityPage = () => {
                                           )}
                                       </div>
                                     </div>
-                                    {/* {media.type === "image" ? (
-                                  <img
-                                    src={media.src}
-                                    alt={`Slide ${index + 1}`}
-                                    className="w-full h-[650px] object-cover rounded-lg"
-                                    loading="lazy"
-                                  />
-                                ) : (
-                                  <video
-                                    src={media.src}
-                                    controls
-                                    className="w-full h-[650px] object-cover rounded-lg"
-                                  />
-                                )} */}
-                                    {/* {userStory?.media_url?.length > 0 ? (
-                                      <img
-                                        src={userStory?.media_url[0]}
-                                        alt={`Media`}
-                                        className="w-full h-[650px] object-cover rounded-lg"
-                                        loading="lazy"
-                                        onMouseEnter={() => increaseViewersCount(userStory?.id)}
-                                      />
-                                    ) : (
-                                      <video
-                                        src={userStory.src}
-                                        controls
-                                        className="w-full h-[650px] object-cover rounded-lg"
-                                      />
-                                    )} */}
                                     <div>
                                     {userStory?.media_url?.length > 0 ? (
                                       userStory?.media_url.map(
@@ -1483,11 +1468,12 @@ const CommunityPage = () => {
                             <div className="relative w-full max-w-4xl mx-auto">
                               {/* Slider */}
                               <div className="overflow-hidden relative mb-4">
-                                <div>
+                                <div className="cursor-pointer">
                                   <img
                                     src={post?.media_url[0]}
                                     alt={`Post Image`}
                                     className="rounded-lg w-full h-[432px] object-cover transition duration-500"
+                                    onClick={() => handleOpenCommentPopup(post?.id)}
                                   />
                                 </div>
                               </div>
@@ -1501,11 +1487,12 @@ const CommunityPage = () => {
                             <div className="relative w-full max-w-4xl mx-auto">
                               {/* Slider */}
                               <div className="overflow-hidden relative mb-4">
-                                <div>
+                                <div className="cursor-pointer">
                                   <img
                                     src={post?.media_url[currentIndex]}
                                     alt={`Slide ${currentIndex}`}
                                     className="rounded-lg w-full h-[432px] object-cover transition duration-500"
+                                    onClick={() => handleOpenCommentPopup(post?.id)}
                                   />
                                 </div>
                               </div>

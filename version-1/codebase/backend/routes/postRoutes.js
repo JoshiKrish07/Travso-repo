@@ -15,6 +15,7 @@ const verifyToken = require("../utils/verifyToken");
 router.get('/allposts', verifyToken, communityPagePosts );
 // router.get('/allposts/:userId', communityPagePosts );   // for testing
 router.get('/stories', verifyToken, getActiveStories);
+// router.get('/stories/:userid', getActiveStories);  // for testing
 router.get('/comments/:postId', getPostComments);
 // router.get('/userpost/:postId', getUserPosts);
 router.get('/userpost',verifyToken, getUserPosts);

@@ -80,6 +80,14 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
   if (!isOpen) return null;
 
   return (
+    <>
+    <style>
+        {`
+          .no-scroll {
+            overflow: hidden;
+          }
+        `}
+    </style>
     <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-[16px] shadow-lg w-[696px] px-1 py-5 md:w-[696px] h-[672px] flex flex-col overflow-hidden">
         {/* Header */}
@@ -263,7 +271,24 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
 
         {/*---------- Scrollable Part ---------*/}
         <div className="mb-3 px-4 flex-1 overflow-y-auto scrollbar-hidden">
-          {images.length > 0 && (
+
+          {
+            images.length === 1 && (
+              <div>
+                <div className="overflow-hidden relative">
+                  <div>
+                    <img
+                      src={images[0]}
+                      alt={`Slide ${0}`}
+                      className="rounded-lg w-full h-[344px] object-cover transition duration-500"
+                    />
+                  </div>
+                </div>
+              </div>
+            )
+          }
+
+          {images.length > 1 && (
             <>
               <div className="relative w-full max-w-4xl mx-auto">
                 {/* Slider */}
@@ -351,6 +376,7 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -5,7 +5,7 @@ import Boy2 from "../../assets/headerIcon/boy2.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import dummyUserImage from "../../assets/user_image-removebg-preview.png";
 import { useLocation, useNavigate } from "react-router-dom";
-import { addBuddy, getUserBuddies, getUserFollowers, removeBuddy, toWhomUserIsFollowing } from "../../redux/slices/authSlice";
+import { addBuddy, getSuggestionList, getUserBuddies, getUserFollowers, removeBuddy, toWhomUserIsFollowing } from "../../redux/slices/authSlice";
 import { followUnfollow, followUnfollowOnFollowing } from "../../redux/slices/postSlice";
 
 const Rightbar = () => {
@@ -234,6 +234,7 @@ const Rightbar = () => {
         await dispatch(getUserFollowers());
         await dispatch(getUserBuddies());
         await dispatch(toWhomUserIsFollowing());
+        await dispatch(getSuggestionList());
       }
     } catch (error) {
       console.log("==error in handleFollowUnfollow==", error);
@@ -249,6 +250,7 @@ const Rightbar = () => {
         await dispatch(getUserFollowers());
         await dispatch(toWhomUserIsFollowing());
         await dispatch(getUserBuddies());
+        await dispatch(getSuggestionList());
       }
     } catch (error) {
       console.log("==error in handleFollowUnfollowForFollowing==", error);

@@ -109,9 +109,29 @@ const SharePopup = ({ isOpen, onClose, postId,userName }) => {
     }
   };
 
+  // Disable body scroll when popup is open
+    useEffect(() => {
+      if (isOpen) {
+        document.body.classList.add("no-scroll");
+      } else {
+        document.body.classList.remove("no-scroll");
+      }
+      return () => {
+        document.body.classList.remove("no-scroll");
+      };
+    }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
+    <>
+    <style>
+        {`
+          .no-scroll {
+            overflow: hidden;
+          }
+        `}
+    </style>
     <div className="fixed top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.15)] flex items-center justify-center z-50">
       <div className="bg-white rounded-[16px] shadow-lg w-[696px] px-5 py-5 md:w-[696px] h-[660px] flex flex-col overflow-hidden">
         {/* Header */}
@@ -205,6 +225,7 @@ const SharePopup = ({ isOpen, onClose, postId,userName }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
