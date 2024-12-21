@@ -701,35 +701,66 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                   <div className="relative w-full max-w-4xl mx-auto">
                     <div className="overflow-hidden relative">
                       <div>
-                        <img
-                          // src={images[currentIndex]}
-                          src={
-                            mediaArray &&
-                            mediaArray.length > 0 &&
-                            mediaArray[currentIndex]
-                          }
-                          alt={`Slide ${currentIndex}`}
-                          className="rounded-lg w-full h-[344px] object-cover transition duration-500"
-                        />
+                        {mediaArray[currentIndex]?.match(
+                          /\.(mp4|mov|webm|avi|mkv|flv|wmv|ogv|3gp)$/i
+                        ) ? (
+                          <video
+                            controls
+                            preload="auto"
+                            className="rounded-lg w-full h-[344px] object-cover transition duration-500"
+                          >
+                            <source
+                              src={mediaArray[currentIndex]}
+                              type="video/mp4"
+                            />
+                            Your browser does not support the video tag.
+                          </video>
+                        ) : (
+                          <img
+                            src={
+                              mediaArray &&
+                              mediaArray.length > 0 &&
+                              mediaArray[currentIndex]
+                            }
+                            alt={`Slide ${currentIndex}`}
+                            className="rounded-lg w-full h-[344px] object-cover transition duration-500"
+                          />
+                        )}
                       </div>
                     </div>
                   </div>
                 )}
+
                 {/* Slider */}
                 {mediaArray && mediaArray.length > 1 && (
                   <div className="relative w-full max-w-4xl mx-auto">
                     <div className="overflow-hidden relative">
                       <div>
-                        <img
-                          // src={images[currentIndex]}
-                          src={
-                            mediaArray &&
-                            mediaArray.length > 0 &&
-                            mediaArray[currentIndex]
-                          }
-                          alt={`Slide ${currentIndex}`}
-                          className="rounded-lg w-full h-[344px] object-cover transition duration-500"
-                        />
+                        {mediaArray[currentIndex]?.match(
+                          /\.(mp4|mov|webm|avi|mkv|flv|wmv|ogv|3gp)$/i
+                        ) ? (
+                          <video
+                            controls
+                            preload="auto"
+                            className="rounded-lg w-full h-[344px] object-cover transition duration-500"
+                          >
+                            <source
+                              src={mediaArray[currentIndex]}
+                              type="video/mp4"
+                            />
+                            Your browser does not support the video tag.
+                          </video>
+                        ) : (
+                          <img
+                            src={
+                              mediaArray &&
+                              mediaArray.length > 0 &&
+                              mediaArray[currentIndex]
+                            }
+                            alt={`Slide ${currentIndex}`}
+                            className="rounded-lg w-full h-[344px] object-cover transition duration-500"
+                          />
+                        )}
                       </div>
                     </div>
 
@@ -767,16 +798,18 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                     </div>
                   </div>
                 )}
+
                 {/* Post Description */}
                 <p className="font-inter font-medium text-[14px] text-[#212626] text-left text-justify mb-1">
                   {isFullTextVisible
-                    ? allPosts && allPosts[0].description
-                    : allPosts && `${allPosts[0].description.slice(0, 100)}...`}
+                    ? allPosts && allPosts[0]?.description
+                    : allPosts &&
+                      `${allPosts[0]?.description?.slice(0, 100)}...`}
                   <span
                     onClick={toggleFullText}
                     className="text-[#2DC6BE] cursor-pointer"
                   >
-                    {allPosts && allPosts[0].description.length < 100
+                    {allPosts && allPosts[0]?.description?.length < 100
                       ? ""
                       : isFullTextVisible
                       ? " Show less"
@@ -786,7 +819,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
 
                 {/* Hashtags */}
                 <p className="text-left text-[#1DB2AA] mb-2">
-                  {allPosts && allPosts[0].tag_id}
+                  {allPosts && allPosts[0]?.tag_id}
                 </p>
               </div>
               {/*---------- Scrollable Part ---------*/}
@@ -936,7 +969,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                             <img
                               src={userPosts?.profile_image || dummyUserImage}
                               alt="User"
-                              className="w-8 h-8 rounded-full"
+                              className="w-9 h-8 rounded-full"
                             />
 
                             {/* Content Section */}
@@ -1529,7 +1562,7 @@ const CommentPopup = ({ isOpen, onClose, postId }) => {
                       dummyUserImage
                     }
                     alt="Profile"
-                    className="w-10 h-10 rounded-full"
+                    className="w-10 h-9 rounded-full object-cover"
                   />
 
                   {/* <div>

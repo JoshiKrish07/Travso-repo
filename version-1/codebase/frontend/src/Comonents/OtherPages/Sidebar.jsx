@@ -9,7 +9,7 @@ import Seventh from "../../assets/PostImage/seventh.png";
 import Eighth from "../../assets/PostImage/eigth.png";
 import Ninth from "../../assets/PostImage/ninth.png";
 import Tenth from "../../assets/PostImage/first.png";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 const Sidebar = () => {
@@ -174,14 +174,16 @@ const Sidebar = () => {
         {/* Header Section */}
         <div className="flex justify-between items-center pb-3">
           <h2 className="text-lg font-semibold text-gray-800">About me</h2>
-          <button
-            aria-label="Edit Info"
-            className="flex items-center text-[#2DC6BE]"
-          >
-            <span className="font-inter font-medium text-[14px] text-[#2DC6BE] cursor-pointer hover:underline">
-              Edit
-            </span>
-          </button>
+          <Link to="/editprofile">
+            <button
+              aria-label="Edit Info"
+              className="flex items-center text-[#2DC6BE]"
+            >
+              <span className="font-inter font-medium text-[14px] text-[#2DC6BE] cursor-pointer hover:underline">
+                Edit
+              </span>
+            </button>
+          </Link>
         </div>
 
         {/* Info List */}
@@ -309,7 +311,7 @@ const Sidebar = () => {
         <div className="grid grid-cols-3 gap-2">
           {/* Dynamically render images and titles */}
 
-          {visiblePosts &&
+          {/* {visiblePosts &&
             visiblePosts.map(
               (post) =>
                 post.media_url.length > 0 && (
@@ -319,6 +321,33 @@ const Sidebar = () => {
                       alt={post.description}
                       className="w-full h-[130px] rounded-sm object-cover"
                     />
+                  </div>
+                )
+            )} */}
+
+          {visiblePosts &&
+            visiblePosts.map(
+              (post) =>
+                post.media_url.length > 0 && (
+                  <div key={post.id}>
+                    {post.media_url[0]?.match(
+                      /\.(mp4|mov|webm|avi|mkv|flv|wmv|ogv|3gp)$/i
+                    ) ? (
+                      <video
+                        controls
+                        preload="auto"
+                        className="w-full h-[130px] rounded-sm object-cover"
+                      >
+                        <source src={post.media_url[0]} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : (
+                      <img
+                        src={post.media_url[0]}
+                        alt={post.description}
+                        className="w-full h-[130px] rounded-sm object-cover"
+                      />
+                    )}
                   </div>
                 )
             )}

@@ -70,7 +70,7 @@ const ProfilePageHeaderData = () => {
 
   return (
     <div className="mt-5 bg-[#F0F7F7] flex justify-center items-center">
-      <div className="w-full max-w-[98%] h-[714px] bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col items-center">
+      <div className="w-full max-w-[98%] h-full bg-white rounded-lg shadow-[0_4px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col items-center">
         {/* Cover Photo Section */}
         <div className="flex flex-col justify-center w-full max-w-98% p-4 px-4">
           <div>
@@ -191,7 +191,7 @@ const ProfilePageHeaderData = () => {
                 {userDetails?.description?.length > maxWordLimit && (
                   <span
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="text-blue-500 hover:underline cursor-pointer ml-1"
+                    className="text-[#2dc6be] hover:underline cursor-pointer ml-1"
                   >
                     {isExpanded ? "See Less" : "See More"}
                   </span>

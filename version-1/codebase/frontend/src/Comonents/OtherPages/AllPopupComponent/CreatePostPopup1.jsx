@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Girl from "../../../assets/headerIcon/girl.jpg";
 import chevron_down from "../../../assets/chevron-down.png";
 import ImageBoxed from "../../../assets/ImageBoxed.png";
+import image_add_logo from "../../../assets/image_add_logo.png";
 import BadgesIconFirst from "../../../assets/BadgesIconFirst.png";
 import Select from "react-select";
 import "./AllPopupPage.css";
@@ -34,20 +35,52 @@ const CreateaPostPopup = ({
   const [showTagBuddySuggestions, setShowBuddyTagSuggestions] = useState(false);
   const [buddyInput, setBuddyInput] = useState("");
   const [tagInput, setTagInput] = useState("");
-  const inputRef = useRef(null);
   const [showTagSuggestion, setShowTagSuggestion] = useState(false);
   const [filteredTagSuggestions, setFilteredTagSuggestions] = useState([]);
   const [isPostDetailPopup, setIsPostDetailPopup] = useState(false);
   const fileInputRef = useRef(null); // Create a ref for the file input
 
-  const validate = async () => {};
+  const validateFields = () => {
+    const {
+      description,
+      location,
+      buddies,
+      tags,
+      media_url,
+      buddies_id,
+    } = postData;
+
+    // Check if all fields are empty
+    // if (
+    //   !description.trim() &&
+    //   !location.trim() &&
+    //   buddies.length === 0 &&
+    //   tags.length === 0 &&
+    //   media_url.length === 0 &&
+    //   buddies_id.length === 0
+    // ) {
+    //   return false;
+    // }
+
+    if (
+      !description.trim() &&
+      media_url.length === 0 
+    ) {
+      return false;
+    }
+    return true;
+  };
 
   const handlePostUpload = async () => {
-    console.log("running");
-    const isValid = await validate();
-    onClose();
-    // setIsPostDetailPopup(true);
-    openPostDetail();
+    // console.log("running");
+    const isValid = await validateFields();
+    if(isValid) {
+      onClose();
+      // setIsPostDetailPopup(true);
+      openPostDetail();
+    } else {
+      alert("At least discription or image is required.");
+    }
   };
 
   const handlePostDetailPopup = () => {
@@ -130,6 +163,15 @@ const CreateaPostPopup = ({
     }));
   };
 
+  /* handle location set */
+  const handleLocationInputChange = async(e) => {
+    const { value } = e.target;
+    setPostData((prev) => ({
+      ...prev,
+      location: value,
+    }));
+  }
+
   const handleSuggestionClick = (person) => {
     // Add selected buddy to postData.buddies
     setPostData((prevData) => {
@@ -141,7 +183,16 @@ const CreateaPostPopup = ({
         ...prevData,
         buddies: [
           ...prevData.buddies,
-          { id: person.id, name: person.full_name },
+          {
+             id: person.id,
+             name: person.full_name, 
+             profile_image: person.profile_image,
+             followers_count: person.followers_count || 0,
+             buddies_count: person.buddies_count || 0,
+             trips_count: person.trips_count || 0,
+             role: person.user_role,
+             user_name: person.user_name
+          },
         ],
         buddies_id: [...prevData.buddies_id, person.id], // Maintain IDs separately
       };
@@ -226,6 +277,7 @@ const CreateaPostPopup = ({
 
   const handleFileChange = (e) => {
     const files = e.target.files;
+    console.log("===files===>", files);
     if (files.length > 0) {
       handleFileSelect(files);
     }
@@ -254,7 +306,7 @@ const CreateaPostPopup = ({
   };
 
   /* for setting image in postData */
-  const handleFileSelect = (files) => {
+  const handleFileSelect1 = (files) => {
     const file = files[0];
     const reader = new FileReader();
 
@@ -269,6 +321,25 @@ const CreateaPostPopup = ({
     reader.readAsDataURL(file); // Read the file as base64
   };
 
+  const handleFileSelect = (files) => {
+
+    for(let img in files) {
+
+      const file = files[img];
+      const reader = new FileReader();
+  
+      reader.onloadend = () => {
+        const imageUrl = reader.result; // Base64 encoded image
+        setPostData((prevState) => ({
+          ...prevState,
+          media_url: [...prevState.media_url, imageUrl], // Add image URL to media_url array
+        }));
+      };
+  
+      reader.readAsDataURL(file); // Read the file as base64
+    }
+  };
+
   // Remove image from media_url
   const handleRemoveImage = (index) => {
     console.log("=====index====>", index);
@@ -281,9 +352,29 @@ const CreateaPostPopup = ({
     });
   };
 
+  // Disable body scroll when popup is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add("no-scroll");
+    } else {
+      document.body.classList.remove("no-scroll");
+    }
+    return () => {
+      document.body.classList.remove("no-scroll");
+    };
+  },[isOpen]);
+  
   if (!isOpen) return null;
 
   return (
+    <>
+    <style>
+        {`
+          .no-scroll {
+            overflow: hidden;
+          }
+        `}
+    </style>
     <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-[16px] shadow-lg w-[696px] px-1 py-5 md:w-[696px] h-[672px] flex flex-col overflow-hidden">
         {/* Header */}
@@ -325,7 +416,7 @@ const CreateaPostPopup = ({
                 </div>
                 <div>
                   <p className="-mt-2 font-inter font-medium text-[16px] text-[#667877] text-left">
-                    @{userDetails?.user_name}
+                    {userDetails?.user_name}
                   </p>
                 </div>
               </div>
@@ -393,12 +484,19 @@ const CreateaPostPopup = ({
                 <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">
                   Add Location ( Only one )
                 </p>
-                <Select
+                {/* <Select
                   options={options}
                   onChange={handleLocationChange}
                   placeholder="eg: Mysore"
                   className=""
-                />
+                /> */}
+                <input
+                    type="text"
+                    onChange={(e) => handleLocationInputChange(e)}
+                    placeholder= "eg: Mysore"
+                    value={postData?.location || ""}
+                    className="flex-grow font-inter font-medium text-[16px] text-[#212626] w-full p-3 h-[48px] bg-[#F0F7F7] rounded-[8px] border-1 border-[#F5F5F5] placeholder:text-[#869E9D] focus:outline-none focus:ring-1 focus:ring-[#5E6F78] placeholder:font-inter placeholder:font-medium placeholder:text-[16px]"
+                  />
               </div>
 
               {/* <div className="flex flex-col">
@@ -451,7 +549,8 @@ const CreateaPostPopup = ({
                 
               </div> */}
 
-              <div className="flex flex-col">
+              {/* Prashant Code Start */}
+              <div className="flex flex-col relative">
                 <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">
                   Add Buddies
                 </p>
@@ -501,7 +600,7 @@ const CreateaPostPopup = ({
 
                 {/* Search show dropdown */}
                 {showTagBuddySuggestions && filteredSuggestions.length > 0 && (
-                  <div className="absolute top-[335px] bg-white border border-gray-200 rounded shadow-lg w-[656px] z-10">
+                  <div className="absolute top-[80px] bg-white border border-gray-200 rounded shadow-lg w-[656px] z-10">
                     <ul className="max-h-40 overflow-y-auto">
                       {filteredSuggestions.map((person) => (
                         <li
@@ -517,7 +616,7 @@ const CreateaPostPopup = ({
                 )}
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex flex-col relative">
                 <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">
                   Add Tags (Up to 10)
                 </p>
@@ -566,7 +665,7 @@ const CreateaPostPopup = ({
                 </div>
 
                 {/* Search show dropdown */}
-                {showTagBuddySuggestions && filteredSuggestions.length > 0 && (
+                {/* {showTagBuddySuggestions && filteredSuggestions.length > 0 && (
                   <div className="absolute top-[335px] bg-white border border-gray-200 rounded shadow-lg w-[656px] z-10">
                     <ul className="max-h-40 overflow-y-auto">
                       {filteredSuggestions.map((person) => (
@@ -580,8 +679,9 @@ const CreateaPostPopup = ({
                       ))}
                     </ul>
                   </div>
-                )}
+                )} */}
               </div>
+              {/* Prashant Code End */}
 
               {/* <div className="flex flex-col">
                 <p className="text-left font-inter font-medium text-[14px] text-[#212626] mb-3">
@@ -636,34 +736,55 @@ const CreateaPostPopup = ({
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
               >
-                <div className="flex flex-col items-center justify-center gap-2">
-                  <div className="cursor-pointer">
+                <div className={`flex flex-col ${postData.media_url.length > 0 ? "items-start": "items-center" } justify-center gap-2`}>
+                  <div className="cursor-pointer flex flex-col items-center">
                     {postData.media_url.length > 0 ? (
                       <div className="flex gap-2">
                         {postData.media_url.map((url, index) => (
-                          <div key={index} className="relative inline-block">
+                          <div
+                            key={index}
+                            className="relative inline-block items-start"
+                          >
                             <img
                               key={index}
                               src={url}
                               alt={`Uploaded ${index}`}
-                              className="w-[32px] h-[32px]"
+                              className="w-[100px] h-[110px] object-cover"
                             />
                             {/* Cancel button */}
                             <button
                               type="button"
                               onClick={() => handleRemoveImage(index)}
-                              className="absolute top-0 right-0 text-red-500 p-1"
+                              className="absolute top-0 right-0 bg-[#2dc6be] p-1 rounded-l-[8px] rounded-t-[0px]"
                             >
-                              cancel
+                              <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M12 4L4 12M4 4L12 12"
+                                  stroke="white"
+                                  strokeWidth="1.33333"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
                             </button>
                           </div>
                         ))}
                         <button
                           type="button"
                           onClick={handleClick}
-                          className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[82px] h-[36px]"
+                          className="font-inter font-medium text-[14px] flex items-center justify-center bg-[#2DC6BE] text-white rounded-[7px] w-[100px] h-[112px]"
                         >
-                          Add
+                          <img
+                            src={image_add_logo}
+                            alt="image_add_logo"
+                            className=""
+                            />
                         </button>
                       </div>
                     ) : (
@@ -725,6 +846,7 @@ const CreateaPostPopup = ({
         </div>
       </div>
     </div>
+    </>
   );
 };
 

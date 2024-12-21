@@ -60,6 +60,7 @@ const CommunityPage = () => {
   let scrollLeft;
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndices, setCurrentIndices] = useState({}); // to track slider effect on post images
   const [isFullTextVisible, setIsFullTextVisible] = useState(false);
   const [isCreatePostPopup, setIsCreatePostPopup] = useState(false);
   const [isPostDetailPopup, setIsPostDetailPopup] = useState(false);
@@ -83,9 +84,9 @@ const CommunityPage = () => {
     useState(false);
   const [isCreateSocialPopupUserItself, setIsCreateSocialPopupUserItself] =
     useState(false);
-  const [isShowvisibleStoryViewID, setIsShowvisibleStoryViewID] = useState(false);
+  const [isShowvisibleStoryViewID, setIsShowvisibleStoryViewID] =
+    useState(false);
   const [openDropdownIdUser, setOpenDropdownIdUser] = useState(null);
-
 
   const hadleShowViewStory = (storyId) => {
     setIsShowvisibleStoryViewID(!isShowvisibleStoryViewID);
@@ -113,6 +114,8 @@ const CommunityPage = () => {
   const [currentBuddiesReelIndex, setCurrentBuddiesReelIndex] = useState(0);
   const [dropdownOpenSetting, setDropdownOpenSetting] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false); // working on reply on comment
+  const [showEmojiPickerStory, setShowEmojiPickerStory] = useState(false); // working on reply on comment
+  const [activeEmojiStoryId, setActiveEmojiStoryId] = useState(null); // To track the active story
   const [storyReply, setStoryReply] = useState({});
 
   const toggleSetting = () => {
@@ -133,18 +136,17 @@ const CommunityPage = () => {
     }
   };
 
-//   const handleBuddiesStoryNext = () => {
-//   setCurrentBuddiesReelIndex((prevIndex) =>
-//     prevIndex < activeStories.length - 1 ? prevIndex + 1 : prevIndex
-//   );
-// };
+  //   const handleBuddiesStoryNext = () => {
+  //   setCurrentBuddiesReelIndex((prevIndex) =>
+  //     prevIndex < activeStories.length - 1 ? prevIndex + 1 : prevIndex
+  //   );
+  // };
 
-// const handleBuddiesStoryPrevious = () => {
-//   setCurrentBuddiesReelIndex((prevIndex) =>
-//     prevIndex > 0 ? prevIndex - 1 : prevIndex
-//   );
-// };
-
+  // const handleBuddiesStoryPrevious = () => {
+  //   setCurrentBuddiesReelIndex((prevIndex) =>
+  //     prevIndex > 0 ? prevIndex - 1 : prevIndex
+  //   );
+  // };
 
   /* This function is running when clicked on any active story */
   const handleItemBuddiesStoryClick = async (itemId, index) => {
@@ -220,21 +222,59 @@ const CommunityPage = () => {
     setIsFullTextVisible(!isFullTextVisible);
   };
 
-  const goToPrevious = (mediaLength) => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? mediaLength - 1 : prevIndex - 1
-    );
+  // const goToPrevious = (mediaLength) => {
+  //   setCurrentIndex((prevIndex) =>
+  //     prevIndex === 0 ? mediaLength - 1 : prevIndex - 1
+  //   );
+  // };
+
+  // const goToNext = (mediaLength) => {
+  //   setCurrentIndex((prevIndex) =>
+  //     prevIndex === mediaLength - 1 ? 0 : prevIndex + 1
+  //   );
+  // };
+
+  // const goToSlide = (index) => {
+  //   setCurrentIndex(index);
+  // };
+
+  /* for changing the image through slider starts */
+
+  // Go to Previous Slide
+  const goToPrevious = (postId, imgArrLength) => {
+    setCurrentIndices((prevIndices) => ({
+      ...prevIndices,
+      [postId]:
+        prevIndices[postId] !== undefined
+          ? prevIndices[postId] === 0
+            ? imgArrLength - 1
+            : prevIndices[postId] - 1
+          : imgArrLength - 1,
+    }));
   };
 
-  const goToNext = (mediaLength) => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === mediaLength - 1 ? 0 : prevIndex + 1
-    );
+  // Go to Next Slide
+  const goToNext = (postId, imgArrLength) => {
+    setCurrentIndices((prevIndices) => ({
+      ...prevIndices,
+      [postId]:
+        prevIndices[postId] !== undefined
+          ? prevIndices[postId] === imgArrLength - 1
+            ? 0
+            : prevIndices[postId] + 1
+          : 1,
+    }));
   };
 
-  const goToSlide = (index) => {
-    setCurrentIndex(index);
+  // Go to Specific Slide
+  const goToSlide = (postId, index) => {
+    setCurrentIndices((prevIndices) => ({
+      ...prevIndices,
+      [postId]: index,
+    }));
   };
+
+  /* for changing the image through slider ends */
 
   // Sixth Section of Sample data for the popup
   const postDetails1 = {
@@ -443,13 +483,24 @@ const CommunityPage = () => {
   };
 
   /* Runs when user selects a emoji, then updates emoji in value */
+  // const handleEmojiClickStory = (emojiObject, storyId) => {
+  //   //  console.log("===storyId===>", storyId);
+  //   setStoryReply((prevReplies) => ({
+  //     ...prevReplies,
+  //     [storyId]: (prevReplies[storyId] || "") + emojiObject.emoji,
+  //   }));
+  //   // setShowEmojiPicker(false); // Close the emoji picker after selection
+  //   setShowEmojiPickerStory(false); // Close the emoji picker after selection
+  // };
+
   const handleEmojiClickStory = (emojiObject, storyId) => {
-    //  console.log("===storyId===>", storyId);
     setStoryReply((prevReplies) => ({
       ...prevReplies,
-      [storyId]: (prevReplies[storyId] || "") + emojiObject.emoji,
+      [storyId]: (prevReplies[storyId] || "") + emojiObject.emoji, // Append the selected emoji to the story's reply
     }));
-    setShowEmojiPicker(false); // Close the emoji picker after selection
+
+    setShowEmojiPickerStory(false); // Close the emoji picker after selection
+    setActiveEmojiStoryId(null); // Reset the active story ID
   };
 
   /* when user press enters on comment section after writing comment in story */
@@ -544,22 +595,28 @@ const CommunityPage = () => {
   };
 
   const toggleSettingStoryView = (storyId) => {
-    setOpenDropdownIdUser(storyId)
+    setOpenDropdownIdUser(storyId);
     // setDropdownOpenStoryViewSetting(!dropdownOpenStoryViewSetting);
   };
   /* showing story of user itself only ends */
 
-  const increaseViewersCount = async(storyId) =>  {
+  const increaseViewersCount = async (storyId) => {
     try {
       const response = await dispatch(addCountOnStoryView(storyId)).unwrap();
       // console.log("===response=increaseViewersCount=", response);
     } catch (error) {
-      console.log(
-        "==error in add story count==increaseViewersCount==>",
-        error
-      );
+      console.log("==error in add story count==increaseViewersCount==>", error);
     }
-  }
+  };
+
+  // const handleEmojiSelectUserID = (id) => {
+  //   setActiveEmojiStoryId((prevId) => (prevId === id ? null : id)); // Toggle the picker for the selected story
+  // };
+
+  const handleEmojiSelectUserID = (id) => {
+    setActiveEmojiStoryId((prevId) => (prevId === id ? null : id)); // Toggle the picker for the selected story
+    setShowEmojiPickerStory((prevId) => (prevId === id ? false : true)); // Ensure the picker state is consistent
+  };
 
   // console.log("===activestories", activeStories)
 
@@ -603,7 +660,7 @@ const CommunityPage = () => {
                         className="w-[64px] h-[64px] object-cover rounded-full border-2 border-[#2DC6BE] p-[2px]"
                         onClick={() => setIsCreateSocialPopupUserItself(true)}
                       />
-                       <p
+                      <p
                         className="font-inter font-medium text-[14px] mt-2 text-[#212626]"
                         onClick={() => setIsCreateSocialPopupUserItself(true)}
                       >
@@ -621,10 +678,12 @@ const CommunityPage = () => {
                           }
                           hadleShowViewStory={hadleShowViewStory}
                           isShowvisibleStoryViewID={isShowvisibleStoryViewID}
-                          storyData= {activeStories[0]}
+                          storyData={activeStories[0]}
                           openDropdownIdUser={openDropdownIdUser}
                           setOpenDropdownIdUser={setOpenDropdownIdUser}
-                          setIsShowvisibleStoryViewID={setIsShowvisibleStoryViewID}
+                          setIsShowvisibleStoryViewID={
+                            setIsShowvisibleStoryViewID
+                          }
                           isCreateSocialPopup={isCreateSocialPopup}
                           setIsCreateSocialPopup={setIsCreateSocialPopup}
                           isOpen={isCreateSocialPopupUserItself}
@@ -658,26 +717,26 @@ const CommunityPage = () => {
                   activeStories.slice(1).map((user, index) => {
                     return (
                       // index > 0 && (
-                        <div
-                          key={user.id}
-                          className="flex flex-col items-center mb-2 mr-2"
-                          style={{ flex: "0 0 auto" }}
-                          onClick={() =>
-                            handleItemBuddiesStoryClick(user.id, index)
-                          }
-                        >
-                          <img
-                            src={user.profile_image || dummyUserImage}
-                            alt={"Profile"}
-                            className="w-[64px] h-[64px] object-cover rounded-full border-2 border-[#2DC6BE] p-[2px]"
-                          />
-                          <p className="font-inter font-medium text-[14px] mt-2 text-[#212626]">
-                            {/* {user.full_name} */}
-                            {
-                              user.full_name.length > 7 ? user.full_name.slice(0, 7) + '...' : user.full_name
-                            }
-                          </p>
-                        </div>
+                      <div
+                        key={user.id}
+                        className="flex flex-col items-center mb-2 mr-2"
+                        style={{ flex: "0 0 auto" }}
+                        onClick={() =>
+                          handleItemBuddiesStoryClick(user.id, index)
+                        }
+                      >
+                        <img
+                          src={user.profile_image || dummyUserImage}
+                          alt={"Profile"}
+                          className="w-[64px] h-[64px] object-cover rounded-full border-2 border-[#2DC6BE] p-[2px]"
+                        />
+                        <p className="font-inter font-medium text-[14px] mt-2 text-[#212626]">
+                          {/* {user.full_name} */}
+                          {user.full_name.length > 7
+                            ? user.full_name.slice(0, 7) + "..."
+                            : user.full_name}
+                        </p>
+                      </div>
                       // )
                     );
                   })}
@@ -1043,8 +1102,15 @@ const CommunityPage = () => {
                                           fill="none"
                                           xmlns="http://www.w3.org/2000/svg"
                                           className="absolute left-2 cursor-pointer"
+                                          // onClick={() =>
+                                          //   setShowEmojiPickerStory(
+                                          //     !showEmojiPickerStory
+                                          //   )
+                                          // }
                                           onClick={() =>
-                                            setShowEmojiPicker(!showEmojiPicker)
+                                            handleEmojiSelectUserID(
+                                              userStory?.id
+                                            )
                                           }
                                         >
                                           <g clipPath="url(#clip0_40000261_30967)">
@@ -1066,21 +1132,33 @@ const CommunityPage = () => {
                                             </clipPath>
                                           </defs>
                                         </svg>
-                                        <div className="relative">
-                                          {showEmojiPicker && (
+                                        {/* {showEmojiPickerStory && (
+                                          <div className="absolute -top-[380px] left-0 z-50">
+                                            <EmojiPicker
+                                              onEmojiClick={(emojiObject) =>
+                                                handleEmojiClickStory(
+                                                  emojiObject,
+                                                  userStory?.id
+                                                )
+                                              }
+                                              className="w-[250px] h-[300px] shadow-lg rounded-lg"
+                                            />
+                                          </div>
+                                        )} */}
+                                        {activeEmojiStoryId === userStory.id &&
+                                          showEmojiPickerStory && (
                                             <div className="absolute -top-[380px] left-0 z-50">
                                               <EmojiPicker
                                                 onEmojiClick={(emojiObject) =>
                                                   handleEmojiClickStory(
                                                     emojiObject,
-                                                    userStory?.id
+                                                    userStory.id
                                                   )
                                                 }
                                                 className="w-[250px] h-[300px] shadow-lg rounded-lg"
                                               />
                                             </div>
                                           )}
-                                        </div>
                                       </div>
                                       <div>
                                         <svg
@@ -1193,34 +1271,34 @@ const CommunityPage = () => {
                                       </div>
                                     </div>
                                     <div>
-                                    {userStory?.media_url?.length > 0 ? (
-                                      userStory?.media_url.map(
-                                        (media, mediaIndex) => {
-                                          return (
-                                            <div key={mediaIndex}>
-                                              <img
-                                                // src={userStory?.media_url[0]}
-                                                src={media}
-                                                alt={`Media`}
-                                                className="w-full h-[650px] object-cover rounded-lg"
-                                                loading="lazy"
-                                                onMouseEnter={() =>
-                                                  increaseViewersCount(
-                                                    userStory?.id
-                                                  )
-                                                }
-                                              />
-                                            </div>
-                                          );
-                                        }
-                                      )
-                                    ) : (
-                                      <video
-                                        src={userStory.src}
-                                        controls
-                                        className="w-full h-[650px] object-cover rounded-lg"
-                                      />
-                                    )}
+                                      {userStory?.media_url?.length > 0 ? (
+                                        userStory?.media_url.map(
+                                          (media, mediaIndex) => {
+                                            return (
+                                              <div key={mediaIndex}>
+                                                <img
+                                                  // src={userStory?.media_url[0]}
+                                                  src={media}
+                                                  alt={`Media`}
+                                                  className="w-full h-[650px] object-cover rounded-lg"
+                                                  loading="lazy"
+                                                  onMouseEnter={() =>
+                                                    increaseViewersCount(
+                                                      userStory?.id
+                                                    )
+                                                  }
+                                                />
+                                              </div>
+                                            );
+                                          }
+                                        )
+                                      ) : (
+                                        <video
+                                          src={userStory.src}
+                                          controls
+                                          className="w-full h-[650px] object-cover rounded-lg"
+                                        />
+                                      )}
                                     </div>
                                   </div>
                                 );
@@ -1254,15 +1332,15 @@ const CommunityPage = () => {
                   </div>
                 )}
               </div>
-              <div className="flex items-center gap-2 mt-5">
+              <div className="flex items-center justify-between gap-2 mt-5 w-full">
                 {/* Profile Image */}
                 <img
                   src={userDetails?.profile_image || dummyUserImage}
                   alt="Profile"
-                  className="w-[44px] h-[44px] rounded-full"
+                  className="w-[48px] h-[44px] rounded-full object-cover"
                 />
 
-                <div className="flex items-center bg-[#F0F7F7] p-2 rounded-full w-[100%] h-[44px] ">
+                <div className="flex items-center bg-[#F0F7F7] p-2 rounded-full h-[44px] w-full">
                   {/* Input Field */}
                   <input
                     type="text"
@@ -1312,140 +1390,118 @@ const CommunityPage = () => {
                           />
                           <div>
                             <div className="flex items-center space-x-2">
-                              <h3 className="font-poppins font-semibold text-left text-[16px] text-[#212626]">
-                                {post?.full_name}
-                                {post?.buddies_id.length > 0 && (
-                                  <div className="flex space-x-1 relative inline-block">
-                                    <p
-                                      className="font-poppins font-semibold text-[20px] text-[#212626]"
-                                      // onClick={() =>
-                                      //   setIsotherDataVisible(!isotherDataVisible)
-                                      // }
-                                      onClick={() => togglePopup(post.id)}
-                                    >
-                                      {" "}
-                                      with
-                                      <span className="text-[#869E9D]"></span>{" "}
-                                      {post?.buddies_id?.length} others{" "}
-                                    </p>
-                                    <div className="relative">
-                                      {/* <img
-                                        src={BadgesIconFirst}
-                                        alt="BadgesIconFirst"
-                                        className="w-[24px] h-[24px]"
-                                      /> */}
-                                      <img
-                                        src={
-                                          badges[
-                                            userDetails?.badge
-                                              ?.split("-")[0]
-                                              ?.trim()
-                                          ] || null
-                                        }
-                                        alt="Badge"
-                                        className="absolute -top-[325px] left-[15px] w-[192px] h-[60px]"
-                                      />
-                                    </div>
+                              <div className="flex items-center">
+                                <h3 className="font-poppins font-semibold text-left text-[20px] text-[#212626]">
+                                  {post?.full_name}
+                                </h3>
+                                <div>
+                                  {post?.buddies_id.length > 0 && (
+                                    <div className="">
+                                      <p
+                                        className="font-poppins font-semibold text-[20px] text-[#212626] cursor-pointer"
+                                        onClick={() => togglePopup(post.id)}
+                                      >
+                                        <span className="text-[#869E9D]">
+                                          &nbsp;with
+                                        </span>{" "}
+                                        {post?.buddies_id?.length} others{" "}
+                                      </p>
 
-                                    {isotherDataVisible &&
-                                      showTaggedBuddiesPostId == post?.id && (
-                                        <div className="absolute mt-10 w-[416px] p-[24px] bg-white border border-gray-300 rounded-[16px] shadow-lg z-10 flex flex-col gap-[34px]">
-                                          {post?.buddies_id?.map((buddy) => {
-                                            return (
-                                              <div
-                                                className="flex flex-col"
-                                                key={buddy?.id}
-                                              >
-                                                <div className="flex items-center space-x-3">
-                                                  <div>
-                                                    <img
-                                                      src={
-                                                        buddy?.profile_image ||
-                                                        dummyUserImage
-                                                      }
-                                                      alt="Image"
-                                                      className="w-[44px] h-[44px] rounded-full"
-                                                    />
-                                                  </div>
-                                                  <div className="flex flex-col">
-                                                    <div className="flex items-center gap-2">
-                                                      <h5 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
-                                                        {buddy?.full_name}
-                                                      </h5>
-                                                      <div className="relative group">
-                                                        <img
-                                                          src={
-                                                            badges[
+                                      {isotherDataVisible &&
+                                        showTaggedBuddiesPostId == post?.id && (
+                                          <div className="absolute mt-0 w-[416px] p-[24px] bg-white border border-gray-300 rounded-[16px] shadow-lg z-10 flex flex-col gap-[34px]">
+                                            {post?.buddies_id?.map((buddy) => {
+                                              return (
+                                                <div
+                                                  className="flex flex-col"
+                                                  key={buddy?.id}
+                                                >
+                                                  <div className="flex items-center space-x-3">
+                                                    <div>
+                                                      <img
+                                                        src={
+                                                          buddy?.profile_image ||
+                                                          dummyUserImage
+                                                        }
+                                                        alt="Image"
+                                                        className="w-[44px] h-[44px] rounded-full"
+                                                      />
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                      <div className="flex items-center gap-2">
+                                                        <h5 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
+                                                          {buddy?.full_name}
+                                                        </h5>
+                                                        <div className="relative group">
+                                                          <img
+                                                            src={
+                                                              badges[
+                                                                buddy?.badge?.split(
+                                                                  "-"
+                                                                )[0]
+                                                              ] ||
+                                                              BadgesIconFirst
+                                                            }
+                                                            alt="BadgesIconFirst"
+                                                            className="w-[24px] h-[24px]"
+                                                          />
+                                                          <div className="absolute left-0 mt-1 hidden group-hover:block bg-[#2DC6BE] text-white text-sm p-2 rounded shadow-lg w-[250px] text-justify">
+                                                            {
                                                               buddy?.badge?.split(
                                                                 "-"
-                                                              )[0]
-                                                            ] || BadgesIconFirst
-                                                          }
-                                                          alt="BadgesIconFirst"
-                                                          className="w-[24px] h-[24px]"
-                                                        />
-                                                        <div className="absolute left-0 mt-1 hidden group-hover:block bg-[#2DC6BE] text-white text-sm p-2 rounded shadow-lg w-[250px] text-justify">
-                                                          {
-                                                            buddy?.badge?.split(
-                                                              "-"
-                                                            )[1]
-                                                          }
+                                                              )[1]
+                                                            }
+                                                          </div>
                                                         </div>
                                                       </div>
-                                                    </div>
-                                                    <div>
-                                                      <p className="-mt-2 font-inter font-medium text-[16px] text-[#667877] text-left">
-                                                        {buddy?.user_name}
-                                                      </p>
+                                                      <div>
+                                                        <p className="-mt-2 font-inter font-medium text-[16px] text-[#667877] text-left">
+                                                          {buddy?.user_name}
+                                                        </p>
+                                                      </div>
                                                     </div>
                                                   </div>
+                                                  <div className="md:w-[338px] md:h-[32px] flex items-center justify-center rounded-full bg-[#E5FFFE] mt-3">
+                                                    <p className="font-inter font-medium items-center text-center text-[12px] text-[#212626]">
+                                                      {
+                                                        buddy?.badge?.split(
+                                                          "-"
+                                                        )[0]
+                                                      }{" "}
+                                                      &nbsp;•&nbsp; 0 Trips
+                                                      &nbsp;•&nbsp;{" "}
+                                                      {buddy?.followers_count ||
+                                                        0}{" "}
+                                                      followers &nbsp;•&nbsp;{" "}
+                                                      {buddy?.buddies_count ||
+                                                        0}{" "}
+                                                      Buddies
+                                                    </p>
+                                                  </div>
                                                 </div>
-                                                <div className="md:w-[338px] md:h-[32px] flex items-center justify-center rounded-full bg-[#E5FFFE] mt-3">
-                                                  <p className="font-inter font-medium items-center text-center text-[12px] text-[#212626]">
-                                                    {
-                                                      buddy?.badge?.split(
-                                                        "-"
-                                                      )[0]
-                                                    }{" "}
-                                                    &nbsp;•&nbsp; 0 Trips
-                                                    &nbsp;•&nbsp;{" "}
-                                                    {buddy?.followers_count ||
-                                                      0}{" "}
-                                                    followers &nbsp;•&nbsp;{" "}
-                                                    {buddy?.buddies_count || 0}{" "}
-                                                    Buddies
-                                                  </p>
-                                                </div>
-                                              </div>
-                                            );
-                                          })}
-                                        </div>
-                                      )}
-                                  </div>
-                                )}
-                              </h3>
+                                              );
+                                            })}
+                                          </div>
+                                        )}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
                               {/* Images beside h3 */}
                               <div className="flex space-x-1">
-                                <svg
-                                  width="16"
-                                  height="16"
-                                  viewBox="0 0 16 16"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M8 0L14.2547 3.01208L15.7994 9.78017L11.4711 15.2078H4.52893L0.200577 9.78017L1.74535 3.01208L8 0Z"
-                                    fill="#9747FF"
-                                  />
-                                  <path
-                                    fillRule="evenodd"
-                                    clipRule="evenodd"
-                                    d="M11.6846 5.53463C11.8636 5.71362 11.8636 6.00382 11.6846 6.18281L7.4068 10.4606C7.22781 10.6396 6.93761 10.6396 6.75862 10.4606L4.31417 8.01615C4.13518 7.83716 4.13518 7.54696 4.31417 7.36797C4.49316 7.18898 4.78337 7.18898 4.96236 7.36797L7.08271 9.48832L11.0364 5.53463C11.2154 5.35564 11.5056 5.35564 11.6846 5.53463Z"
-                                    fill="white"
-                                  />
-                                </svg>
+                                <img
+                                  src={
+                                    badges[
+                                      userDetails?.badge?.split("-")[0]?.trim()
+                                    ] || null
+                                  }
+                                  alt="Badge"
+                                  className="w-[24px] h-[24px]"
+                                />
                               </div>
                             </div>
+
                             <p className="-mt-1 font-inter font-medium text-left text-[12px] text-[#667877]">
                               {post?.badge.split("-")[0]} • {post?.location}
                             </p>
@@ -1468,39 +1524,88 @@ const CommunityPage = () => {
                             <div className="relative w-full max-w-4xl mx-auto">
                               {/* Slider */}
                               <div className="overflow-hidden relative mb-4">
-                                <div className="cursor-pointer">
-                                  <img
-                                    src={post?.media_url[0]}
-                                    alt={`Post Image`}
-                                    className="rounded-lg w-full h-[432px] object-cover transition duration-500"
-                                    onClick={() => handleOpenCommentPopup(post?.id)}
-                                  />
+                                <div>
+                                  {post?.media_url[0]?.match(
+                                    /\.(mp4|mov|webm|avi|mkv|flv|wmv|ogv|3gp)$/i
+                                  ) ? (
+                                    <video
+                                      controls
+                                      src={post?.media_url[0]}
+                                      className="rounded-lg w-full h-[432px] object-cover transition duration-500"
+                                    >
+                                      {/* <source
+                                  src={post?.media_url[0]}
+                                  type="video/mp4"
+                                /> */}
+                                      Your browser does not support the video
+                                      tag.
+                                    </video>
+                                  ) : (
+                                    <img
+                                      src={post?.media_url[0]}
+                                      alt={`Post Image`}
+                                      className="rounded-lg w-full h-[432px] object-cover transition duration-500"
+                                      onClick={() =>
+                                        handleOpenCommentPopup(post?.id)
+                                      }
+                                    />
+                                  )}
                                 </div>
                               </div>
                             </div>
                           </>
-                          // )
                         )}
 
                         {post?.media_url?.length > 1 && (
                           <>
                             <div className="relative w-full max-w-4xl mx-auto">
-                              {/* Slider */}
+                              {/* Slider Content */}
                               <div className="overflow-hidden relative mb-4">
-                                <div className="cursor-pointer">
-                                  <img
-                                    src={post?.media_url[currentIndex]}
-                                    alt={`Slide ${currentIndex}`}
-                                    className="rounded-lg w-full h-[432px] object-cover transition duration-500"
-                                    onClick={() => handleOpenCommentPopup(post?.id)}
-                                  />
+                                <div>
+                                  {post?.media_url[
+                                    currentIndices[post.id] || 0
+                                  ]?.match(
+                                    /\.(mp4|mov|webm|avi|mkv|flv|wmv|ogv|3gp)$/i
+                                  ) ? (
+                                    <video
+                                      controls
+                                      preload="auto"
+                                      className="rounded-lg w-full h-[432px] object-cover transition duration-500"
+                                    >
+                                      <source
+                                        src={
+                                          post?.media_url[
+                                            currentIndices[post.id] || 0
+                                          ]
+                                        }
+                                        type="video/mp4"
+                                      />
+                                      Your browser does not support the video
+                                      tag.
+                                    </video>
+                                  ) : (
+                                    <img
+                                      src={
+                                        post?.media_url[
+                                          currentIndices[post.id] || 0
+                                        ]
+                                      }
+                                      alt={`Slide ${
+                                        currentIndices[post.id] || 0
+                                      }`}
+                                      className="rounded-lg w-full h-[432px] object-cover transition duration-500"
+                                      onClick={() =>
+                                        handleOpenCommentPopup(post?.id)
+                                      }
+                                    />
+                                  )}
                                 </div>
                               </div>
 
                               {/* Left Button */}
                               <button
                                 onClick={() =>
-                                  goToPrevious(post?.media_url?.length)
+                                  goToPrevious(post.id, post?.media_url?.length)
                                 }
                                 className="absolute top-1/2 left-4 w-9 h-9 transform -translate-y-1/2 bg-[#EEF0F299] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center"
                               >
@@ -1509,7 +1614,6 @@ const CommunityPage = () => {
                                   height="14"
                                   viewBox="0 0 8 14"
                                   fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
                                 >
                                   <path
                                     d="M7 13L1 7L7 1"
@@ -1524,7 +1628,7 @@ const CommunityPage = () => {
                               {/* Right Button */}
                               <button
                                 onClick={() =>
-                                  goToNext(post?.media_url?.length)
+                                  goToNext(post.id, post?.media_url?.length)
                                 }
                                 className="absolute top-1/2 right-4 w-9 h-9 transform -translate-y-1/2 bg-[#EEF0F299] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center rotate-180"
                               >
@@ -1533,7 +1637,6 @@ const CommunityPage = () => {
                                   height="14"
                                   viewBox="0 0 8 14"
                                   fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
                                 >
                                   <path
                                     d="M7 13L1 7L7 1"
@@ -1550,9 +1653,9 @@ const CommunityPage = () => {
                                 {post?.media_url?.map((_, index) => (
                                   <div
                                     key={index}
-                                    onClick={() => goToSlide(index)}
+                                    onClick={() => goToSlide(post.id, index)}
                                     className={`w-2 h-2 mx-1 rounded-full transform transition-transform duration-300 ${
-                                      index === currentIndex
+                                      index === (currentIndices[post.id] || 0)
                                         ? "bg-[#2DC6BE] scale-150"
                                         : "bg-[#869E9D] hover:bg-[#2DC6BE] scale-100"
                                     } cursor-pointer`}
@@ -1561,7 +1664,6 @@ const CommunityPage = () => {
                               </div>
                             </div>
                           </>
-                          // )
                         )}
                         {/* Post Description */}
                         <p className="font-inter font-medium text-[14px] text-[#212626] text-left text-justify mb-1 mt-3">
