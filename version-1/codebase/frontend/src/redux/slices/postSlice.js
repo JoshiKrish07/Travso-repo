@@ -237,7 +237,7 @@ export const deleteCommentByPostOwner = createAsyncThunk(
       }
 
       const data = await response.json();
-      console.log("=====data===in deleteCommentByPostOwner===>", data);
+      // console.log("=====data===in deleteCommentByPostOwner===>", data);
       return data;
     } catch (error) {
       console.log("error in deleteCommentByPostOwner call thunk", error.message)
@@ -538,10 +538,10 @@ export const createStory = createAsyncThunk(
       }
 
       const data = await response.json();
-      // console.log("=====data===in commentOnReply===>", data);
+      // console.log("=====data===in createStory===>", data);
       return data;
     } catch (error) {
-      console.log("error in commentOnReply call thunk", error.message)
+      console.log("error in createStory call thunk", error.message)
       return rejectWithValue(error.message);
     }
   }

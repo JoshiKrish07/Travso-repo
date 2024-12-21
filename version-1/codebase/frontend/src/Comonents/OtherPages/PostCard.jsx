@@ -40,6 +40,7 @@ const PostCard = () => {
   const [activePostId, setActivePostId] = useState(null);
   const [isCreatePostPopup, setIsCreatePostPopup] = useState(false);
   const [isPostDetailPopup, setIsPostDetailPopup] = useState(false);
+  const [currentIndices, setCurrentIndices] = useState({});
 
   const [postData, setPostData] = useState({
     description: "",
@@ -48,7 +49,7 @@ const PostCard = () => {
     tags: [],
     media_url: [],
     is_public: true,
-    buddies_id: []
+    buddies_id: [],
   });
 
   const triggerRef = useRef(null);
@@ -76,7 +77,6 @@ const PostCard = () => {
   };
 
   const handleLikeUnlike = async (postId) => {
-   
     try {
       const likeUnlikeResult = await dispatch(
         LikeUnlikePost({ post_id: postId })
@@ -151,21 +151,59 @@ const PostCard = () => {
     setIsFullTextVisible(!isFullTextVisible);
   };
 
-  const goToPrevious = (imgArrLength) => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? imgArrLength - 1 : prevIndex - 1
-    );
+  // const goToPrevious = (imgArrLength) => {
+  //   setCurrentIndex((prevIndex) =>
+  //     prevIndex === 0 ? imgArrLength - 1 : prevIndex - 1
+  //   );
+  // };
+
+  // const goToNext = (imgArrLength) => {
+  //   setCurrentIndex((prevIndex) =>
+  //     prevIndex === imgArrLength - 1 ? 0 : prevIndex + 1
+  //   );
+  // };
+
+  // const goToSlide = (index) => {
+  //   setCurrentIndex(index);
+  // };
+
+  /* for changing the image through slider starts */
+
+  // Go to Previous Slide
+  const goToPrevious = (postId, imgArrLength) => {
+    setCurrentIndices((prevIndices) => ({
+      ...prevIndices,
+      [postId]:
+        prevIndices[postId] !== undefined
+          ? prevIndices[postId] === 0
+            ? imgArrLength - 1
+            : prevIndices[postId] - 1
+          : imgArrLength - 1,
+    }));
   };
 
-  const goToNext = (imgArrLength) => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === imgArrLength - 1 ? 0 : prevIndex + 1
-    );
+  // Go to Next Slide
+  const goToNext = (postId, imgArrLength) => {
+    setCurrentIndices((prevIndices) => ({
+      ...prevIndices,
+      [postId]:
+        prevIndices[postId] !== undefined
+          ? prevIndices[postId] === imgArrLength - 1
+            ? 0
+            : prevIndices[postId] + 1
+          : 1,
+    }));
   };
 
-  const goToSlide = (index) => {
-    setCurrentIndex(index);
+  // Go to Specific Slide
+  const goToSlide = (postId, index) => {
+    setCurrentIndices((prevIndices) => ({
+      ...prevIndices,
+      [postId]: index,
+    }));
   };
+
+  /* for changing the image through slider ends */
 
   // format in format for dob like 25 Aug 2002 and for joined Feb 2022
   function formatDate(isoDate) {
@@ -195,17 +233,15 @@ const PostCard = () => {
     return `${day} ${shortMonth} ${year}`; // Example: 25 Aug 2002
   }
 
-  const handlePostDetailPopup = () =>{
+  const handlePostDetailPopup = () => {
     setIsPostDetailPopup(false);
     setIsCreatePostPopup(true);
     // isOpen();
-  }
+  };
 
-  const handlePostUpload = async() => {
+  const handlePostUpload = async () => {
     try {
-      const commentResult = await dispatch(
-        commitPost(postData)
-      ).unwrap();
+      const commentResult = await dispatch(commitPost(postData)).unwrap();
       if (commentResult) {
         // await dispatch(getAllPosts());
         await dispatch(getUserPosts());
@@ -216,54 +252,53 @@ const PostCard = () => {
           tags: [],
           media_url: [],
           is_public: true,
-          buddies_id: []
+          buddies_id: [],
         });
         setIsPostDetailPopup(false);
         // handleFlashMessage(commentResult.message, 'success');
       }
     } catch (error) {
-      console.log("error in handlePostUpload", error)
+      console.log("error in handlePostUpload", error);
     }
-  }
+  };
 
   // to close share popup
   const handleSharePopupClose = () => {
     setIsSharePopup(false);
     setActivePostId(null);
     dispatch(getUserPosts());
-  }
+  };
 
   // to open share popup
   const handleOpenSharePopup = (postId) => {
     setActivePostId(postId);
     setIsSharePopup(true);
-  }
+  };
 
   // to close bucket saved popup
   const handleBucketSavedPopupClose = () => {
     setIsCommentWithSavedPopup(false);
-    setActivePostId(null)
-  }
+    setActivePostId(null);
+  };
 
   // to open share popup
   const handleOpenBucketSavedPopup = (postId) => {
     setActivePostId(postId);
     setIsCommentWithSavedPopup(true);
-  }
+  };
 
   // to open comment popup
   const handleOpenCommentPopup = (postId) => {
     // console.log("===postId===>", postId);
     setActivePostId(postId);
     setIsCommentPopup(true);
-  }
+  };
 
   // to close comment popup
   const handleCloseCommentPopup = () => {
     setIsCommentPopup(false);
-    setActivePostId(null)
-  }
-
+    setActivePostId(null);
+  };
 
   return (
     <>
@@ -376,35 +411,82 @@ const PostCard = () => {
                         {/* Slider */}
                         <div className="overflow-hidden relative mb-4">
                           <div>
-                            <img
-                              src={post?.media_url[0]}
-                              alt={`Post Image`}
-                              className="rounded-lg w-full h-[432px] object-cover transition duration-500"
-                            />
+                            {post?.media_url[0]?.match(
+                              /\.(mp4|mov|webm|avi|mkv|flv|wmv|ogv|3gp)$/i
+                            ) ? (
+                              <video
+                                controls
+                                src={post?.media_url[0]}
+                                className="rounded-lg w-full h-[432px] object-cover transition duration-500"
+                              >
+                                {/* <source
+                                  src={post?.media_url[0]}
+                                  type="video/mp4"
+                                /> */}
+                                Your browser does not support the video tag.
+                              </video>
+                            ) : (
+                              <img
+                                src={post?.media_url[0]}
+                                alt={`Post Image`}
+                                className="rounded-lg w-full h-[432px] object-cover transition duration-500"
+                                onClick={() =>
+                                  handleOpenCommentPopup(post?.id)
+                                }
+                              />
+                            )}
                           </div>
                         </div>
                       </div>
                     </>
-                    // )
                   )}
 
                   {post?.media_url?.length > 1 && (
                     <>
                       <div className="relative w-full max-w-4xl mx-auto">
-                        {/* Slider */}
+                        {/* Slider Content */}
                         <div className="overflow-hidden relative mb-4">
                           <div>
-                            <img
-                              src={post?.media_url[currentIndex]}
-                              alt={`Slide ${currentIndex}`}
-                              className="rounded-lg w-full h-[432px] object-cover transition duration-500"
-                            />
+                            {post?.media_url[
+                              currentIndices[post.id] || 0
+                            ]?.match(
+                              /\.(mp4|mov|webm|avi|mkv|flv|wmv|ogv|3gp)$/i
+                            ) ? (
+                              <video
+                                controls
+                                preload="auto"
+                                className="rounded-lg w-full h-[432px] object-cover transition duration-500"
+                              >
+                                <source
+                                  src={
+                                    post?.media_url[
+                                      currentIndices[post.id] || 0
+                                    ]
+                                  }
+                                  type="video/mp4"
+                                />
+                                Your browser does not support the video tag.
+                              </video>
+                            ) : (
+                              <img
+                                src={
+                                  post?.media_url[currentIndices[post.id] || 0]
+                                }
+                                alt={`Slide ${currentIndices[post.id] || 0}`}
+                                className="rounded-lg w-full h-[432px] object-cover transition duration-500"
+                                onClick={() =>
+                                  handleOpenCommentPopup(post?.id)
+                                }
+                              />
+                            )}
                           </div>
                         </div>
 
                         {/* Left Button */}
                         <button
-                          onClick={() => goToPrevious(post?.media_url?.length)}
+                          onClick={() =>
+                            goToPrevious(post.id, post?.media_url?.length)
+                          }
                           className="absolute top-1/2 left-4 w-9 h-9 transform -translate-y-1/2 bg-[#EEF0F299] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center"
                         >
                           <svg
@@ -412,7 +494,6 @@ const PostCard = () => {
                             height="14"
                             viewBox="0 0 8 14"
                             fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
                           >
                             <path
                               d="M7 13L1 7L7 1"
@@ -426,7 +507,9 @@ const PostCard = () => {
 
                         {/* Right Button */}
                         <button
-                          onClick={() => goToNext(post?.media_url?.length)}
+                          onClick={() =>
+                            goToNext(post.id, post?.media_url?.length)
+                          }
                           className="absolute top-1/2 right-4 w-9 h-9 transform -translate-y-1/2 bg-[#EEF0F299] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center rotate-180"
                         >
                           <svg
@@ -434,7 +517,6 @@ const PostCard = () => {
                             height="14"
                             viewBox="0 0 8 14"
                             fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
                           >
                             <path
                               d="M7 13L1 7L7 1"
@@ -451,9 +533,9 @@ const PostCard = () => {
                           {post?.media_url?.map((_, index) => (
                             <div
                               key={index}
-                              onClick={() => goToSlide(index)}
+                              onClick={() => goToSlide(post.id, index)}
                               className={`w-2 h-2 mx-1 rounded-full transform transition-transform duration-300 ${
-                                index === currentIndex
+                                index === (currentIndices[post.id] || 0)
                                   ? "bg-[#2DC6BE] scale-150"
                                   : "bg-[#869E9D] hover:bg-[#2DC6BE] scale-100"
                               } cursor-pointer`}
@@ -462,13 +544,15 @@ const PostCard = () => {
                         </div>
                       </div>
                     </>
-                    // )
                   )}
+
                   {/* Post Description */}
                   <p className="font-inter font-medium text-[14px] text-[#212626] text-left text-justify mb-1 mt-3">
                     {isFullTextVisible
                       ? post.description
-                      : post?.description?.length > 170 ? `${post.description.slice(0, 170)}...` : post?.description}
+                      : post?.description?.length > 170
+                      ? `${post.description.slice(0, 170)}...`
+                      : post?.description}
                     <span
                       onClick={toggleFullText}
                       className="text-[#2DC6BE] cursor-pointer"
@@ -598,27 +682,23 @@ const PostCard = () => {
                     />
                   )}
 
-                  {
-                    activePostId === post?.id && isSharePopup && (
-                      <SharePopup
-                        isOpen={isSharePopup}
-                        // onClose={() => setIsSharePopup(false)}
-                        onClose={() => handleSharePopupClose()}
-                        postId={activePostId}
-                        userName={post?.user_name}
-                      />
-                    )
-                  }
+                  {activePostId === post?.id && isSharePopup && (
+                    <SharePopup
+                      isOpen={isSharePopup}
+                      // onClose={() => setIsSharePopup(false)}
+                      onClose={() => handleSharePopupClose()}
+                      postId={activePostId}
+                      userName={post?.user_name}
+                    />
+                  )}
 
-                  {
-                    activePostId === post?.id && isCommentWithSavedPopup && (
-                      <SavedPopup
-                        isOpen={isCommentWithSavedPopup}
-                        // onClose={() => setIsCommentWithSavedPopup(false)}
-                        onClose={() => handleBucketSavedPopupClose()}
-                      />
-                    )
-                  }
+                  {activePostId === post?.id && isCommentWithSavedPopup && (
+                    <SavedPopup
+                      isOpen={isCommentWithSavedPopup}
+                      // onClose={() => setIsCommentWithSavedPopup(false)}
+                      onClose={() => handleBucketSavedPopupClose()}
+                    />
+                  )}
                 </div>
                 {/* Bottom Fixed Section */}
               </div>

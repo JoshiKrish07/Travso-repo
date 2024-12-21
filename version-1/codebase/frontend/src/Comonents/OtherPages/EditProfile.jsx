@@ -158,12 +158,46 @@ const EditProfile = () => {
     return Object.keys(formErrors).length === 0;
   };
 
+  // const handleImageUpload = async (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.readAsDataURL(file);
+
+  //     reader.onloadend = async () => {
+  //       try {
+  //         const uploadImageResult = await dispatch(
+  //           uploadProfileImage({ image: reader.result })
+  //         ).unwrap();
+  //         if (uploadImageResult) {
+  //           await dispatch(getUserDetails());
+  //         }
+  //         console.log("Image upload successful:", uploadImageResult);
+  //       } catch (error) {
+  //         console.error("Image upload failed:", error);
+  //       } finally {
+  //         e.target.value = null;
+  //       }
+  //     };
+  //   }
+  // };
+
+  /* handle image upload with validation of 2mb */
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
+    console.log("======file=====>", file);
+    // Check if a file is selected and if it's not more than 2MB
     if (file) {
+      const fileSizeInMB = file.size / (1024 * 1024); // Convert size to MB
+      if (fileSizeInMB > 2) {
+        alert("File size exceeds 2MB. Please choose a smaller image.");
+        e.target.value = null; // Reset the file input
+        return; // Stop further processing
+      }
+  
       const reader = new FileReader();
       reader.readAsDataURL(file);
-
+  
       reader.onloadend = async () => {
         try {
           const uploadImageResult = await dispatch(
@@ -176,11 +210,12 @@ const EditProfile = () => {
         } catch (error) {
           console.error("Image upload failed:", error);
         } finally {
-          e.target.value = null;
+          e.target.value = null; // Reset the file input
         }
       };
     }
   };
+  
 
   // to show gender option on select box
   const genderOption = Object.keys(genderData).map((genderName) => ({
@@ -286,7 +321,7 @@ const EditProfile = () => {
 
   const handleSave = async () => {
     const isValid = await validate();
-    console.log("=====formData====>", formData);
+    // console.log("=====formData====>", formData);
 
     if (isValid) {
       try {
@@ -334,37 +369,74 @@ const EditProfile = () => {
       if (removeCoverImgResult) {
         await dispatch(getUserDetails());
       }
-      console.log("====removeCoverImgResult====>", removeCoverImgResult);
+      // console.log("====removeCoverImgResult====>", removeCoverImgResult);
     } catch (error) {
       console.log("error in cover image profilepage", error);
     }
   };
 
   // upload cover image
-  const handleCoverUpload = async (e) => {
-    const file = e.target.files[0];
-    console.log("===file====>", file);
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
+  // const handleCoverUpload = async (e) => {
+  //   const file = e.target.files[0];
+  //   console.log("===file====>", file);
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.readAsDataURL(file);
 
-      reader.onloadend = async () => {
-        try {
-          const uploadImageResult = await dispatch(
-            uploadCoverImage({ image: reader.result })
-          ).unwrap();
-          if (uploadImageResult) {
-            await dispatch(getUserDetails());
-          }
-          console.log("Image upload successful:", uploadImageResult);
-        } catch (error) {
-          console.error("Image upload failed:", error);
-        } finally {
-          e.target.value = null;
-        }
-      };
+  //     reader.onloadend = async () => {
+  //       try {
+  //         const uploadImageResult = await dispatch(
+  //           uploadCoverImage({ image: reader.result })
+  //         ).unwrap();
+  //         if (uploadImageResult) {
+  //           await dispatch(getUserDetails());
+  //         }
+  //         console.log("Image upload successful:", uploadImageResult);
+  //       } catch (error) {
+  //         console.error("Image upload failed:", error);
+  //       } finally {
+  //         e.target.value = null;
+  //       }
+  //     };
+  //   }
+  // };
+
+  // upload cover image
+const handleCoverUpload = async (e) => {
+  const file = e.target.files[0];
+  // console.log("===file====>", file);
+  
+  // Check if a file is selected and if it's not more than 2MB
+  if (file) {
+    const fileSizeInMB = file.size / (1024 * 1024); // Convert size to MB
+    if (fileSizeInMB > 2) {
+      // handleFlashMessage("File size exceeds 2MB. Please choose a smaller image.", 'error');
+      alert("File size exceeds 2MB. Please choose a smaller image.");
+      e.target.value = null; // Reset the file input
+      return; // Stop further processing
     }
-  };
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onloadend = async () => {
+      try {
+        const uploadImageResult = await dispatch(
+          uploadCoverImage({ image: reader.result })
+        ).unwrap();
+        if (uploadImageResult) {
+          await dispatch(getUserDetails());
+        }
+        // console.log("Image upload successful:", uploadImageResult);
+      } catch (error) {
+        console.error("Image upload failed:", error);
+      } finally {
+        e.target.value = null; // Reset the file input
+      }
+    };
+  }
+};
+
 
   const handleProfilePhotoUpload = (e) => {
     const file = e.target.files[0];
@@ -381,13 +453,15 @@ const EditProfile = () => {
     setProfilePhoto(null); // Remove the profile photo
   };
 
+  console.log("===setFlashMessage===>", flashMessage);
+
   return (
     <>
-      {/* Header Section */}
-      <EditHeader />
       {flashMessage && (
         <SuccessError message={flashMessage} messageType={flashMsgType} />
       )}
+      {/* Header Section */}
+      <EditHeader />
       <div className="bg-[#F0F7F7] flex justify-center items-center min-h-screen">
         <div className="w-full mt-12 rounded-[16px] mb-5 max-w-[1024px] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] overflow-hidden p-[24px]">
           {/* Title and Subtitle */}
@@ -434,7 +508,7 @@ const EditProfile = () => {
                       id="cover-upload-1"
                       className="hidden"
                       accept="image/*"
-                      onChange={handleCoverUpload}
+                      onChange={(e) => handleCoverUpload(e)}
                     />
                   </div>
                 </>
@@ -457,7 +531,7 @@ const EditProfile = () => {
                     id="cover-upload-2"
                     className="hidden"
                     accept="image/*"
-                    onChange={handleCoverUpload}
+                    onChange={(e) => handleCoverUpload(e)}
                   />
                 </div>
               )}
@@ -497,7 +571,7 @@ const EditProfile = () => {
                         id="profile-upload"
                         className="hidden"
                         accept="image/*"
-                        onChange={handleImageUpload}
+                        onChange={(e) => handleImageUpload(e)}
                       />
                     </div>
                   </>
@@ -522,7 +596,7 @@ const EditProfile = () => {
                       id="profile-upload-1"
                       className="hidden"
                       accept="image/*"
-                      onChange={handleImageUpload}
+                      onChange={(e) => handleImageUpload(e)}
                     />
                   </div>
                 )}
