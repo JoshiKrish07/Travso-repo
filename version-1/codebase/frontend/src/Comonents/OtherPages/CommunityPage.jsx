@@ -512,11 +512,11 @@ const CommunityPage = () => {
           story_id: storyId,
           reply_text: storyReply[storyId], // Full comment text
         };
-        console.log("==commentPayload==>", commentPayload);
+        // console.log("==commentPayload==>", commentPayload);
         const replyResponse = await dispatch(
           commentOnStory(commentPayload)
         ).unwrap();
-        console.log("==replyResponse===>", replyResponse);
+        // console.log("==replyResponse===>", replyResponse);
         if (replyResponse) {
           setStoryReply({});
         }
@@ -678,7 +678,7 @@ const CommunityPage = () => {
                           }
                           hadleShowViewStory={hadleShowViewStory}
                           isShowvisibleStoryViewID={isShowvisibleStoryViewID}
-                          storyData={activeStories[0]}
+                          storyData={activeStories[0].stories}
                           openDropdownIdUser={openDropdownIdUser}
                           setOpenDropdownIdUser={setOpenDropdownIdUser}
                           setIsShowvisibleStoryViewID={

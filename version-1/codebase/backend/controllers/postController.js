@@ -372,12 +372,22 @@ async function getActiveStories(req, res) {
     //   viewers: story.viewers ? JSON.parse(story.viewers) : [], // Parse viewers JSON
     // });
 
+    // const parseFields = (story) => ({
+    //   ...story,
+    //   media_url: JSON.parse(story.media_url || "[]"), // Parse media_url to array
+    //   tag: JSON.parse(story.tag || "[]"), // Parse tag to array
+    //   viewers: story.viewers ? JSON.parse(story.viewers) : [], // Parse viewers JSON
+    // });
+
     const parseFields = (story) => ({
       ...story,
-      media_url: JSON.parse(story.media_url || "[]"), // Parse media_url to array
+      type: "image",
+      media_url: story.media_url || "",
+      url: story.media_url || "", // Parse media_url to array
       tag: JSON.parse(story.tag || "[]"), // Parse tag to array
       viewers: story.viewers ? JSON.parse(story.viewers) : [], // Parse viewers JSON
     });
+
 
 
     // Parse userStories and otherUsersStories
@@ -2013,7 +2023,7 @@ async function getPostData (req, res){
   };
 
   /* to add a story */
-  async function storeStory(req, res) {
+  async function storeStory1(req, res) {
     try {
 
       const user_id = req.user.userId;
@@ -2086,6 +2096,98 @@ async function getPostData (req, res){
         error: "Internal Server Error",
       });
     }
+  }
+
+  async function storeStory(req, res) {
+    try {
+      // const { user_id } = req.params;
+      const user_id = req.user.userId;
+      const userName = req.user.userName
+      const {
+        media_url = [],
+        tags = [],
+        view = "public",
+        story_text = [],
+      } = req.body;
+  
+      // Validate required fields
+      if (!user_id) {
+        return res.status(400).json({
+          message: "Missing required fields (user_id).",
+        });
+      }
+  
+      const storyImages = [];
+      const created_at = new Date();
+      const expires_at = new Date(created_at.getTime() + 12 * 60 * 60 * 1000);
+  
+      // Validate and process media_url
+      if (Array.isArray(media_url) && media_url.length > 0) {
+        for (let image of media_url) {
+          try {
+            // Extract Base64 part of the image
+            const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
+            const extension = image.substring(
+              "data:image/".length,
+              image.indexOf(";base64")
+            );
+            const fileName = `story_${Date.now()}.${extension}_${user_id}_${userName}`;
+            const filePath = path.join(STORY_UPLOAD_DIR, fileName);
+            const imagePath = `${process.env.APP_SERVER_URL}/uploads/story_img/${fileName}`;
+            storyImages.push(imagePath);
+  
+            // Write image to file system
+            await fs.promises.writeFile(filePath, base64Data, {
+              encoding: "base64",
+            });
+          } catch (err) {
+            console.error("Failed to save image:", err);
+            return res.status(500).json({ error: "Failed to save image." });
+          }
+        }
+      }
+  
+      // Insert each image as a separate story record
+      const queries = storyImages.map((image) =>
+        pool.execute(
+          `INSERT INTO stories (
+            user_id,
+            tag,
+            media_url,
+            view,
+            story_text,
+            created_at,
+            expires_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [
+            user_id,
+            JSON.stringify(tags), // Serialize tags as JSON
+            image, // Single media URL
+            view,
+            JSON.stringify(story_text), // Serialize story text as JSON
+            created_at,
+            expires_at,
+          ]
+        )
+      );
+  
+      // Execute all insertion queries
+      const results = await Promise.all(queries);
+  
+      // Collect inserted story IDs
+      const storyIds = results.map((result) => result[0].insertId);
+  
+      // Respond with success message and story IDs
+      return res.status(200).json({
+        message: "Stories added successfully.",
+        story_ids: storyIds,
+      });
+    } catch (error) {
+      console.error("Error in storing story:", error);
+      return res.status(500).json({
+        error: "Internal Server Error",
+      });
+    }
   }
 
 // to store the count on story view

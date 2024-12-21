@@ -274,11 +274,11 @@ const StoryPage = ({ isOpen, onClose }) => {
     );
   };
 
-  const goToNextStory = () => {
-    setStoryIndex((prevIndex) =>
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1
-    );
-  };
+  // const goToNextStory = () => {
+  //   setStoryIndex((prevIndex) =>
+  //     prevIndex === images.length - 1 ? 0 : prevIndex + 1
+  //   );
+  // };
 
   /* to handle story view to public, buddies, followers */
   const handleOption = (option) => {
@@ -299,8 +299,36 @@ const StoryPage = ({ isOpen, onClose }) => {
     "Luxury Traveler": BadgesIconFirst,
   };
 
+  console.log("====storyData====>", storyData);
+
   /* handle story submit */
-  const handleStorySubmit = async () => {
+/* handle story submit */
+const handleStorySubmit = async () => {
+  console.log("====storyData====>", storyData);
+
+  // Validate media_url length
+  if (storyData.media_url.length === 0) {
+    alert("At least one image is required.");
+    return; // Stop further execution
+  }
+
+  try {
+    const response = await dispatch(createStory(storyData)).unwrap();
+    if (response) {
+      await dispatch(getActiveStories());
+      setStoryData({
+        media_url: [],
+        view: "Public",
+      });
+      onClose();
+    }
+  } catch (error) {
+    console.log("Error in handleStorySubmit", error);
+  }
+};
+
+
+  const handleStorySubmit1 = async () => {
     console.log("====storyData====>", storyData);
     try {
       const response = await dispatch(createStory(storyData)).unwrap();
@@ -747,8 +775,8 @@ const StoryPage = ({ isOpen, onClose }) => {
                               // className="rounded-[16px]"
                               className="rounded-[16px] pointer-events-none"
                               style={{
-                                width: "120px",
-                                height: "96px",
+                                width: "100px",
+                                height: "100px",
                                 objectFit: "cover",
                               }}
                               controls
@@ -759,8 +787,8 @@ const StoryPage = ({ isOpen, onClose }) => {
                               alt={`Slide ${index}`}
                               className="rounded-[16px]"
                               style={{
-                                width: "120px",
-                                height: "96px",
+                                width: "100px",
+                                height: "100px",
                                 objectFit: "cover",
                               }}
                             />
@@ -809,7 +837,10 @@ const StoryPage = ({ isOpen, onClose }) => {
                   {/* Left Button */}
                   <button
                     onClick={goToPreviousStory}
-                    className="absolute top-1/2 left-0 w-9 h-9 transform -translate-y-1/2 bg-[#000000BF] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center"
+                    className={`absolute top-1/2 left-0 w-9 h-9 transform -translate-y-1/2 bg-[#000000BF] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center ${
+                      storyIndex <= 0 ? "disabled" : ""
+                    }`}
+                    disabled={storyIndex<=0}
                   >
                     <svg
                       width="8"
@@ -829,7 +860,7 @@ const StoryPage = ({ isOpen, onClose }) => {
                   </button>
 
                   {/* Right Button */}
-                  <button
+                  {/* <button
                     onClick={goToNextStory}
                     className="absolute top-1/2 right-0 w-9 h-9 transform -translate-y-1/2 bg-[#000000BF] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center rotate-180"
                   >
@@ -848,7 +879,7 @@ const StoryPage = ({ isOpen, onClose }) => {
                         strokeLinejoin="round"
                       />
                     </svg>
-                  </button>
+                  </button> */}
                 </div>
               )}
               {/*---------- Slider Part ---------*/}
