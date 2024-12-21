@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React from "react";
+import React, { useEffect } from "react";
 import Girl from "../../../assets/headerIcon/girl.jpg";
 import Travel from "../../../assets/travel.png";
 import Background from "../../../assets/Background.png";
@@ -22,10 +22,13 @@ const StoryViewPage = ({
   setOpenDropdownIdUser,
   setIsShowvisibleStoryViewID,
   isCreateSocialPopup,
-  setIsCreateSocialPopup
+  setIsCreateSocialPopup,
+  isOpen
 }) => {
     // console.log("===storyData===>",storyData);
   const dispatch = useDispatch();
+
+  console.log("====storyData====>", storyData);
 
   const deleteThisStory = async(storyid) => {
     // console.log("====storyid===>", storyid);
@@ -39,7 +42,29 @@ const StoryViewPage = ({
     }
   }
 
+  // Disable body scroll when popup is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add("no-scroll");
+    } else {
+      document.body.classList.remove("no-scroll");
+    }
+    return () => {
+      document.body.classList.remove("no-scroll");
+    };
+  }, [isOpen]);
+  
+    if (!isOpen) return null;
+
   return (
+    <>
+    <style>
+        {`
+          .no-scroll {
+            overflow: hidden;
+          }
+        `}
+    </style>
     <div>
       <div
         className="fixed inset-0 flex items-center justify-center bg-cover bg-center z-50"
@@ -119,7 +144,7 @@ const StoryViewPage = ({
           </div>
 
           {/* show dynamic stories */}
-          {storyData?.stories.map((story, storyIndex) => {
+          {storyData?.map((story, storyIndex) => {
             return (
               <div key={story?.id}>
                 {/* Image Slider */}
@@ -479,6 +504,7 @@ const StoryViewPage = ({
                     </div>
       </div>
     </div>
+    </>
   );
 };
 

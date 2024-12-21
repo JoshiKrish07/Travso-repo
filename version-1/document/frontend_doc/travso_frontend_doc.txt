@@ -186,7 +186,7 @@ file destination :- src/Components/OtherPages/AllPopupComponent/CreateaPostPopup
    mark.
 4) handleRemoveBuddy() :- Allows user to remove tagged buddy.
 5) handleTagEnter() :- It is used to set tag starting with #.
-6) handleDrop() and handleFileChange() function :- Both are used to select file and then calls handleFileSelect() function and setActivePostId
+6) handleDrop() and handleFileChange() function :- Both are used to select file which can be image or video and then calls handleFileSelect() function and setActivePostId
    images in postData in array. 
 7) handleRemoveImage() function :- When user wants to deselect any image, a cancel icon above image calls this function and removes 
    image from data.
