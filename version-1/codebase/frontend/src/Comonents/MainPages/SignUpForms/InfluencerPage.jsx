@@ -2,7 +2,7 @@
 /* This is Signup step 2 */
 
 import { useDispatch } from "react-redux";
-import backgroundImage from "../../../assets/signin.jpg";
+import backgroundImage from "../../../assets/signin.png";
 import logo from "../../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import { setInfluencerType } from "../../../redux/slices/authSlice";
@@ -24,16 +24,21 @@ const InfluencerPage = ({
   };
 
   const handleNextStep2 = async () => {
-    if(formData.isInfluencer) {
+    if (formData.isInfluencer) {
       const isValid = await validate();
-      if(isValid) {
+      if (isValid) {
         handleNext();
         try {
-          const isInfluencerResponse = await dispatch(setInfluencerType({ smlink1: formData.smlink1, email: formData.email, mobileNumber: formData.mobileNumber })).unwrap();
+          const isInfluencerResponse = await dispatch(
+            setInfluencerType({
+              smlink1: formData.smlink1,
+              email: formData.email,
+              mobileNumber: formData.mobileNumber,
+            })
+          ).unwrap();
         } catch (error) {
           console.log("Error during social media link verification:", error);
         }
-        
       }
     } else {
       handleNext();
@@ -57,14 +62,18 @@ const InfluencerPage = ({
           {/* Logo size and responsiveness */}
         </div>
         <div className=" absolute inset-0 flex flex-col justify-end p-8 md:p-16 text-white text-left md:ml-10">
-        <h1 className="text-3xl md:text-5xl font-bold">
-        Weave Your Own Indian  <br /> Travel Story
+          <h1 className="text-3xl md:text-5xl font-bold">
+            Connect with Travel <br /> Buddies
           </h1>
           <p className="mt-4 text-sm md:text-base hidden md:flex">
-          Inspire others with your unique experiences as you explore India is vibrant tourism destinations, from cultural landmarks to hidden gems. Share your journey and help others discover the beauty and diversity of India.
+          Join a global community of travel enthusiasts to share your travel
+            story, exchange insider tips, discover hidden gems, and celebrate
+            the beauty of diverse destinations.
           </p>
           <p className="mt-4 text-sm md:text-base flex md:hidden">
-          Inspire others with your unique experiences as you explore India is vibrant tourism destinations, from cultural landmarks to hidden gems. Share your journey and help others discover the beauty and diversity of India.
+            Join a global community of travel enthusiasts to share your travel
+            story, exchange insider tips, discover hidden gems, and celebrate
+            the beauty of diverse destinations.
           </p>
           <div className="flex items-center mt-8 space-x-4 w-[50%] gap-[30px]">
             <div className="flex-1 relative">
@@ -76,7 +85,7 @@ const InfluencerPage = ({
               ></div>{" "}
               {/* 30% filled portion */}
             </div>
-            <span className="text-sm">02 — 03</span>
+            <span className="text-sm">02</span>
           </div>
         </div>
       </div>
@@ -92,7 +101,9 @@ const InfluencerPage = ({
             <div className="space-x-2">
               <button
                 className={`py-1 px-4 ${
-                  formData.isInfluencer ? "bg-teal-400 text-white rounded-[12px]" : "border border-[#2DC6BE] bg-gradient text-teal-400 font-semibold rounded-[12px] hover:bg-teal-500 hover:text-white transition"
+                  formData.isInfluencer
+                    ? "bg-teal-400 text-white rounded-[12px]"
+                    : "border border-[#2DC6BE] bg-gradient text-teal-400 font-semibold rounded-[12px] hover:bg-teal-500 hover:text-white transition"
                 } `}
                 onClick={() => handleInfluencerType(true)}
               >
@@ -100,7 +111,9 @@ const InfluencerPage = ({
               </button>
               <button
                 className={`py-1 px-4  ${
-                  !formData.isInfluencer ? "bg-teal-400 text-white rounded-[12px]" : "border border-[#2DC6BE] bg-gradient text-teal-400 font-semibold rounded-[12px] hover:bg-teal-500 hover:text-white transition"
+                  !formData.isInfluencer
+                    ? "bg-teal-400 text-white rounded-[12px]"
+                    : "border border-[#2DC6BE] bg-gradient text-teal-400 font-semibold rounded-[12px] hover:bg-teal-500 hover:text-white transition"
                 } `}
                 onClick={() => handleInfluencerType(false)}
               >

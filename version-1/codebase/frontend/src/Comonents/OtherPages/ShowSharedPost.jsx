@@ -281,7 +281,7 @@ function ShowSharedPost() {
                   </button>
 
                   {/* Dots */}
-                  <div className="flex justify-center mt-1 absolute items-center justify-center inline-flex top-[400px] bg-[#FFFFFFBF] w-[68px] h-[16px] rounded-[16px]">
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-[68px] h-[16px]  bg-[#FFFFFFBF] rounded-[16px]">
                     {sharedPostData?.media_url.map((_, index) => (
                       <div
                         key={index}

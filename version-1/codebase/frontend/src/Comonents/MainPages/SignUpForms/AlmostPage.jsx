@@ -6,14 +6,19 @@ import backgroundImage from "../../../assets/almostthere.jpg";
 import logo from "../../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 
-const AlmostPage = ({ formData, formDataError, handleInputChange, handleSubmit, handleBackStep}) => {
+const AlmostPage = ({
+  formData,
+  formDataError,
+  handleInputChange,
+  handleSubmit,
+  handleBackStep,
+}) => {
   const navigate = useNavigate();
 
-
   // onclick of logo, navigate to landing page
-  const handleLogo = () =>{
-    navigate("/")
-  }
+  const handleLogo = () => {
+    navigate("/");
+  };
 
   return (
     <div className="flex flex-col md:flex-row  bg-gradient-to-b from-teal-50 to-teal-200 md:h-screen ">
@@ -23,18 +28,35 @@ const AlmostPage = ({ formData, formDataError, handleInputChange, handleSubmit, 
         style={{ backgroundImage: `url(${backgroundImage})` }}
       >
         <div className="absolute top-8 left-8 md:top-12 md:left-12 md:ml-10">
-          <img src={logo} alt="Travso Logo" className="w-32 md:w-40 cursor-pointer" onClick={handleLogo} />{" "}
+          <img
+            src={logo}
+            alt="Travso Logo"
+            className="w-32 md:w-40 cursor-pointer"
+            onClick={handleLogo}
+          />{" "}
           {/* Logo size and responsiveness */}
         </div>
         <div className=" absolute inset-0 flex flex-col justify-end p-8 md:p-16 text-white text-left md:ml-10">
           <h1 className="text-3xl md:text-5xl font-bold">
-          Connect with Travel <br /> Buddies
+            Weave Your Own Indian <br /> Travel Story
           </h1>
           <p className="mt-4 text-sm md:text-base hidden md:flex">
-          Join a global community of travel enthusiasts to share your travel story, exchange insider tips, discover hidden gems, and celebrate the beauty of diverse destinations.
+            {
+              `Inspire others with your unique experiences as you explore India's
+            vibrant tourism destinations, from cultural landmarks to hidden
+            gems. Share your journey and help others discover the beauty and
+            diversity of India.`
+            }
+            
           </p>
           <p className="mt-4 text-sm md:text-base flex md:hidden">
-          Join a global community of travel enthusiasts to share your travel story, exchange insider tips, discover hidden gems, and celebrate the beauty of diverse destinations.
+            {
+              `Inspire others with your unique experiences as you explore India's
+            vibrant tourism destinations, from cultural landmarks to hidden
+            gems. Share your journey and help others discover the beauty and
+            diversity of India.`
+            }
+            
           </p>
           <div className="flex items-center mt-8 space-x-4 w-[50%] gap-[30px]">
             <div className="flex-1 relative">
@@ -46,7 +68,7 @@ const AlmostPage = ({ formData, formDataError, handleInputChange, handleSubmit, 
               ></div>{" "}
               {/* 30% filled portion */}
             </div>
-            <span className="text-sm">03 — 03</span>
+            <span className="text-sm">03</span>
           </div>
         </div>
       </div>
@@ -67,7 +89,11 @@ const AlmostPage = ({ formData, formDataError, handleInputChange, handleSubmit, 
                 onChange={handleInputChange}
                 className="w-full p-2 border border-[#2DC6BE] rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder:font-poppins placeholder:text-customBlack"
               />
-              {formDataError.userName && <p className='error text-left text-[#ff0000] text-sm'>{formDataError.userName}</p>}
+              {formDataError.userName && (
+                <p className="error text-left text-[#ff0000] text-sm">
+                  {formDataError.userName}
+                </p>
+              )}
             </div>
 
             {/* <div>
@@ -91,7 +117,11 @@ const AlmostPage = ({ formData, formDataError, handleInputChange, handleSubmit, 
                 placeholder="Create Password"
                 className="text-[#364045] w-full p-2 border border-[#2DC6BE] rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder:font-poppins placeholder:text-customBlack"
               />
-              {formDataError.password && <p className='error text-left text-[#ff0000] text-sm'>{formDataError.password}</p>}
+              {formDataError.password && (
+                <p className="error text-left text-[#ff0000] text-sm">
+                  {formDataError.password}
+                </p>
+              )}
             </div>
 
             <div>
@@ -103,15 +133,19 @@ const AlmostPage = ({ formData, formDataError, handleInputChange, handleSubmit, 
                 onChange={handleInputChange}
                 className="text-[#364045] w-full p-2 border border-[#2DC6BE] rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder:font-poppins placeholder:text-customBlack"
               />
-              {formDataError.confirmPassword && <p className='error text-left text-[#ff0000] text-sm'>{formDataError.confirmPassword}</p>}
+              {formDataError.confirmPassword && (
+                <p className="error text-left text-[#ff0000] text-sm">
+                  {formDataError.confirmPassword}
+                </p>
+              )}
             </div>
-          <div className="flex justify-between">
+            <div className="flex justify-between">
               <button
                 type="submit"
                 className="mt-2 w-[48%] py-2 border border-[#2DC6BE] bg-gradient text-teal-400 font-semibold rounded-lg hover:bg-teal-500 hover:text-white transition"
                 onClick={handleBackStep}
               >
-                {'<'} Back
+                {"<"} Back
               </button>
               <button
                 type="submit"
@@ -119,7 +153,7 @@ const AlmostPage = ({ formData, formDataError, handleInputChange, handleSubmit, 
               >
                 Create
               </button>
-          </div>
+            </div>
           </form>
         </div>
       </div>

@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useMemo, useState } from "react";
 import logo from "../../../assets/logo.png";
-import backgroundImage from "../../../assets/signup.jpg";
+import backgroundImage from "../../../assets/signup.png";
 import Select from "react-select";
 import stateData from "../../../statedata/statedata.json";
 import { useNavigate } from "react-router-dom";
@@ -361,7 +361,7 @@ const SignupStep1 = ({
               ></div>{" "}
               {/* 30% filled portion */}
             </div>
-            <span className="text-sm">01 — 03</span>
+            <span className="text-sm">01</span>
           </div>
         </div>
       </div>

@@ -18,6 +18,9 @@ import FollowersPage from "./Comonents/OtherPages/FollowersPage";
 import FollowingPage from "./Comonents/OtherPages/FollowingPage";
 import PostDataDetailPage from "./Comonents/OtherPages/PostDataDetailPage";
 import ShowSharedPost from './Comonents/OtherPages/ShowSharedPost';
+import ExplorerPage from './Comonents/OtherPages/ExplorerPage';
+import BuddiesRequestPage from './Comonents/OtherPages/BuddiesRequestPage';
+import SettingPages from './Comonents/OtherPages/AllSettingPages/SettingPages';
 
 
 function App() {
@@ -40,6 +43,10 @@ function App() {
         <Route path="/buddiespage" element={<BuddiesPage />} />
         <Route path="/followers" element={<FollowersPage />} />
         <Route path="/following" element={<FollowingPage />} />
+        <Route path="/explorer" element={<ExplorerPage />} />
+        <Route path="/setting" element={<SettingPages />} />
+        <Route path="/buddies-request" element={<BuddiesRequestPage />} />
+        
         <Route path="/PostData" element={<PostDataDetailPage />} />
         {/* <Route path={`/:Krishna005/14`} element={<ShowSharedPost />} /> */}
         <Route path="/:userName/:postId" element={<ShowSharedPost />} />

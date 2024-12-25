@@ -299,12 +299,12 @@ const StoryPage = ({ isOpen, onClose }) => {
     "Luxury Traveler": BadgesIconFirst,
   };
 
-  console.log("====storyData====>", storyData);
+  // console.log("====storyData====>", storyData);
 
   /* handle story submit */
 /* handle story submit */
 const handleStorySubmit = async () => {
-  console.log("====storyData====>", storyData);
+  // console.log("====storyData====>", storyData);
 
   // Validate media_url length
   if (storyData.media_url.length === 0) {

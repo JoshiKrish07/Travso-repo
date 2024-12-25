@@ -149,7 +149,7 @@ const ProfilePageHeaderData = () => {
                         }
                         hadleShowViewStory={hadleShowViewStory}
                         isShowvisibleStoryViewID={isShowvisibleStoryViewID}
-                        storyData={activeStories[0]}
+                        storyData={activeStories[0].stories}
                         openDropdownIdUser={openDropdownIdUser}
                         setOpenDropdownIdUser={setOpenDropdownIdUser}
                         setIsShowvisibleStoryViewID={

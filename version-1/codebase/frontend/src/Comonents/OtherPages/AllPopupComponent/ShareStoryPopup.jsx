@@ -162,97 +162,61 @@ const ShareStoryPopup = ({ isOpen, onClose, storyId, userName }) => {
               </span>
             </div>
             <div className="grid grid-cols-4 gap-4">
-              {/* {buddieList && buddieList.map((item) => (
-              <div
-                key={item.id}
-                className="relative flex flex-col items-center"
-                onClick={() => handleSelect(item.id)}
-              >
-                 {shareIds.includes(item.id) && (
-                <div className="absolute top-4 right-4 flex items-center gap-[8px]">
-                  <div
-                    className={`relative h-6 w-6 rounded-full border-2 cursor-pointer flex items-center justify-center ${
-                      shareIds.includes(item.id)
-                        ? "bg-[#2DC6BE] border-[#2DC6BE]"
-                        : "bg-white border-gray-300"
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent triggering the parent onClick
-                      handleSelect(item.id); // Handle checkbox selection
-                    }}
-                  >
-                    {shareIds.includes(item.id) && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="white"
-                        className="h-5 w-5"
-                      >
-                        <path d="M9 16.17l-3.59-3.58L4 14l5 5 10-10-1.41-1.42L9 16.17z" />
-                      </svg>
-                    )}
-                  </div>
+              {!buddieList ||
+                buddieList.length === 0 && (
+                  <div className="flex flex-col items-center justify-center m-auto p-4 text-[#212626]">
+                    <p className="bg-[#f3f4f6] rounded-full p-5">❗</p>
+                  <p className="flex items-center justify-center m-auto mt-1 text-[#2DC6BE]">Add Buddies to share post. <br/>Please, Go to suggestion section.</p>
                 </div>
                 )}
-                <img
-                  src={item.profile_image || dummyUserImage}
-                  alt={'Profile'}
-                  className="w-[66px] h-[66px] rounded-full border-2 border-gray-300 object-cover"
-                />
-                <p className="font-inter font-medium text-[14px] text-[#212626]">
-                  {item.full_name}
-                </p>
-              </div>
-            ))} */}
 
-              {!buddieList || buddieList.length === 0 ? (
-                <div>
-                  <h3>Add Buddies to share posts</h3>
-                </div>
-              ) : (
-                buddieList.map((item) => (
-                  <div
-                    key={item.id}
-                    className="relative flex flex-col items-center"
-                    onClick={() => handleSelect(item.id)}
-                  >
-                    {shareIds.includes(item.id) && (
-                      <div className="absolute top-4 right-4 flex items-center gap-[8px]">
-                        <div
-                          className={`relative h-6 w-6 rounded-full border-2 cursor-pointer flex items-center justify-center ${
-                            shareIds.includes(item.id)
-                              ? "bg-[#2DC6BE] border-[#2DC6BE]"
-                              : "bg-white border-gray-300"
-                          }`}
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevent triggering the parent onClick
-                            handleSelect(item.id); // Handle checkbox selection
-                          }}
-                        >
-                          {shareIds.includes(item.id) && (
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="white"
-                              className="h-5 w-5"
+              {
+                buddieList ||
+                  buddieList.length !== 0 &&
+                    buddieList.map((item) => (
+                      <div
+                        key={item.id}
+                        className="relative flex flex-col items-center"
+                        onClick={() => handleSelect(item.id)}
+                      >
+                        {shareIds.includes(item.id) && (
+                          <div className="absolute top-4 right-4 flex items-center gap-[8px]">
+                            <div
+                              className={`relative h-6 w-6 rounded-full border-2 cursor-pointer flex items-center justify-center ${
+                                shareIds.includes(item.id)
+                                  ? "bg-[#2DC6BE] border-[#2DC6BE]"
+                                  : "bg-white border-gray-300"
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent triggering the parent onClick
+                                handleSelect(item.id); // Handle checkbox selection
+                              }}
                             >
-                              <path d="M9 16.17l-3.59-3.58L4 14l5 5 10-10-1.41-1.42L9 16.17z" />
-                            </svg>
-                          )}
-                        </div>
+                              {shareIds.includes(item.id) && (
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  fill="white"
+                                  className="h-5 w-5"
+                                >
+                                  <path d="M9 16.17l-3.59-3.58L4 14l5 5 10-10-1.41-1.42L9 16.17z" />
+                                </svg>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        <img
+                          src={item.profile_image || dummyUserImage}
+                          alt={"Profile"}
+                          className="w-[66px] h-[66px] rounded-full border-2 border-gray-300 object-cover"
+                        />
+                        <p className="font-inter font-medium text-[14px] text-[#212626]">
+                          {item.full_name}
+                        </p>
                       </div>
-                    )}
-                    <img
-                      src={item.profile_image || dummyUserImage}
-                      alt={"Profile"}
-                      className="w-[66px] h-[66px] rounded-full border-2 border-gray-300 object-cover"
-                    />
-                    <p className="font-inter font-medium text-[14px] text-[#212626]">
-                      {item.full_name}
-                    </p>
-                  </div>
-                ))
-              )}
+                    ))
+                // )
+              }
             </div>
           </div>
 
@@ -280,7 +244,11 @@ const ShareStoryPopup = ({ isOpen, onClose, storyId, userName }) => {
               </button> */}
               <button
                 className={`rounded-[8px] border border-[#F0F7F7] bg-[#F0F7F7] p-[12px] w-full font-inter font-medium text-[16px] text-[#2DC6BE] 
-                  ${!buddieList || buddieList.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-teal-400 hover:text-white'}`}
+                  ${
+                    !buddieList || buddieList.length === 0
+                      ? "opacity-50 cursor-not-allowed"
+                      : "hover:bg-teal-400 hover:text-white"
+                  }`}
                 onClick={() => copyLinkToClipBoard()}
                 disabled={!buddieList || buddieList.length === 0}
               >

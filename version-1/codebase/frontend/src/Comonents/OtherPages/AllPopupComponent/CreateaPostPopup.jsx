@@ -277,7 +277,7 @@ const CreateaPostPopup = ({
       // Check if total files exceed the limit
       const currentMediaCount = postData.media_url.length;
       if (currentMediaCount + filesArray.length > MAX_FILES) {
-        alert(`You can only upload up to ${MAX_FILES} files in total.`);
+        alert(`You can upload maximum 4 files/images at once.`);
         return; // Do not process the files
       }
 
