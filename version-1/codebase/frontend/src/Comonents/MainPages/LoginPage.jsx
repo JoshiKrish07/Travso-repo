@@ -330,42 +330,16 @@ const handleSubmit = async(e) => {
 }
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gradient-to-b from-teal-50 to-teal-200">
+    <div className="flex flex-col md:flex-row items-center justify-center w-full h-screen bg-gradient-to-r from-[#1DB2AA] to-[#bbd570] p-2">
       {flashMessage && <SuccessError message={flashMessage} messageType={flashMsgType}/>}
 
-      {/* Left Section */}
-      <div
-        className="flex-[1.5] bg-cover bg-center relative md:rounded-r-[50px] overflow-hidden"
-        style={{ backgroundImage: `url(${backgroundImage})` }}
-      >
-        <div className="absolute top-8 left-8 md:top-12 md:left-12 md:ml-10">
-          <img src={logo} alt="Travso Logo" className="w-32 md:w-40" /> {/* Logo size and responsiveness */}
-        </div>
-        <div className=" absolute inset-0 flex flex-col justify-end p-8 md:p-16 text-white text-left md:ml-10">
-          <h1 className="text-4xl md:text-5xl font-bold">The Whole World <br/> in One Place</h1>
-          <p className="mt-4 text-sm md:text-base">
-            Discover the most unique places, experiences,<br/> and amazing homes around the world.
-          </p>
-          <div className="flex items-center mt-8 space-x-4 w-[50%] gap-[30px]">
-            <div className="flex-1 relative">
-              <div className="w-full h-0.5 bg-gray-300"></div>{" "}
-              {/* Full horizontal line */}
-              <div
-                className="absolute top-0 left-0 h-0.5 bg-white"
-                style={{ width: "100%" }}
-              ></div>{" "}
-              {/* 100% filled portion */}
-            </div>
-            <span className="text-sm">03 — 03</span>
-          </div>
-        </div>
-      </div>
+    
 
       {/* Right Section */}
-      <div className="flex-[1] flex justify-center items-center">
-        <div className="rounded-lg w-11/12 md:w-3/4 lg:w-3/5">
-          <h2 className="text-[32px] font-semibold mb-4 mt-2 text-center">Login</h2>
-          <form className="space-y-6" onSubmit={handleSubmit}>
+      <div className="flex flex-col justify-center items-center rounded-[16px] bg-[#FFFFFFBF] w-full p-2 py-4 md:w-[480px] md:h-[452px]">
+          <img src={logo} alt="Travso Logo" className="w-32 md:w-40"/>
+          <h2 className="font-poppins text-[32px] text-[#364045] font-semibold text-center mt-10 mb-5">Login</h2>
+          <form className="flex flex-col gap-[16px] w-full md:w-[416px]" onSubmit={handleSubmit}>
             <div>
               <input
                 type="text"
@@ -373,7 +347,7 @@ const handleSubmit = async(e) => {
                 placeholder="User Name"
                 value={formData.username}
                 onChange={handleChange}
-                className="w-full p-2 border border-[#2DC6BE] rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
+                className="font-inter w-full p-2  rounded-[8px] focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder:font-inter placeholder:font-medium placeholder:text-[#667877] placeholder:text-[16px]"
               />
                   {formDataError.username && <p className="error text-left text-[#ff0000] text-sm">{formDataError.username}</p>}
             </div>
@@ -384,29 +358,29 @@ const handleSubmit = async(e) => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full p-2 border border-[#2DC6BE] rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400"
+                className="font-inter w-full p-2  rounded-[8px] focus:outline-none focus:ring-2 focus:ring-teal-400 placeholder:font-inter placeholder:font-medium placeholder:text-[#667877] placeholder:text-[16px]"
               />
               {formDataError.password && <p className="error text-left text-[#ff0000] text-sm">{formDataError.password}</p>}
             </div>
             <button
               type="submit"
-              className="mt-5 w-full py-2 bg-teal-400 text-[white] font-semibold rounded-md hover:bg-teal-500 transition"
+              className="font-roboto mt-2 w-full py-2 bg-gradient-to-r from-[#1DB2AA] to-[#bbd570] text-[white] font-semibold rounded-[8px] hover:bg-teal-500 transition"
             >
               Sign In
             </button>
           </form>
-          <p className="text-right mt-2 pb-10 md:pb-0 text-base">
+          <p className="font-roboto text-[16px] font-normal text-right mt-1 text-base">
             <Link
-              className="text-teal-600 hover:underline"
+              className="text-right text-teal-600 hover:underline"
               onClick={toggleForgotPassword}
             >
               Forgot Password?
             </Link>
           </p>
-          <p className="text-center mt-10 pb-10 md:pb-0 text-base">
-            Don’t have an account? <Link to="/signup" className="text-teal-600 hover:underline">Signup</Link>
+          <p className="font-roboto text-[16px] font-normal text-center mt-3 text-base">
+            Don’t have an account? <Link to="/signup" className="text-[#6CC38D] hover:underline">Signup</Link>
           </p>
-        </div>
+      
       </div>
       {/* Forgot Password Modal */}
       {isForgotPasswordOpen && (
@@ -459,7 +433,7 @@ const handleSubmit = async(e) => {
               {step === 1 && (
                 <div>
                   {activeTab === "email" && (
-                    <form>
+                    <form className='flex flex-col gap-[20px]'>
                       <div>
                         <input
                           type="email"
@@ -492,7 +466,7 @@ const handleSubmit = async(e) => {
                     </form>
                   )}
                   {activeTab === "mobile" && (
-                    <form>
+                    <form className='flex flex-col gap-[20px]'>
                       <div>
                         <input
                           type="number"

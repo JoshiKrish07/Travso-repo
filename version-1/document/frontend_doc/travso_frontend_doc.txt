@@ -329,3 +329,21 @@ Major functions working :-
 -> handleOpenShareStoryPopup() function :- It is used to open a share popup having buddies in popup in the story section.
 -> handleShareStoryPopupClose() function :- It is used to close share popup in story section.
 ====================================================================================================================================
+
+Module:- Story Section
+
+folder :- src/Component/OtherPages/AllStoriesPages
+
+1) StoryPage.jsx :- It is being called on Community.jsx and ProfilePageHeaderData.jsx to upload a story
+                  -> handleImageUpload() & handleDrop() function :- It is used to upload image and video with conditions of 4 images/videos and images
+                                                     not more than 2 mb.
+                 
+                  -> storyData :- This state is used to manage data to be used to update on story.
+                  -> handleStorySubmit() function :- It is calling redux createStory() function through which story data is saved in DB.
+                  -> handleRemoveImage() :- It is used to remove selected image before uploading for story.
+
+2) StoryViewPage.jsx :- We are using stories-react package to view story of logged in user.
+                  -> Using storyData(prop) which is coming for api(stories), displaying user story in sequential manner.
+                  -> deleteThisStory() :- This function is used to delete the selected story.
+
+=====================================================================================================================================

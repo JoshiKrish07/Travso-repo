@@ -239,18 +239,38 @@ const PostDataDetailPage = () => {
                               </svg>
                             </div>
                             <p className="text-left text-[14px] text-[#667877] font-inter font-medium -mt-1">
-                              {"Solo Traveler"} • {"Rameswaram"}
+                              {/* {"Solo Traveler"} • {"Rameswaram"} */}
+                              {post?.badge.split("-")[0]}{" "}
+                              {post?.location &&
+                                post?.badge.split("-")[0] &&
+                                "•"}{" "}
+                              {post?.location}
                             </p>
                           </div>
                         </div>
 
                         {/* Post Image */}
 
-                        <img
+                        {/* <img
                           src={post.media_url[0]}
                           alt="Post"
                           className="w-full rounded-[5px] h-[432px] object-cover"
-                        />
+                        /> */}
+
+                        {post.media_url[0].match(/\.(mp4|avi|mov|flv|webm|mkv|mpg|mpeg|3gp)$/) ? (
+                          <video
+                            src={post.media_url[0]}
+                            alt="Post"
+                            className="w-full rounded-[5px] h-[432px] object-cover"
+                            controls
+                          />
+                        ) : (
+                          <img
+                            src={post.media_url[0]}
+                            alt="Post"
+                            className="w-full rounded-[5px] h-[432px] object-cover"
+                          />
+                        )}
 
                         {/* Post Stats */}
                         <div className="mt-4 text-sm flex justify-between items-center text-gray-600">
