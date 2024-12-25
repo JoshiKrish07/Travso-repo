@@ -887,7 +887,7 @@ const authSlice = createSlice({
     toWhomUserFollows: null,
     allUsers: null,
     onlineFriends: null,
-    suggestionList: null
+    suggestionList: null,
   },
   reducers: {
     resetAuthState: (state) => {

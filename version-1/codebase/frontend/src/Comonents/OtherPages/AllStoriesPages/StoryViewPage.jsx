@@ -28,7 +28,7 @@ const StoryViewPage = ({
   const dispatch = useDispatch();
 
   const deleteThisStory = async(storyid) => {
-    // console.log("====storyid===>", storyid);
+    console.log("====storyid===>", storyid);
     try {
         const deleteResponse = await dispatch(deleteStory(storyid)).unwrap();
          await dispatch(getActiveStories());
@@ -39,6 +39,7 @@ const StoryViewPage = ({
     }
   }
 
+  // console.log("===storyData===>",storyData)
   
 
   // Verify and preprocess the stories data to ensure correct formatting
@@ -192,7 +193,7 @@ const StoryViewPage = ({
                     </li>
                   </ul>
                 </div>
-              )}
+               )}  
             </div>
           </div>
         </div>
@@ -363,7 +364,7 @@ const StoryViewPage = ({
     ),
   }));
 
-  console.log("====processedStoriesData===>",processedStoriesData)
+  // console.log("====processedStoriesData===>",processedStoriesData)
 
   return (
     <div

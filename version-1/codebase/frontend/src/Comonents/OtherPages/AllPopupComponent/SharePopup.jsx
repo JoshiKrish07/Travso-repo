@@ -158,12 +158,18 @@ const SharePopup = ({ isOpen, onClose, postId, userName }) => {
                 <SearchIcon />
               </span>
             </div>
-            <div className="grid grid-cols-5 gap-4">
-              {!buddieList || buddieList.length === 0 ? (
-                <div className="text-center p-4 text-[#212626]">
-                  <p>Add Buddies to share post</p>
+
+            {
+              !buddieList || buddieList.length === 0 && (
+                  <div className="flex flex-col items-center justify-center m-auto p-4 text-[#212626]">
+                    <p className="bg-[#f3f4f6] rounded-full p-5">❗</p>
+                  <p className="flex items-center justify-center m-auto mt-1 text-[#2DC6BE]">Add Buddies to share post. <br/>Please, Go to suggestion section.</p>
                 </div>
-              ) : (
+              )
+            }
+            
+            <div className="grid grid-cols-5 gap-4">
+              {buddieList || buddieList.length !== 0 && 
                 buddieList.map((item) => (
                   <div
                     key={item.id}
@@ -206,7 +212,7 @@ const SharePopup = ({ isOpen, onClose, postId, userName }) => {
                     </p>
                   </div>
                 ))
-              )}
+              }
             </div>
           </div>
 

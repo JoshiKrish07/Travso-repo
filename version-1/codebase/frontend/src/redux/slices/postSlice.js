@@ -654,6 +654,8 @@ const postSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.sharedPostData = null;
+      state.activeStories = null;
+      state.allPosts = null;
     },
    },
   extraReducers: (builder) => {

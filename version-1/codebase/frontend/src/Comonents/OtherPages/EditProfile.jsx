@@ -336,6 +336,7 @@ const EditProfile = () => {
         ).unwrap();
         console.log("updateResult", updateResult);
         if (updateResult) {
+          dispatch(getUserDetails());
           navigate("/suggestion");
         }
       } catch (error) {
