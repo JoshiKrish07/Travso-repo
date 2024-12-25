@@ -4,7 +4,7 @@ import logo from "../../../assets/logo.png";
 import backgroundImage from "../../../assets/signup.png";
 import Select from "react-select";
 import stateData from "../../../statedata/statedata.json";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import OTPInput from "react-otp-input";
 import { generateOtp, registerUser, resendOTP, verifyOtp } from "../../../redux/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -102,6 +102,8 @@ const SignupStep1 = ({
       label: states[stateName].name,
     }));
   }, [states]);
+
+  // console.log("=====stateOptions====>", stateOptions);
 
 
  // old one it may need to be implemented if data comes from backend
@@ -548,9 +550,9 @@ const SignupStep1 = ({
             </form>
             <p className="text-center mt-5 pb-10 md:pb-0 text-base">
               Already have an account?{" "}
-              <a href="/login" className="text-teal-600 hover:underline">
+              <Link to="/login" className="text-teal-600 hover:underline">
                 Login
-              </a>
+              </Link>
             </p>
           </div>
         </div>

@@ -216,7 +216,7 @@ const CreateaPostPopup = ({
 
   /* when user hits enter after writing tag */
   const handleTagEnter = async (e) => {
-    if (postData?.tags.length > 9) {
+    if (postData?.tags.length > 10) {
       alert("Only 10 tags are acceptable");
       return;
     }
@@ -239,8 +239,7 @@ const CreateaPostPopup = ({
   };
 
   const handleTagInputChange = async (e) => {
-    console.log("===postData?.tags.length====>", postData?.tags.length);
-    if (postData?.tags.length > 9) {
+    if (postData?.tags.length > 10) {
       alert("Only 10 tags are acceptable");
       return;
     }
@@ -661,7 +660,7 @@ const CreateaPostPopup = ({
                     {postData.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="inline-flex items-center justify-center gap-2 bg-[#09857E] text-white w-[108px] h-[24px] rounded-[4px] text-[12px] font-inter font-medium "
+                        className="absolute left-2 inline-flex items-center justify-center gap-2 bg-[#09857E] text-white w-[108px] h-[24px] rounded-[4px] text-[12px] font-inter font-medium "
                       >
                         {tag}
                         <button

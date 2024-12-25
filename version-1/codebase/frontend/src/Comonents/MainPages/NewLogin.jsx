@@ -154,7 +154,7 @@ const NewLogin = () => {
               {step === 1 && (
                 <div>
                   {activeTab === "email" && (
-                    <form>
+                    <form className="flex flex-col gap-[20px]">
                       <input
                         type="email"
                         placeholder="Email Address"
@@ -169,7 +169,7 @@ const NewLogin = () => {
                     </form>
                   )}
                   {activeTab === "mobile" && (
-                    <form>
+                    <form className="flex flex-col gap-[20px]">
                       <input
                         type="number"
                         placeholder="Mobile Number"

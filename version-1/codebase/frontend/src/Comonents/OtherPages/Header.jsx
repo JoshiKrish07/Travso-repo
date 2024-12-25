@@ -925,6 +925,7 @@ const Header = () => {
                   }`}
                   onClick={() => {
                     setActiveTab("isNotificationsOpen");
+                    setIsNotificationsOpen(!isNotificationsOpen)
                   }}
                 >
                   {activeTab !== "isNotificationsOpen" && (
@@ -993,7 +994,7 @@ const Header = () => {
                     </svg>
                   )}
                 </button>
-                {activeTab === "isNotificationsOpen" && (
+                {activeTab === "isNotificationsOpen" && isNotificationsOpen && (
                   <div className="absolute -left-[18rem] top-full mt-[0.5px] max-w-80 bg-white shadow-lg rounded-b-lg overflow-hidden p-4 z-50">
                     {/* Recent Views */}
                     <div className="mb-4">

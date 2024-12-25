@@ -646,6 +646,7 @@ const CommunityPage = () => {
   // console.log("===popupBuddiesReelVisible====>", popupBuddiesReelVisible)
 
   const toggleSettingStoryView = (storyId) => {
+    console.log("=====storyId====>", storyId);
     setOpenDropdownIdUser(storyId);
     // setDropdownOpenStoryViewSetting(!dropdownOpenStoryViewSetting);
   };

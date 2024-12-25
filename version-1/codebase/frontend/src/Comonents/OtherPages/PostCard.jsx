@@ -29,6 +29,7 @@ import SuccessError from "./SuccessError";
 import dummyUserImage from "../../assets/user_image-removebg-preview.png";
 import CreateaPostPopup from "./AllPopupComponent/CreateaPostPopup";
 import PostDetailPopup from "./AllPopupComponent/PostDetailPopup";
+import BadgesIconFirst from "../../assets/BadgesIconFirst.png";
 
 const PostCard = () => {
   const dispatch = useDispatch();
@@ -145,6 +146,10 @@ const PostCard = () => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullTextVisible, setIsFullTextVisible] = useState(false);
+
+  /* for showing tagged buddies */
+  const [isotherDataVisible, setIsotherDataVisible] = useState(false);
+  const [showTaggedBuddiesPostId, setShowTaggedBuddiesPostId] = useState(false);
 
   // Function to toggle the full text
   const toggleFullText = () => {
@@ -300,6 +305,23 @@ const PostCard = () => {
     setActivePostId(null);
   };
 
+  // Simplified badge image logic
+  const badges = {
+    Adventurer: BadgesIconFirst,
+    Explorer: BadgesIconFirst,
+    Foodie: BadgesIconFirst,
+    "Solo Traveler": BadgesIconFirst,
+    "Luxury Traveler": BadgesIconFirst,
+  };
+
+  const togglePopup = (postId) => {
+    // setActivePostId((prevId) => (prevId === postId ? null : postId));
+    setIsotherDataVisible(!isotherDataVisible);
+    setShowTaggedBuddiesPostId(postId);
+  };
+
+  // console.log("===allPosts===on====postcard===>", allPosts);
+
   return (
     <>
       {flashMessage && (
@@ -363,9 +385,96 @@ const PostCard = () => {
                     />
                     <div>
                       <div className="flex items-center space-x-2">
-                        <h3 className="font-poppins font-semibold text-left text-[16px] text-[#212626]">
+                      <div className="flex items-center">
+                        <h3 className="font-poppins font-semibold text-left text-[20px] text-[#212626]">
                           {post?.full_name}
                         </h3>
+                        <div>
+                          {post?.buddies_id.length > 0 && (
+                            <div className="">
+                              <p
+                                className="font-poppins font-semibold text-[20px] text-[#212626] cursor-pointer"
+                                onClick={() => togglePopup(post.id)}
+                              >
+                                <span className="text-[#869E9D]">
+                                  &nbsp;with
+                                </span>{" "}
+                                {post?.buddies_id?.length} others{" "}
+                              </p>
+
+                              {isotherDataVisible &&
+                                showTaggedBuddiesPostId == post?.id && (
+                                  <div className="absolute mt-0 w-[416px] p-[24px] bg-white border border-gray-300 rounded-[16px] shadow-lg z-10 flex flex-col gap-[34px]">
+                                    {post?.buddies_id?.map((buddy) => {
+                                      return (
+                                        <div
+                                          className="flex flex-col"
+                                          key={buddy?.id}
+                                        >
+                                          <div className="flex items-center space-x-3">
+                                            <div>
+                                              <img
+                                                src={
+                                                  buddy?.profile_image ||
+                                                  dummyUserImage
+                                                }
+                                                alt="Image"
+                                                className="w-[44px] h-[44px] rounded-full"
+                                              />
+                                            </div>
+                                            <div className="flex flex-col">
+                                              <div className="flex items-center gap-2">
+                                                <h5 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
+                                                  {buddy?.full_name}
+                                                </h5>
+                                                <div className="relative group">
+                                                  <img
+                                                    src={
+                                                      badges[
+                                                        buddy?.badge?.split(
+                                                          "-"
+                                                        )[0]
+                                                      ] || BadgesIconFirst
+                                                    }
+                                                    alt="BadgesIconFirst"
+                                                    className="w-[24px] h-[24px]"
+                                                  />
+                                                  <div className="absolute left-0 mt-1 hidden group-hover:block bg-[#2DC6BE] text-white text-sm p-2 rounded shadow-lg w-[250px] text-justify">
+                                                    {
+                                                      buddy?.badge?.split(
+                                                        "-"
+                                                      )[1]
+                                                    }
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <div>
+                                                <p className="-mt-2 font-inter font-medium text-[16px] text-[#667877] text-left">
+                                                  {buddy?.user_name}
+                                                </p>
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="md:w-[338px] md:h-[32px] flex items-center justify-center rounded-full bg-[#E5FFFE] mt-3">
+                                            <p className="font-inter font-medium items-center text-center text-[12px] text-[#212626]">
+                                              {buddy?.badge?.split("-")[0]}{" "}
+                                              &nbsp;•&nbsp; 0 Trips
+                                              &nbsp;•&nbsp;{" "}
+                                              {buddy?.followers_count || 0}{" "}
+                                              followers &nbsp;•&nbsp;{" "}
+                                              {buddy?.buddies_count || 0}{" "}
+                                              Buddies
+                                            </p>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                            </div>
+                          )}
+                        </div>
+                        </div>
                         {/* Images beside h3 */}
                         <div className="flex space-x-1">
                           <svg
@@ -390,8 +499,9 @@ const PostCard = () => {
                       </div>
                       <p className="-mt-1 font-inter font-medium text-left text-[12px] text-[#667877]">
                         {/* {post?.badge.split("-")[0]} • {post?.location} */}
-                        {post?.badge.split("-")[0]} {post?.location && post?.badge.split("-")[0] && '•'} {post?.location}
-                      
+                        {post?.badge.split("-")[0]}{" "}
+                        {post?.location && post?.badge.split("-")[0] && "•"}{" "}
+                        {post?.location}
                       </p>
                     </div>
                   </div>
@@ -432,9 +542,7 @@ const PostCard = () => {
                                 src={post?.media_url[0]}
                                 alt={`Post Image`}
                                 className="rounded-lg w-full h-[432px] object-cover transition duration-500"
-                                onClick={() =>
-                                  handleOpenCommentPopup(post?.id)
-                                }
+                                onClick={() => handleOpenCommentPopup(post?.id)}
                               />
                             )}
                           </div>
@@ -476,9 +584,7 @@ const PostCard = () => {
                                 }
                                 alt={`Slide ${currentIndices[post.id] || 0}`}
                                 className="rounded-lg w-full h-[432px] object-cover transition duration-500"
-                                onClick={() =>
-                                  handleOpenCommentPopup(post?.id)
-                                }
+                                onClick={() => handleOpenCommentPopup(post?.id)}
                               />
                             )}
                           </div>
