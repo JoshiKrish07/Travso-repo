@@ -337,6 +337,7 @@ const Sidebar = () => {
                         controls
                         preload="auto"
                         className="w-full h-[130px] rounded-sm object-cover"
+                        controlsList="nodownload"
                       >
                         <source src={post.media_url[0]} type="video/mp4" />
                         Your browser does not support the video tag.

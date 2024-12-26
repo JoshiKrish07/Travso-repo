@@ -13,6 +13,7 @@ import Background from "../../../assets/Background.png";
 import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
 import { useDispatch, useSelector } from "react-redux";
 import { createStory, getActiveStories } from "../../../redux/slices/postSlice";
+import ShowBadgeIcon from "../ShowBadgeIcons";
 
 const StoryPage = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
@@ -159,49 +160,48 @@ const StoryPage = ({ isOpen, onClose }) => {
     const MAX_FILES = 4;
     const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2 MB
     const MAX_VIDEO_SIZE = 30 * 1024 * 1024; // 30 MB
-  
+
     if (files.length > 0) {
       const filesArray = Array.from(files); // Convert FileList to an array
-  
+
       // Check if total files exceed the limit
       const currentMediaCount = storyData.media_url.length;
       if (currentMediaCount + filesArray.length > MAX_FILES) {
         alert(`You can only upload up to ${MAX_FILES} files in total.`);
         return; // Do not process the files
       }
-  
+
       // Validate file sizes and types
       const invalidFiles = filesArray.filter((file) => {
         const isImage = file.type.startsWith("image/");
         const isVideo = file.type.startsWith("video/");
-  
+
         if (isImage && file.size > MAX_IMAGE_SIZE) {
           return true; // Invalid image size
         }
-  
+
         if (isVideo && file.size > MAX_VIDEO_SIZE) {
           return true; // Invalid video size
         }
-  
+
         if (!isImage && !isVideo) {
           return true; // Invalid file type
         }
-  
+
         return false;
       });
-  
+
       if (invalidFiles.length > 0) {
         alert(
           `Invalid file(s) detected. Images must be less than 2 MB, and videos must be less than 30 MB.`
         );
         return; // Do not process the files
       }
-  
+
       // Pass valid files to handleFileSelect
       handleFileSelect(filesArray);
     }
   };
-  
 
   /* for image drag */
   const handleDragOver = (e) => {
@@ -302,31 +302,30 @@ const StoryPage = ({ isOpen, onClose }) => {
   // console.log("====storyData====>", storyData);
 
   /* handle story submit */
-/* handle story submit */
-const handleStorySubmit = async () => {
-  // console.log("====storyData====>", storyData);
+  /* handle story submit */
+  const handleStorySubmit = async () => {
+    // console.log("====storyData====>", storyData);
 
-  // Validate media_url length
-  if (storyData.media_url.length === 0) {
-    alert("At least one image is required.");
-    return; // Stop further execution
-  }
-
-  try {
-    const response = await dispatch(createStory(storyData)).unwrap();
-    if (response) {
-      await dispatch(getActiveStories());
-      setStoryData({
-        media_url: [],
-        view: "Public",
-      });
-      onClose();
+    // Validate media_url length
+    if (storyData.media_url.length === 0) {
+      alert("At least one image is required.");
+      return; // Stop further execution
     }
-  } catch (error) {
-    console.log("Error in handleStorySubmit", error);
-  }
-};
 
+    try {
+      const response = await dispatch(createStory(storyData)).unwrap();
+      if (response) {
+        await dispatch(getActiveStories());
+        setStoryData({
+          media_url: [],
+          view: "Public",
+        });
+        onClose();
+      }
+    } catch (error) {
+      console.log("Error in handleStorySubmit", error);
+    }
+  };
 
   const handleStorySubmit1 = async () => {
     console.log("====storyData====>", storyData);
@@ -347,13 +346,13 @@ const handleStorySubmit = async () => {
   };
 
   /* when clicking on close mark on top of story popup */
-  const onCloseStoryPopUp = async() => {
+  const onCloseStoryPopUp = async () => {
     setStoryData({
       media_url: [],
       view: "Public",
     });
     onClose();
-  }
+  };
 
   // Disable body scroll when popup is open
   useEffect(() => {
@@ -419,16 +418,38 @@ const handleStorySubmit = async () => {
                         {userDetails?.full_name}
                       </h5>
                       <div className="relative group">
-                        <img
+                        {/* <img
                           src={
                             badges[userDetails?.badge?.split("-")[0]?.trim()]
                           }
                           alt="BadgesIconFirst"
                           className="w-[24px] h-[24px]"
-                        />
-                        <div className="absolute left-0 mt-1 hidden group-hover:block bg-[#2DC6BE] text-white text-sm p-2 rounded shadow-lg w-[250px] text-justify">
-                          {userDetails?.badge?.split("-")[1]}
-                        </div>
+                        /> */}
+                        {/* badge icon section  */}
+                        {userDetails?.badge?.split("-")[0]?.trim() ==
+                          "Solo Traveler" && (
+                          <ShowBadgeIcon badge={userDetails?.badge} />
+                        )}
+
+                        {userDetails?.badge?.split("-")[0]?.trim() ==
+                          "Luxury Traveler" && (
+                          <ShowBadgeIcon badge={userDetails?.badge} />
+                        )}
+
+                        {userDetails?.badge?.split("-")[0]?.trim() ==
+                          "Adventurer" && (
+                          <ShowBadgeIcon badge={userDetails?.badge} />
+                        )}
+
+                        {userDetails?.badge?.split("-")[0]?.trim() ==
+                          "Explorer" && (
+                          <ShowBadgeIcon badge={userDetails?.badge} />
+                        )}
+
+                        {userDetails?.badge?.split("-")[0]?.trim() ==
+                          "Foodie" && (
+                          <ShowBadgeIcon badge={userDetails?.badge} />
+                        )}
                       </div>
                     </div>
                     <div>
@@ -732,6 +753,7 @@ const handleStorySubmit = async () => {
                           height: "500px",
                           objectFit: "cover",
                         }}
+                        controlsList="nodownload"
                       />
                     ) : (
                       <img
@@ -757,7 +779,7 @@ const handleStorySubmit = async () => {
                 <div className="py-[8px] gap-[8px] flex items-center relative w-full max-w-4xl mx-auto">
                   {/* Slider */}
 
-                  <div className="w-full flex justify-between overflow-hidden">
+                  <div className="w-full flex gap-[10px] overflow-hidden">
                     {storyData?.media_url.map((reel, index) => {
                       const isVideo = reel.startsWith("data:video/"); // Check if the media is a video
 
@@ -780,6 +802,7 @@ const handleStorySubmit = async () => {
                                 objectFit: "cover",
                               }}
                               controls
+                              controlsList="nodownload"
                             />
                           ) : (
                             <img
@@ -840,7 +863,7 @@ const handleStorySubmit = async () => {
                     className={`absolute top-1/2 left-0 w-9 h-9 transform -translate-y-1/2 bg-[#000000BF] text-white rounded-full hover:bg-[#2DC6BE] flex items-center justify-center ${
                       storyIndex <= 0 ? "disabled" : ""
                     }`}
-                    disabled={storyIndex<=0}
+                    disabled={storyIndex <= 0}
                   >
                     <svg
                       width="8"

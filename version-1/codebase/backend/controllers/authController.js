@@ -818,6 +818,7 @@ async function getUserBuddies(req, res) {
       `
       SELECT DISTINCT
         u.id,
+        u.badge,
         u.profile_image,
         u.full_name,
         u.user_name,
@@ -969,6 +970,7 @@ async function getUserFollower(req , res){
     const [followers] = await pool.execute(
       ` SELECT 
         u.id,
+        u.badge,
         u.user_name,
         u.full_name,
         u.profile_image,
@@ -1061,10 +1063,12 @@ async function toWhomUserFollows(req , res){
     const [followers] = await pool.execute(
       ` SELECT 
         u.id,
+        u.badge,
         u.user_name,
         u.full_name,
         u.profile_image,
         u.cover_image,
+        u.description,
         u.is_influencer,
         EXISTS (
           SELECT 1 

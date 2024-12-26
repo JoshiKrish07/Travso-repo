@@ -638,6 +638,38 @@ export const deleteStory = createAsyncThunk(
   }
 );
 
+// Thunk for editComment details
+export const editComment = createAsyncThunk(
+  'post/editComment',
+  async (commentData,{ rejectWithValue }) => {
+    console.log("=====commentData====>", commentData);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/post/edit-comment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(commentData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json();
+      // console.log("=====data===in editComment=>", data);
+      return data;
+    } catch (error) {
+      console.log("error in editComment call thunk", error.message)
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
 const postSlice = createSlice({
   name: 'postSlice',
   initialState: {
@@ -901,6 +933,18 @@ const postSlice = createSlice({
         state.loading = false;
       })
       .addCase(deleteStory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle editComment
+      .addCase(editComment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(editComment.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(editComment.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

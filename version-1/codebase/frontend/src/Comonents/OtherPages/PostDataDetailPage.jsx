@@ -263,6 +263,7 @@ const PostDataDetailPage = () => {
                             alt="Post"
                             className="w-full rounded-[5px] h-[432px] object-cover"
                             controls
+                            controlsList="nodownload"
                           />
                         ) : (
                           <img

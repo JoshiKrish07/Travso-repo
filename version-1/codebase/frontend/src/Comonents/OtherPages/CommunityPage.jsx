@@ -52,6 +52,7 @@ import ShareStoryPopup from "./AllPopupComponent/ShareStoryPopup";
 import StoryPage from "./AllStoriesPages/StoryPage";
 import StoryViewPage from "./AllStoriesPages/StoryViewPage";
 import StoryViewPageUser from "./AllStoriesPages/StoryViewPageUser";
+import ShowBadgeIcon from "./ShowBadgeIcons";
 
 const CommunityPage = () => {
   const dispatch = useDispatch();
@@ -88,6 +89,25 @@ const CommunityPage = () => {
   const [isShowvisibleStoryViewID, setIsShowvisibleStoryViewID] =
     useState(false);
   const [openDropdownIdUser, setOpenDropdownIdUser] = useState(null);
+
+  const popupRef = useRef(null);
+
+  const handleOutsideClick = (event) => {
+    if (popupRef.current && !popupRef.current.contains(event.target)) {
+      setIsotherDataVisible(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isotherDataVisible) {
+      document.addEventListener("mousedown", handleOutsideClick);
+    } else {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [isotherDataVisible]);
 
   const hadleShowViewStory = (storyId) => {
     setIsShowvisibleStoryViewID(!isShowvisibleStoryViewID);
@@ -495,7 +515,7 @@ const CommunityPage = () => {
     setStoryReply((prev) => ({
       ...prev,
       [storyId]: value,
-    })); 
+    }));
     // Optional: If you need state for rendering
   };
 
@@ -551,16 +571,16 @@ const CommunityPage = () => {
         // Retrieve the reply text from the ref
         const replyText = storyReplyRef.current[storyId];
         if (!replyText || replyText.trim() === "") return; // Prevent empty submissions
-  
+
         const commentPayload = {
           story_id: storyId,
           reply_text: replyText, // Use the ref value
         };
-  
+
         const replyResponse = await dispatch(
           commentOnStory(commentPayload)
         ).unwrap();
-  
+
         if (replyResponse) {
           // Clear the reply for this story ID in the ref
           storyReplyRef.current[storyId] = "";
@@ -574,7 +594,6 @@ const CommunityPage = () => {
       }
     }
   };
-  
 
   /* to send any reply on story */
   const sendReplyToStory = async (storyId, userId) => {
@@ -793,46 +812,43 @@ const CommunityPage = () => {
                     );
                   })}
 
-                  {
-                    popupBuddiesReelVisible && currentBuddiesReelIndex && (
-                      // <StoryViewPageUser 
-                      //    closeStoryPopup = {closeStoryPopup}
-                      //    toggleSettingStoryView={toggleSettingStoryView}
-                      //    dropdownOpenStoryViewSetting={
-                      //        dropdownOpenStoryViewSetting
-                      //    }
-                      //    setDropdownOpenStoryViewSetting={
-                      //      setDropdownOpenStoryViewSetting
-                      //    }
-                      //    storyData = {activeStories[currentBuddiesReelIndex].stories}
-                      //    currentBuddiesReelIndex = {currentBuddiesReelIndex}
-                      
-                      //    isShowvisibleStoryViewID = {isShowvisibleStoryViewID}
-                      //    closeBuddiesStoryPopup = {closeBuddiesStoryPopup}
-                      //    handleBuddiesStoryPrevious = {handleBuddiesStoryPrevious}
-                      //    handleBuddiesStoryNext = {handleBuddiesStoryNext}
-                      // />
-                      <StoryViewPageUser
-                          closeBuddiesStoryPopup = {closeBuddiesStoryPopup}
-                          currentBuddiesReelIndex = {currentBuddiesReelIndex}
-                          isShowvisibleStoryViewID = {isShowvisibleStoryViewID}
-                          storyData = {activeStories[currentBuddiesReelIndex].stories}
-                          handleBuddiesStoryPrevious = {handleBuddiesStoryPrevious}
-                          handleBuddiesStoryNext = {handleBuddiesStoryNext}
-                          handleStoryCommentEnter = {handleStoryCommentEnter}
-                          handleStoryReplyInputChange = {handleStoryReplyInputChange}
-                          storyReply = {storyReply}
-                          handleShareStoryPopupClose = {handleShareStoryPopupClose}
-                          handleEmojiSelectUserID = {handleEmojiSelectUserID}
-                          activeEmojiStoryId = {activeEmojiStoryId}
-                          showEmojiPickerStory = {showEmojiPickerStory}
-                          handleEmojiClickStory = {handleEmojiClickStory}
-                          handleLikeUnlikeStory = {handleLikeUnlikeStory}
-                          increaseViewersCount = {increaseViewersCount}
-                      />
-                    )
-                  }
-        
+                {popupBuddiesReelVisible && currentBuddiesReelIndex && (
+                  // <StoryViewPageUser
+                  //    closeStoryPopup = {closeStoryPopup}
+                  //    toggleSettingStoryView={toggleSettingStoryView}
+                  //    dropdownOpenStoryViewSetting={
+                  //        dropdownOpenStoryViewSetting
+                  //    }
+                  //    setDropdownOpenStoryViewSetting={
+                  //      setDropdownOpenStoryViewSetting
+                  //    }
+                  //    storyData = {activeStories[currentBuddiesReelIndex].stories}
+                  //    currentBuddiesReelIndex = {currentBuddiesReelIndex}
+
+                  //    isShowvisibleStoryViewID = {isShowvisibleStoryViewID}
+                  //    closeBuddiesStoryPopup = {closeBuddiesStoryPopup}
+                  //    handleBuddiesStoryPrevious = {handleBuddiesStoryPrevious}
+                  //    handleBuddiesStoryNext = {handleBuddiesStoryNext}
+                  // />
+                  <StoryViewPageUser
+                    closeBuddiesStoryPopup={closeBuddiesStoryPopup}
+                    currentBuddiesReelIndex={currentBuddiesReelIndex}
+                    isShowvisibleStoryViewID={isShowvisibleStoryViewID}
+                    storyData={activeStories[currentBuddiesReelIndex].stories}
+                    handleBuddiesStoryPrevious={handleBuddiesStoryPrevious}
+                    handleBuddiesStoryNext={handleBuddiesStoryNext}
+                    handleStoryCommentEnter={handleStoryCommentEnter}
+                    handleStoryReplyInputChange={handleStoryReplyInputChange}
+                    storyReply={storyReply}
+                    handleShareStoryPopupClose={handleShareStoryPopupClose}
+                    handleEmojiSelectUserID={handleEmojiSelectUserID}
+                    activeEmojiStoryId={activeEmojiStoryId}
+                    showEmojiPickerStory={showEmojiPickerStory}
+                    handleEmojiClickStory={handleEmojiClickStory}
+                    handleLikeUnlikeStory={handleLikeUnlikeStory}
+                    increaseViewersCount={increaseViewersCount}
+                  />
+                )}
               </div>
               <div className="flex items-center justify-between gap-2 mt-5 w-full">
                 {/* Profile Image */}
@@ -911,7 +927,7 @@ const CommunityPage = () => {
 
                                       {isotherDataVisible &&
                                         showTaggedBuddiesPostId == post?.id && (
-                                          <div className="absolute mt-0 w-[416px] p-[24px] bg-white border border-gray-300 rounded-[16px] shadow-lg z-10 flex flex-col gap-[34px]">
+                                          <div ref={popupRef} className="absolute mt-0 w-[416px] p-[24px] bg-white border border-gray-300 rounded-[16px] shadow-lg z-10 flex flex-col gap-[34px]">
                                             {post?.buddies_id?.map((buddy) => {
                                               return (
                                                 <div
@@ -935,7 +951,7 @@ const CommunityPage = () => {
                                                           {buddy?.full_name}
                                                         </h5>
                                                         <div className="relative group">
-                                                          <img
+                                                          {/* <img
                                                             src={
                                                               badges[
                                                                 buddy?.badge?.split(
@@ -946,14 +962,66 @@ const CommunityPage = () => {
                                                             }
                                                             alt="BadgesIconFirst"
                                                             className="w-[24px] h-[24px]"
-                                                          />
-                                                          <div className="absolute left-0 mt-1 hidden group-hover:block bg-[#2DC6BE] text-white text-sm p-2 rounded shadow-lg w-[250px] text-justify">
-                                                            {
-                                                              buddy?.badge?.split(
-                                                                "-"
-                                                              )[1]
-                                                            }
-                                                          </div>
+                                                          /> */}
+                                                          {buddy?.badge
+                                                            ?.split("-")[0]
+                                                            ?.trim() ==
+                                                            "Solo Traveler" && (
+                                                            // <img
+                                                            //   src={badges["Solo Traveler"]?.trim()}
+                                                            //   alt="BadgesIconFirst"
+                                                            //   className="w-[24px] h-[24px]"
+                                                            // />
+                                                            <ShowBadgeIcon
+                                                              badge={
+                                                                buddy?.badge
+                                                              }
+                                                            />
+                                                          )}
+
+                                                          {buddy?.badge
+                                                            ?.split("-")[0]
+                                                            ?.trim() ==
+                                                            "Luxury Traveler" && (
+                                                            <ShowBadgeIcon
+                                                              badge={
+                                                                buddy?.badge
+                                                              }
+                                                            />
+                                                          )}
+
+                                                          {buddy?.badge
+                                                            ?.split("-")[0]
+                                                            ?.trim() ==
+                                                            "Adventurer" && (
+                                                            <ShowBadgeIcon
+                                                              badge={
+                                                                buddy?.badge
+                                                              }
+                                                            />
+                                                          )}
+
+                                                          {buddy?.badge
+                                                            ?.split("-")[0]
+                                                            ?.trim() ==
+                                                            "Explorer" && (
+                                                            <ShowBadgeIcon
+                                                              badge={
+                                                                buddy?.badge
+                                                              }
+                                                            />
+                                                          )}
+
+                                                          {buddy?.badge
+                                                            ?.split("-")[0]
+                                                            ?.trim() ==
+                                                            "Foodie" && (
+                                                            <ShowBadgeIcon
+                                                              badge={
+                                                                buddy?.badge
+                                                              }
+                                                            />
+                                                          )}
                                                         </div>
                                                       </div>
                                                       <div>
@@ -992,7 +1060,7 @@ const CommunityPage = () => {
 
                               {/* Images beside h3 */}
                               <div className="flex space-x-1">
-                                <img
+                                {/* <img
                                   src={
                                     badges[
                                       userDetails?.badge?.split("-")[0]?.trim()
@@ -1000,13 +1068,46 @@ const CommunityPage = () => {
                                   }
                                   alt="Badge"
                                   className="w-[24px] h-[24px]"
-                                />
+                                /> */}
+                                {post?.badge?.split("-")[0]?.trim() ==
+                                  "Solo Traveler" && (
+                                  // <img
+                                  //   src={badges["Solo Traveler"]?.trim()}
+                                  //   alt="BadgesIconFirst"
+                                  //   className="w-[24px] h-[24px]"
+                                  // />
+                                  <ShowBadgeIcon badge={post?.badge} />
+                                )}
+
+                                {post?.badge?.split("-")[0]?.trim() ==
+                                  "Luxury Traveler" && (
+                                  <ShowBadgeIcon badge={post?.badge} />
+                                )}
+
+                                {post?.badge?.split("-")[0]?.trim() ==
+                                  "Adventurer" && (
+                                  <ShowBadgeIcon badge={post?.badge} />
+                                )}
+
+                                {post?.badge?.split("-")[0]?.trim() ==
+                                  "Explorer" && (
+                                  <ShowBadgeIcon badge={post?.badge} />
+                                )}
+
+                                {post?.badge?.split("-")[0]?.trim() ==
+                                  "Foodie" && (
+                                  <ShowBadgeIcon badge={post?.badge} />
+                                )}
                               </div>
                             </div>
 
                             <p className="-mt-1 font-inter font-medium text-left text-[12px] text-[#667877]">
                               {/* {post?.badge.split("-")[0]} • {post?.location} */}
-                              {post?.badge.split("-")[0]} {post?.location && post?.badge.split("-")[0] && '•'} {post?.location}
+                              {post?.badge.split("-")[0]}{" "}
+                              {post?.location &&
+                                post?.badge.split("-")[0] &&
+                                "•"}{" "}
+                              {post?.location}
                             </p>
                           </div>
                         </div>
@@ -1035,6 +1136,7 @@ const CommunityPage = () => {
                                       controls
                                       src={post?.media_url[0]}
                                       className="rounded-lg w-full h-[432px] object-cover transition duration-500"
+                                      controlsList="nodownload"
                                     >
                                       {/* <source
                                   src={post?.media_url[0]}
@@ -1074,6 +1176,7 @@ const CommunityPage = () => {
                                       controls
                                       preload="auto"
                                       className="rounded-lg w-full h-[432px] object-cover transition duration-500"
+                                      controlsList="nodownload"
                                     >
                                       <source
                                         src={
@@ -1201,7 +1304,7 @@ const CommunityPage = () => {
                           <li className="flex items-center font-inter font-medium text-[12px] text-[#667877] ">
                             {/* 72K Love &nbsp; &nbsp;{" "} */}
                             {post?.total_likes}&nbsp;
-                            {post?.total_likes > 1 ? "Loves" : "Love"} &nbsp;
+                            {post?.total_likes > 1 ? "Likes" : "Like"} &nbsp;
                             &nbsp;{" "}
                             <div className="w-[4px] h-[4px] bg-[#869E9D] rounded-full"></div>
                           </li>

@@ -10,6 +10,8 @@ import RightArrow from "../../assets/rightarrow.png";
 // import energy from "../../assets/energy.png";
 import plus from "../../assets/plus.png";
 import earth from "../../assets/earth.png";
+import BucketIcon from "../../assets/BucketIcon.svg";
+import RightIconBuddies from "../../assets/RightIconBuddies.svg";
 
 const CommunityLeftSidebar = () => {
   const [joinCommunity, setJoinCommunity] = useState([
@@ -56,68 +58,88 @@ const CommunityLeftSidebar = () => {
     });
   };
 
+  const users = [
+    { id: 1, image: Girl, name: "User 1" },
+    { id: 2, image: Girl, name: "User 2" },
+    { id: 3, image: Girl, name: "User 3" },
+    { id: 4, image: Girl, name: "User 4" },
+    { id: 5, image: Girl, name: "User 5" },
+    { id: 6, image: Girl, name: "User 6" },
+  ];
+
+  const totalUsers = 20;
+
   return (
     <>
-      <div className="bg-white rounded-lg shadow-[0_2px_6px_rgba(0,0,0,0.10)] p-5">
-        
-        <h2 className="mb-4 font-poppins text-[20px] font-semibold text-[#212626] text-left">
-            Important Links 
-          </h2>
-        <div className="flex items-center justify-between mb-2">
+ 
+      <div className="bg-white rounded-[16px] shadow-[0_2px_6px_rgba(0,0,0,0.10)] p-5">
+        <div className="flex items-center justify-between gap-[10px]">
           <div className="flex items-center gap-2">
             <img
-              src={ArchiveMinus}
-              alt="ArchiveMinus"
-              className="w-[22px] h-[22px] rounded-full"
+              src={BucketIcon}
+              alt="BucketIcon"
+              className="w-[74px] h-[74px] rounded-full"
             />
-            <h2 className="font-poppins font-medium text-[14px] text-[#212626] text-left">
-              Bucket list
-            </h2>
+          </div>
+          <div className="flex flex-col items-start">
+            <h5 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
+              Bucket List
+            </h5>
+            <p className="-mt-1 font-inter font-medium text-[14px] text-[#667877] text-left">
+              Nec viverra ac aliquam urna quisque
+            </p>
           </div>
           <div>
             <img
-              src={RightArrow}
-              alt="ArchiveMinus"
-              className="w-2 h-3 rounded-full"
+              src={RightIconBuddies}
+              alt="RightIconBuddies"
+              className="w-[24px] h-[24px] rounded-full"
             />
           </div>
         </div>
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <img
-              src={earth}
-              alt="ArchiveMinus"
-              className="w-[20px] h-[20px] rounded-full"
-            />
-            <h2 className="font-poppins font-medium text-[14px] text-[#212626] text-left">
-              Explore
-            </h2>
+      </div>
+
+      <div className="mt-4 bg-[#09857E] rounded-[16px] shadow-[0_2px_6px_rgba(0,0,0,0.10)] p-5">
+        <div className="flex flex-col items-start justify-between gap-[10px]">
+          <div className="flex items-center">
+            {users.map((user, index) => (
+              <div
+                key={user.id}
+                className={`w-10 h-10 rounded-full overflow-hidden border-2 border-white${
+                  index === users.length - 2
+                    ? "-translate-y-2 z-10"
+                    : index === users.length - 1
+                    ? "-translate-y-4 z-20"
+                    : ""
+                }`}
+                style={{
+                  marginLeft: index > 0 ? "-8px" : "0",
+                }}
+              >
+                <img
+                  src={user.image}
+                  alt={user.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
+            <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center text-[#09857E] font-bold border-2 border-[#09857E] ml-[-15px] z-20">
+              +{totalUsers - users.length}
+            </div>
           </div>
-          <div>
-            <img
-              src={RightArrow}
-              alt="ArchiveMinus"
-              className="w-2 h-3 rounded-full"
-            />
+          <div className="flex flex-col items-start">
+            <h5 className="font-poppins font-semibold text-[20px] text-[#FFFFFF] text-left">
+              Meet Industry experts
+            </h5>
+            <p className="font-inter font-medium text-[14px] text-[#FFFFFFBF] text-left">
+              Nec viverra ac aliquam urna quisque quis in id. Nec viverra ac
+              aliquam urna
+            </p>
           </div>
-        </div>
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <img
-              src={plus}
-              alt="ArchiveMinus"
-              className="w-[20px] h-[20px] rounded-full"
-            />
-            <h2 className="font-poppins font-medium text-[14px] text-[#212626] text-left">
-               Buddies Request
-            </h2>
-          </div>
-          <div>
-            <img
-              src={RightArrow}
-              alt="ArchiveMinus"
-              className="w-2 h-3 rounded-full"
-            />
+          <div className="flex flex-col items-start justify-start">
+            <button className="bg-[#FFFFFF] flex items-center justify-center w-[166px] h-[36px] rounded-[4px] placeholder:font-inter placeholder:font-medium placeholder:text-[14px] placeholder:text-[#09857E]">
+              Connect with experts
+            </button>
           </div>
         </div>
       </div>

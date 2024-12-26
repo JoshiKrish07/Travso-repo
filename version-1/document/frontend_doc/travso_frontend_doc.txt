@@ -140,7 +140,9 @@ We are using following redux functions on this page for showing information on P
 file destination :- src/Components/OtherPages/AllPopupComponent/CommentPopup.jsx
 => CommentPopup Component :- Used on to show comment of particular post.
                           -> Handled by setActivePostId state.(to show popup)
-                          -> We pass post id to this component and usimg this show the data of post on popup.
+                          -> We pass post id to this component and using this show the data of post on popup.
+                          -> Badge is shown through ShowBadgeIcon component
+                          
 
 
 file destination :- src/Components/OtherPages/EditProfile.jsx
@@ -169,6 +171,9 @@ file destination :- src/Components/OtherPages/AllPopupComponent/CommentPopup.jsx
                                -> If less than 24 hours, it returns hour.
                                -> If more than 24 hours, it return days.
 5) handleCommentLikeUnlike() :- for Like and Unlike on any comment.
+6) handleEditComment() :- This function uses editComment() redux function to call edit api and update the comment. Edit option is enabled
+                           for the user if he has commented and on other user comment he has option to block user.
+7) blockTheUser() :- On comment and reply user have the option to block the user.
 
 file destination :- src/Components/OtherPages/CommunityRightSidebar.jsx
 1) Using displayedFriends shown active friends. If user clicks on show all actives then all actives are shown otherwise 8 people are
@@ -341,9 +346,11 @@ folder :- src/Component/OtherPages/AllStoriesPages
                   -> storyData :- This state is used to manage data to be used to update on story.
                   -> handleStorySubmit() function :- It is calling redux createStory() function through which story data is saved in DB.
                   -> handleRemoveImage() :- It is used to remove selected image before uploading for story.
+                  -> Badge is shown through ShowBadgeIcon Component.
 
 2) StoryViewPage.jsx :- We are using stories-react package to view story of logged in user.
                   -> Using storyData(prop) which is coming for api(stories), displaying user story in sequential manner.
                   -> deleteThisStory() :- This function is used to delete the selected story.
+                  
 
 =====================================================================================================================================
