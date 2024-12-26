@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { deleteStory, getActiveStories } from "../../../redux/slices/postSlice";
 import ShareStoryPopup from "../AllPopupComponent/ShareStoryPopup";
 import EmojiPicker from "emoji-picker-react";
+import ShowBadgeIcon from "../ShowBadgeIcons";
 
 const StoryViewPageUser = ({
   closeBuddiesStoryPopup,
@@ -28,10 +29,10 @@ const StoryViewPageUser = ({
   showEmojiPickerStory,
   handleEmojiClickStory,
   handleLikeUnlikeStory,
-  increaseViewersCount
+  increaseViewersCount,
 }) => {
   const dispatch = useDispatch();
-  const [viewedStoryId, setViewedStoryId] = useState('');
+  const [viewedStoryId, setViewedStoryId] = useState("");
   // console.log("====storyData===>", storyData);
   // console.log("====storyReply===>", storyReply);
   // console.log("====currentBuddiesReelIndex===>", currentBuddiesReelIndex);
@@ -39,12 +40,11 @@ const StoryViewPageUser = ({
   const handleStoryViewed = async () => {
     console.log("====viewedStoryId===>", viewedStoryId);
     await increaseViewersCount(viewedStoryId);
-  }
+  };
 
   // useEffect(() => {
   //   handleStoryViewed();
-  // }, []); 
-
+  // }, []);
 
   // Verify and preprocess the stories data to ensure correct formatting
   const processedStoriesData = storyData?.map((story) => ({
@@ -63,24 +63,26 @@ const StoryViewPageUser = ({
             <div className="flex flex-col">
               <p className="flex items-center gap-[5px] font-poppins font-semibold text-[16px] text-[#FFFFFF]">
                 {story.full_name}
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8 0L14.2547 3.01208L15.7994 9.78017L11.4711 15.2078H4.52893L0.200577 9.78017L1.74535 3.01208L8 0Z"
-                    fill="#9747FF"
-                  />
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M11.6843 5.53415C11.8633 5.71314 11.8633 6.00334 11.6843 6.18233L7.40656 10.4601C7.22757 10.6391 6.93736 10.6391 6.75837 10.4601L4.31393 8.01566C4.13494 7.83667 4.13494 7.54647 4.31393 7.36748C4.49292 7.18849 4.78312 7.18849 4.96211 7.36748L7.08246 9.48783L11.0362 5.53415C11.2151 5.35515 11.5053 5.35515 11.6843 5.53415Z"
-                    fill="white"
-                  />
-                </svg>
+                {/* badge icon section  */}
+                {story?.badge?.split("-")[0]?.trim() == "Solo Traveler" && (
+                  <ShowBadgeIcon badge={story?.badge} />
+                )}
+
+                {story?.badge?.split("-")[0]?.trim() == "Luxury Traveler" && (
+                  <ShowBadgeIcon badge={story?.badge} />
+                )}
+
+                {story?.badge?.split("-")[0]?.trim() == "Adventurer" && (
+                  <ShowBadgeIcon badge={story?.badge} />
+                )}
+
+                {story?.badge?.split("-")[0]?.trim() == "Explorer" && (
+                  <ShowBadgeIcon badge={story?.badge} />
+                )}
+
+                {story?.badge?.split("-")[0]?.trim() == "Foodie" && (
+                  <ShowBadgeIcon badge={story?.badge} />
+                )}
               </p>
               <p className="-mt-1 text-left font-inter font-medium text-[14px] text-[#FFFFFF]">
                 {story?.badge?.split("-")[0]?.trim()}
@@ -213,9 +215,7 @@ const StoryViewPageUser = ({
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="cursor-pointer "
-              onClick={() =>
-                handleLikeUnlikeStory(story?.id)
-              }
+              onClick={() => handleLikeUnlikeStory(story?.id)}
             >
               <rect width="44" height="44" rx="22" fill="#2DC6BE" />
               <path

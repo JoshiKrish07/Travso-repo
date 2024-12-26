@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
 import PostDetailPopup from "./PostDetailPopup";
 import { fetchCities } from "../../../redux/slices/stateCitySlice";
+import ShowBadgeIcon from "../ShowBadgeIcons";
 
 const options = [
   { value: "chocolate", label: "Chocolate" },
@@ -239,7 +240,7 @@ const CreateaPostPopup = ({
   };
 
   const handleTagInputChange = async (e) => {
-    console.log("===postData?.tags.length====>", postData?.tags.length);
+    // console.log("===postData?.tags.length====>", postData?.tags.length);
     if (postData?.tags.length > 9) {
       alert("Only 10 tags are acceptable");
       return;
@@ -271,7 +272,7 @@ const CreateaPostPopup = ({
     const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2 MB
     const MAX_VIDEO_SIZE = 30 * 1024 * 1024; // 30 MB
 
-    console.log("===files===>", files);
+    // console.log("===files===>", files);
     if (files.length > 0) {
       const filesArray = Array.from(files); // Convert FileList to an array
 
@@ -441,11 +442,35 @@ const CreateaPostPopup = ({
                     <h5 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
                       {userDetails?.full_name}
                     </h5>
-                    <img
+                    {/* badge icon section  */}
+                    {userDetails?.badge?.split("-")[0]?.trim() ==
+                      "Solo Traveler" && (
+                      <ShowBadgeIcon badge={userDetails?.badge} />
+                    )}
+
+                    {userDetails?.badge?.split("-")[0]?.trim() ==
+                      "Luxury Traveler" && (
+                      <ShowBadgeIcon badge={userDetails?.badge} />
+                    )}
+
+                    {userDetails?.badge?.split("-")[0]?.trim() ==
+                      "Adventurer" && (
+                      <ShowBadgeIcon badge={userDetails?.badge} />
+                    )}
+
+                    {userDetails?.badge?.split("-")[0]?.trim() ==
+                      "Explorer" && (
+                      <ShowBadgeIcon badge={userDetails?.badge} />
+                    )}
+
+                    {userDetails?.badge?.split("-")[0]?.trim() == "Foodie" && (
+                      <ShowBadgeIcon badge={userDetails?.badge} />
+                    )}
+                    {/* <img
                       src={BadgesIconFirst}
                       alt="BadgesIconFirst"
                       className="w-[24px] h-[24px]"
-                    />
+                    /> */}
                   </div>
                   <div>
                     <p className="-mt-2 font-inter font-medium text-[16px] text-[#667877] text-left">
@@ -596,7 +621,9 @@ const CreateaPostPopup = ({
                         className="inline-flex items-center justify-center gap-2 bg-[#09857E] text-white w-[90px] h-[24px] rounded-[4px] text-[12px] font-inter font-medium p-2"
                       >
                         {/* {buddy.name} */}
-                        {buddy.name.length > 6 ? `${buddy.name.slice(0, 6)}...` : buddy.name}
+                        {buddy.name.length > 6
+                          ? `${buddy.name.slice(0, 6)}...`
+                          : buddy.name}
                         <button
                           onClick={() => handleRemoveBuddy(buddy.id)}
                           className="text-[#2DC6BE] font-bold"
@@ -802,6 +829,7 @@ const CreateaPostPopup = ({
                                   alt={`Uploaded ${index}`}
                                   className="w-[100px] h-[110px] object-cover rounded-[8px]"
                                   controls
+                                  controlsList="nodownload"
                                 />
                               ) : (
                                 // Fallback in case of invalid media type
@@ -854,7 +882,9 @@ const CreateaPostPopup = ({
                                 strokeLinejoin="round"
                               />
                             </svg>
-                            <p className="font-inter font-medium text-12px text-[#212626]">Add Images/Video</p>
+                            <p className="font-inter font-medium text-12px text-[#212626]">
+                              Add Images/Video
+                            </p>
                           </button>
                         </div>
                       ) : (

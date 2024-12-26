@@ -21,13 +21,14 @@ import ShowSharedPost from './Comonents/OtherPages/ShowSharedPost';
 import ExplorerPage from './Comonents/OtherPages/ExplorerPage';
 import BuddiesRequestPage from './Comonents/OtherPages/BuddiesRequestPage';
 import SettingPages from './Comonents/OtherPages/AllSettingPages/SettingPages';
+import LandingPage from './Comonents/MainPages/LandingPage';
 
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/influencer" element={<InfluencerPage />} />

@@ -9,6 +9,11 @@ import { Link } from "react-router-dom";
 import StoryPage from "./AllStoriesPages/StoryPage";
 import { getActiveStories } from "../../redux/slices/postSlice";
 import StoryViewPage from "./AllStoriesPages/StoryViewPage";
+import adventureBadge from "../../assets/Badges/adventurer.svg";
+import soloTraveller from "../../assets/Badges/soloTraveler.svg";
+import explorerBadge from "../../assets/Badges/Explorer.svg";
+import foodieBadge from "../../assets/Badges/Foddie.svg";
+import luxuryTravelerBadge from "../../assets/Badges/Foddie.svg";
 
 const ProfilePageHeaderData = () => {
   const dispatch = useDispatch();
@@ -91,11 +96,11 @@ const ProfilePageHeaderData = () => {
               // Badge mapping and rendering
               (() => {
                 const badges = {
-                  Adventurer: travel_badges,
-                  Explorer: travel_badges,
-                  Foodie: travel_badges,
-                  "Solo Traveler": travel_badges,
-                  "Luxury Traveler": travel_badges,
+                  Adventurer: adventureBadge,
+                  Explorer: explorerBadge,
+                  Foodie: foodieBadge,
+                  "Solo Traveler": soloTraveller,
+                  "Luxury Traveler": luxuryTravelerBadge,
                 };
 
                 const badgeParts = userDetails?.badge?.split("-");

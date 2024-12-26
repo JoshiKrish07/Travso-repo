@@ -9,6 +9,7 @@ import Travel from "../../../assets/travel.png";
 import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
 import { useDispatch } from "react-redux";
 import { deleteStory, getActiveStories } from "../../../redux/slices/postSlice";
+import ShowBadgeIcon from "../ShowBadgeIcons";
 
 const StoryViewPage = ({
   closeStoryPopup,
@@ -550,7 +551,32 @@ const StoryViewPage = ({
                   <div className="flex flex-col">
                     <p className="flex items-center gap-[5px] font-poppins font-semibold text-[16px] text-[#FFFFFF]">
                       {storyData[activeStory].full_name}
-                      <svg
+                      {/* badge icon section  */}
+                      {storyData[activeStory]?.badge?.split("-")[0]?.trim() ==
+                          "Solo Traveler" && (
+                          <ShowBadgeIcon badge={storyData[activeStory]?.badge} />
+                        )}
+
+                        {storyData[activeStory]?.badge?.split("-")[0]?.trim() ==
+                          "Luxury Traveler" && (
+                          <ShowBadgeIcon badge={storyData[activeStory]?.badge} />
+                        )}
+
+                        {storyData[activeStory]?.badge?.split("-")[0]?.trim() ==
+                          "Adventurer" && (
+                          <ShowBadgeIcon badge={storyData[activeStory]?.badge} />
+                        )}
+
+                        {storyData[activeStory]?.badge?.split("-")[0]?.trim() ==
+                          "Explorer" && (
+                          <ShowBadgeIcon badge={storyData[activeStory]?.badge} />
+                        )}
+
+                        {storyData[activeStory]?.badge?.split("-")[0]?.trim() ==
+                          "Foodie" && (
+                          <ShowBadgeIcon badge={storyData[activeStory]?.badge} />
+                        )}
+                      {/* <svg
                         width="16"
                         height="16"
                         viewBox="0 0 16 16"
@@ -567,7 +593,7 @@ const StoryViewPage = ({
                           d="M11.6843 5.53415C11.8633 5.71314 11.8633 6.00334 11.6843 6.18233L7.40656 10.4601C7.22757 10.6391 6.93736 10.6391 6.75837 10.4601L4.31393 8.01566C4.13494 7.83667 4.13494 7.54647 4.31393 7.36748C4.49292 7.18849 4.78312 7.18849 4.96211 7.36748L7.08246 9.48783L11.0362 5.53415C11.2151 5.35515 11.5053 5.35515 11.6843 5.53415Z"
                           fill="white"
                         />
-                      </svg>
+                      </svg> */}
                     </p>
                     <p className="-mt-1 text-left font-inter font-medium text-[14px] text-[#FFFFFF]">
                       {storyData[activeStory]?.badge?.split("-")[0]?.trim()}

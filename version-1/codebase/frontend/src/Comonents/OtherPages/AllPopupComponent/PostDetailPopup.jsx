@@ -14,6 +14,7 @@ import leftIcon from "../../../assets/lefticon.png";
 import "./AllPopupPage.css";
 import dummyUserImage from "../../../assets/user_image-removebg-preview.png";
 import { useSelector } from "react-redux";
+import ShowBadgeIcon from "../ShowBadgeIcons";
 
 const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
@@ -77,6 +78,8 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
     };
   }, [isOpen]);
 
+  // console.log("====postData===>", postData)
+
   if (!isOpen) return null;
 
   return (
@@ -105,13 +108,48 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
 
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
-                    <h5 className="font-poppins font-semibold text-[20px] text-[#212626] text-left">
-                      {userDetails?.full_name}{" "}
-                      {postData?.buddies.length > 0
-                        ? `with ${postData?.buddies.length} others`
-                        : ""}
+                    <h5 className="flex items-center font-poppins font-semibold text-[20px] text-[#212626] text-left">
+                      {userDetails?.full_name} {/* badge icon section  */}
+                      {postData?.buddies.length > 0 ? (
+                        <p className="font-poppins font-semibold text-[20px] text-[#212626] cursor-pointer">
+                          {" "}
+                          <span className="text-[#869E9D]">
+                            &nbsp;with
+                          </span>{" "}
+                          {postData?.buddies.length} others
+                        </p>
+                      ) : (
+                        ""
+                      )}
+                      <p className="ml-2">
+                        {userDetails?.badge?.split("-")[0]?.trim() ==
+                          "Solo Traveler" && (
+                          <ShowBadgeIcon badge={userDetails?.badge} />
+                        )}
+
+                        {userDetails?.badge?.split("-")[0]?.trim() ==
+                          "Luxury Traveler" && (
+                          <ShowBadgeIcon badge={userDetails?.badge} />
+                        )}
+
+                        {userDetails?.badge?.split("-")[0]?.trim() ==
+                          "Adventurer" && (
+                          <ShowBadgeIcon badge={userDetails?.badge} />
+                        )}
+
+                        {userDetails?.badge?.split("-")[0]?.trim() ==
+                          "Explorer" && (
+                          <ShowBadgeIcon badge={userDetails?.badge} />
+                        )}
+
+                        {userDetails?.badge?.split("-")[0]?.trim() ==
+                          "Foodie" && (
+                          <ShowBadgeIcon badge={userDetails?.badge} />
+                        )}
+                      </p>
                       {/* {userDetails?.full_name} */}
                     </h5>
+                    <img />
 
                     {/* <div className="flex space-x-1 relative inline-block">
                     <p
@@ -228,7 +266,12 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
                   </div>
                   <div>
                     <p className="-mt-1 font-inter font-medium text-left text-[12px] text-[#667877]">
-                      {postDetails.subtitle} • {postData?.location || ""}
+                      {/* {postDetails.subtitle} • {postData?.location || ""} */}
+                      {userDetails?.badge.split("-")[0]}{" "}
+                      {postData?.location &&
+                        userDetails?.badge.split("-")[0] &&
+                        "•"}{" "}
+                      {postData?.location}
                     </p>
                   </div>
                 </div>
@@ -292,6 +335,7 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
                         alt={`Slide ${0}`}
                         className="rounded-lg w-full h-[344px] object-cover transition duration-500"
                         controls
+                        controlsList="nodownload"
                       />
                     ) : null}{" "}
                     {/* No fallback, just don't render anything if the file type is not valid */}
@@ -320,6 +364,7 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
                           alt={`Slide ${currentIndex}`}
                           className="rounded-lg w-full h-[344px] object-cover transition duration-500"
                           controls
+                          controlsList="nodownload"
                         />
                       ) : null}{" "}
                       {/* No rendering for invalid file types */}
@@ -343,7 +388,7 @@ const PostDetailPopup = ({ isOpen, onClose, postData, handlePostUpload }) => {
                   </button>
 
                   {/* Dots */}
-                  <div className="flex justify-center mt-1 absolute items-center justify-center inline-flex top-[310px] bg-[#FFFFFFBF] w-[68px] h-[16px] rounded-[16px]">
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center w-[68px] h-[16px] rounded-[16px] bg-[#FFFFFFBF] rounded-[16px]">
                     {postData.media_url.map((_, index) => (
                       <div
                         key={index}

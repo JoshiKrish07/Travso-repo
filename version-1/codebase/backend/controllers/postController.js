@@ -2440,6 +2440,47 @@ const shareStoryWithFriends = async (req, res) => {
   }
 };
 
+// api for editing own comment
+async function editComment(req, res) {
+  try {
+    // const { user_id } = req.params;
+    const  user_id  = req.user.userId;
+    const { comment_id, content } = req.body;
+
+    if (!comment_id || !content) {
+      console.log("=====error=====>",error);
+      return res.status(404).json({
+        error: "All fields are required(user_id, comment_id, content)",
+      });
+    }
+
+    const [exist] = await pool.execute(
+      `SELECT * FROM comments WHERE id = ? AND user_id = ?`,[comment_id,user_id]
+    );
+
+    if (exist.length === 0){
+      return res.status(400).json({
+        error:"Comment not found"
+      });
+    }
+
+    const [
+      update,
+    ] = await pool.execute(
+      `UPDATE comments SET content = ? WHERE id = ? AND user_id = ?`,[content, comment_id, user_id ]
+    );
+    return res.status(200).json({
+      message: "Comment updated successfully",
+      data: update
+    });
+  } catch (error) {
+    console.log("====error========>", error);
+    return res.status(500).json({
+      error: "Error During Updating Comment",
+  });
+ }
+}
+
 module.exports = {
     allPosts,
     postWithlikes,
@@ -2466,5 +2507,6 @@ module.exports = {
     storeStory,
     storeStoryView,
     deleteStory,
-    shareStoryWithFriends
+    shareStoryWithFriends,
+    editComment
 }
